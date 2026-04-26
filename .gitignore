@@ -1,0 +1,43 @@
+# ========================
+# FRONT-END (Next.js / Node)
+# ========================
+# Dependências gigantes
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Arquivos de "build" (gerados automaticamente quando o site vai pro ar)
+.next/
+out/
+build/
+
+# ========================
+# BACK-END (Python / FastAPI)
+# ========================
+# Ambiente Virtual
+venv/
+env/
+.env_python/
+
+# Arquivos de cache que o Python cria sozinho
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ========================
+# SEGURANÇA (O MAIS IMPORTANTE!)
+# ========================
+# NUNCA envie seus arquivos .env, pois eles têm suas senhas do MongoDB e chaves secretas
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# ========================
+# SISTEMA OPERACIONAL
+# ========================
+# Arquivos de lixo que o Windows ou o Mac criam sozinhos
+.DS_Store
+Thumbs.db
