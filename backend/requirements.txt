@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pymongo
+certifi
+python-dotenv
+pydantic[email]
+passlib
+bcrypt==3.2.2
