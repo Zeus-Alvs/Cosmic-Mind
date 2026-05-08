@@ -96,7 +96,9 @@ export default function LoginPage() {
               <button type="submit" className="px-12 py-3 bg-gradient-to-r from-blue-400 to-purple-500 text-white font-bold rounded-full shadow-lg hover:opacity-90 transition cursor-pointer">
                 ACESSAR
               </button>
-              <a href="#" className="text-sm text-purple-600 hover:underline">Esqueci a minha senha</a>
+              <Link href="/remember-password" className="text-xs text-[#4078A4] hover:underline font-bold mt-2 inline-block">
+                Esqueceu a senha?
+              </Link>
             </div>
           </form>
         </div>

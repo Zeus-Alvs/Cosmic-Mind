@@ -24,7 +24,7 @@ export default function Home() {
   return (
     <div className="h-full overflow-hidden relative">
 
-      {/* barra (responsiva sem quebrar menu) */}
+
       <div
         className="
           fixed top-0 h-3 z-50
@@ -34,7 +34,7 @@ export default function Home() {
         "
       />
 
-      {/* conteúdo */}
+
       <div className="h-screen flex items-start justify-center pt-20 px-4 md:px-0">
 
         <div className="w-full max-w-3xl px-4 md:px-10">
