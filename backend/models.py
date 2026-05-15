@@ -43,3 +43,7 @@ class RedefinirSenha(BaseModel):
 class ConfirmarEmail(BaseModel):
     token: str
 
+class JogadorCadastro(BaseModel):
+    apelido: str
+    foto_perfil: int = 1
+

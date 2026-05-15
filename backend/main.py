@@ -5,12 +5,13 @@ from bson import ObjectId
 import os
 from dotenv import load_dotenv
 from passlib.context import CryptContext
-from models import UsuarioCadastro, UsuarioLogin, UsuarioRetorno, UsuarioUpdate, TrocarSenha, EsqueciSenha, RedefinirSenha, ConfirmarEmail
+from models import *
 import smtplib
 import secrets
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from datetime import datetime, timedelta
+import random
+from datetime import datetime, timedelta, timezone
 
 
 load_dotenv()
@@ -27,30 +28,27 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# Conectando ao Banco
+
 MONGO_URL = os.getenv("MONGO_URL")
 client = MongoClient(MONGO_URL)
 db = client["cosmic_mind_db"]
-colecao_usuarios = db["usuarios"]
+colecao_usuarios = db["usuario"]
 
 @app.get("/")
 def read_root():
     return {"status": "A API do Cosmic Mind está viva!"}
 
-# --- ROTA DE CADASTRO ---
+
 @app.post("/api/cadastrar", response_model=UsuarioRetorno, status_code=status.HTTP_201_CREATED)
 def cadastrar_usuario(novo_usuario: UsuarioCadastro):
-    # 1. Verifica se o e-mail já existe no banco
     usuario_existente = colecao_usuarios.find_one({"email": novo_usuario.email})
     if usuario_existente:
         raise HTTPException(status_code=400, detail="Este e-mail já está cadastrado.")
 
-    # 2. Transforma o molde em um dicionário que o MongoDB entende
     usuario_dict = novo_usuario.dict()
     usuario_dict["senha"] = pwd_context.hash(novo_usuario.senha)
     resultado = colecao_usuarios.insert_one(usuario_dict)
     
-    # 4. Monta a resposta para devolver ao Front-end (escondendo a senha!)
     return UsuarioRetorno(
         id=str(resultado.inserted_id),
         nome=usuario_dict["nome"],
@@ -87,32 +85,25 @@ def atualizar_perfil(email_usuario: str, dados: UsuarioUpdate):
 
     mensagem_retorno = "Perfil atualizado com sucesso!"
 
-    # --- A MÁGICA DA SEGURANÇA ACONTECE AQUI ---
     if "email" in campos_para_atualizar and campos_para_atualizar["email"] != email_usuario:
         novo_email = campos_para_atualizar["email"]
         
-        # 1. Verifica se algum espertinho já está usando esse e-mail
         if colecao_usuarios.find_one({"email": novo_email}):
             raise HTTPException(status_code=400, detail="Este e-mail já está em uso.")
 
-        # 2. Gera o Token de verificação
         token_confirmacao = secrets.token_hex(20)
 
-        # 3. Salva o e-mail novo como PENDENTE, não como oficial!
         colecao_usuarios.update_one(
             {"email": email_usuario},
             {"$set": {"email_pendente": novo_email, "token_troca_email": token_confirmacao}}
         )
 
-        # 4. Dispara o e-mail para a nova caixa de entrada do cara
         enviar_email_troca_email(novo_email, token_confirmacao)
 
-        # 5. Remove o e-mail dos campos normais para NÃO atualizar direto no banco agora
         del campos_para_atualizar["email"]
         
         mensagem_retorno = "Dados salvos! Um link de verificação foi enviado para o seu novo e-mail."
 
-    # Se sobrou algo para atualizar (como Nome, Avatar, Registro), atualiza na hora
     if campos_para_atualizar:
         colecao_usuarios.update_one(
             {"email": email_usuario},
@@ -127,15 +118,12 @@ def trocar_senha(email_usuario: str, dados: TrocarSenha):
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
 
-    # 1. Verifica se a senha atual digitada está correta
     senha_correta = pwd_context.verify(dados.senha_atual, usuario["senha"])
     if not senha_correta:
         raise HTTPException(status_code=400, detail="A senha atual está incorreta.")
 
-    # 2. Criptografa a nova senha
     nova_senha_hash = pwd_context.hash(dados.nova_senha)
 
-    # 3. Salva no banco de dados
     colecao_usuarios.update_one(
         {"email": email_usuario},
         {"$set": {"senha": nova_senha_hash}}
@@ -147,7 +135,6 @@ def enviar_email_recuperacao(email_destino: str, token: str):
     remetente = os.getenv("EMAIL_REMETENTE")
     senha = os.getenv("EMAIL_SENHA")
     
-    # O link que vai levar o usuário de volta para o Next.js
     link_recuperacao = f"http://localhost:3000/reset-password?token={token}"
 
     msg = MIMEMultipart()
@@ -155,7 +142,6 @@ def enviar_email_recuperacao(email_destino: str, token: str):
     msg['To'] = email_destino
     msg['Subject'] = "Cosmic Mind - Recuperação de Senha"
 
-    # Corpo do E-mail (Você pode estilizar com HTML se quiser depois!)
     corpo = f"""
     Olá!
     
@@ -184,7 +170,6 @@ def enviar_email_troca_email(email_novo: str, token: str):
     remetente = os.getenv("EMAIL_REMETENTE")
     senha = os.getenv("EMAIL_SENHA")
     
-    # Este é o link que o usuário vai clicar para confirmar que o e-mail é dele
     link_confirmacao = f"http://localhost:3000/confirmar-email?token={token}"
 
     msg = MIMEMultipart()
@@ -217,24 +202,18 @@ def enviar_email_troca_email(email_novo: str, token: str):
 def solicitar_recuperacao(dados: EsqueciSenha):
     usuario = colecao_usuarios.find_one({"email": dados.email})
     
-    # REGRA DE SEGURANÇA BANCÁRIA: Mesmo que o email não exista, 
-    # retornamos sucesso para que hackers não fiquem testando quais emails existem na base.
     if not usuario:
         return {"message": "Se o e-mail existir, um link de recuperação será enviado."}
 
-    # 1. Gera um Token aleatório e super seguro de 40 caracteres
     token_seguro = secrets.token_hex(20)
     
-    # 2. Define que o token expira em 1 hora
     expiracao = datetime.utcnow() + timedelta(hours=1)
 
-    # 3. Salva o token temporário no documento desse usuário no MongoDB
     colecao_usuarios.update_one(
         {"email": dados.email},
         {"$set": {"reset_token": token_seguro, "reset_expiracao": expiracao}}
     )
 
-    # 4. Envia o e-mail
     enviar_email_recuperacao(dados.email, token_seguro)
 
     return {"message": "Se o e-mail existir, um link de recuperação será enviado."}
@@ -242,24 +221,21 @@ def solicitar_recuperacao(dados: EsqueciSenha):
 
 @app.post("/api/auth/redefinir-senha")
 def redefinir_senha(dados: RedefinirSenha):
-    # 1. Procura qual usuário é o dono desse Token e se ainda está no prazo
     usuario = colecao_usuarios.find_one({
         "reset_token": dados.token,
-        "reset_expiracao": {"$gt": datetime.utcnow()} # Verifica se a expiração é MAIOR que a hora atual
+        "reset_expiracao": {"$gt": datetime.utcnow()}
     })
 
     if not usuario:
         raise HTTPException(status_code=400, detail="Token inválido ou expirado.")
 
-    # 2. Criptografa a nova senha escolhida
     nova_senha_hash = pwd_context.hash(dados.nova_senha)
 
-    # 3. Atualiza a senha no banco e DELETA o token (para não ser usado de novo)
     colecao_usuarios.update_one(
         {"_id": usuario["_id"]},
         {
             "$set": {"senha": nova_senha_hash},
-            "$unset": {"reset_token": "", "reset_expiracao": ""} # O $unset remove as colunas do MongoDB
+            "$unset": {"reset_token": "", "reset_expiracao": ""} 
         }
     )
 
@@ -268,7 +244,6 @@ def redefinir_senha(dados: RedefinirSenha):
 
 @app.post("/api/conta/confirmar-email")
 def confirmar_novo_email(dados: ConfirmarEmail):
-    # Procura quem é o dono desse token
     usuario = colecao_usuarios.find_one({"token_troca_email": dados.token})
     
     if not usuario or "email_pendente" not in usuario:
@@ -276,7 +251,6 @@ def confirmar_novo_email(dados: ConfirmarEmail):
 
     novo_email = usuario["email_pendente"]
 
-    # Agora sim! Substitui o email antigo pelo novo e apaga os dados pendentes
     colecao_usuarios.update_one(
         {"_id": usuario["_id"]},
         {
@@ -299,3 +273,73 @@ def cancelar_troca_email(dados: EsqueciSenha):
     )
 
     return {"message": "Troca de e-mail cancelada no banco de dados."}
+
+
+@app.post("/api/jogo/gerar-pin/{id_jogador}")
+def gerar_pin_jogo(id_jogador: str):
+
+    pin_gerado = str(random.randint(0, 999999)).zfill(6)
+    tempo_expiracao = datetime.now(timezone.utc) + timedelta(minutes=10)
+
+    nova_sessao = {
+        "codigo_pin": pin_gerado,
+        "id_jogador": id_jogador,
+        "token_acesso": None, 
+        "criado_em": datetime.now(timezone.utc),
+        "expira_em": tempo_expiracao
+    }
+
+    db["sessao"].insert_one(nova_sessao)
+
+    return {
+        "mensagem": "PIN gerado com sucesso!", 
+        "pin": pin_gerado, 
+        "expira_em": tempo_expiracao
+    }
+
+@app.post("/api/jogadores/{id_usuario}")
+def criar_jogador(id_usuario: str, dados: JogadorCadastro):
+    novo_jogador = {
+        "apelido": dados.apelido,
+        "foto_perfil": dados.foto_perfil,
+        "preferencias_jogo": {"volume_musica": 50, "daltonismo_modo": False},
+        "planetas_desbloqueados": [],
+        "melhores_pontuacoes": [],
+        "pets_desbloqueados": [],
+        "conquistas_obtidas": []
+    }
+
+    resultado = db["jogador"].insert_one(novo_jogador)
+    id_novo_jogador = resultado.inserted_id
+
+
+    colecao_usuarios.update_one(
+        {"_id": ObjectId(id_usuario)},
+        {"$push": {"jogadores_vinculados": id_novo_jogador}}
+    )
+
+    return {"message": "Jogador criado!", "id_jogador": str(id_novo_jogador)}
+
+
+@app.get("/api/jogadores/{id_usuario}")
+def listar_jogadores(id_usuario: str):
+    usuario = colecao_usuarios.find_one({"_id": ObjectId(id_usuario)})
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+
+    ids_jogadores = usuario.get("jogadores_vinculados", [])
+
+    jogadores_banco = list(db["jogador"].find({"_id": {"$in": ids_jogadores}}))
+
+    resultado = []
+    for jogador in jogadores_banco:
+        resultado.append({
+            "id": str(jogador["_id"]),
+            "nome": jogador.get("apelido", "Jogador"),
+            "progresso": 0, 
+            "tempoUso": "0 horas",
+            "nivelFase": "1 - Mercúrio",
+            "pontuacao": 0
+        })
+
+    return resultado

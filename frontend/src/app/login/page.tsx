@@ -34,9 +34,9 @@ export default function LoginPage() {
         console.log("4. Sucesso! Dados do usuário:", dadosUsuario);
         localStorage.setItem('user_data', JSON.stringify(dadosUsuario));
         console.log("Usuário salvo no navegador!");
-        router.push('/performance');
+        router.push('/menu');
       } else {
-        console.log("4. Senha errada ou usuário não existe.");
+       console.log("4. Senha errada ou usuário não existe.");
         setErro('E-mail ou senha incorretos.');
       }
     } catch (error) {

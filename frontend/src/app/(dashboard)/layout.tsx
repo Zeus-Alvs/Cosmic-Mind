@@ -31,7 +31,7 @@ export default function DashboardLayout({
     const dadosSalvos = localStorage.getItem("user_data");
 
     if (!dadosSalvos) {
-      router.push("/login");
+      router.push("../");
       return;
     }
 
@@ -42,7 +42,7 @@ export default function DashboardLayout({
   // Todos os botões agora possuem ambos os perfis liberados
   const links = [
     { 
-      href: "/", 
+      href: "/menu", 
       label: "Início", 
       icon: "/icons/home.png", 
       activeIcon: "/icons/home-active.png",
@@ -193,7 +193,7 @@ export default function DashboardLayout({
             <button
               onClick={() => {
                 localStorage.removeItem("user_data");
-                router.push("/login");
+                router.push("../");
               }}
               className="flex items-center justify-center gap-2 w-full p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 border border-slate-600/50 hover:border-red-500/50 transition-all text-sm font-medium group"
             >
