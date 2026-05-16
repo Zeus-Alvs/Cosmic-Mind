@@ -3,30 +3,31 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getApiUrl } from '@/utils/api';
 
 export default function RegisterPage() {
   const router = useRouter();
-  
-  // Nossas variáveis de estado para guardar tudo que o usuário digitar
+
+
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [tipoPerfil, setTipoPerfil] = useState('responsavel'); // Já começa marcado como responsável
+  const [tipoPerfil, setTipoPerfil] = useState('responsavel');
   const [erro, setErro] = useState('');
 
-  // Função disparada ao clicar em "Confirmar"
+
   const fazerCadastro = async (e: React.FormEvent) => {
-    e.preventDefault(); // Evita recarregar a página
+    e.preventDefault();
     setErro('');
 
     try {
-      // Bate na porta do Python usando o IP direto (que já vimos que funciona)
-      const resposta = await fetch('http://127.0.0.1:8000/api/cadastrar', {
+
+      const resposta = await fetch(`${getApiUrl()}/cadastrar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           nome: nome,
-          email: email, 
+          email: email,
           senha: senha,
           tipo_perfil: tipoPerfil
         })
@@ -34,10 +35,10 @@ export default function RegisterPage() {
 
       if (resposta.ok) {
         console.log("Cadastro realizado com sucesso!");
-        // Se deu certo, manda o usuário direto para a tela de login
+
         router.push('/login');
       } else {
-        // Se der erro (ex: e-mail já existe), o Python manda um erro 400
+
         const dadosErro = await resposta.json();
         setErro(dadosErro.detail || 'Erro ao realizar o cadastro.');
       }
@@ -49,18 +50,16 @@ export default function RegisterPage() {
 
   return (
     <div className="flex h-screen w-full bg-white">
-      
-      {/* Lado Esquerdo - Gradiente */}
+
       <div className="hidden md:flex flex-col justify-center items-start p-16 w-1/2 bg-gradient-to-br from-purple-500 to-blue-400 text-white relative overflow-hidden">
         <div className="absolute top-10 left-10 text-3xl">✨</div>
         <div className="absolute bottom-10 right-10 text-2xl">⭐</div>
-        <h1 className="text-4xl font-bold mb-8">Já tem uma<br/>conta?</h1>
+        <h1 className="text-4xl font-bold mb-8">Já tem uma<br />conta?</h1>
         <Link href="/login" className="flex items-center px-6 py-3 border-2 border-white rounded-full hover:bg-white hover:text-purple-500 transition font-medium">
           <span className="mr-2">←</span> Acesse já
         </Link>
       </div>
 
-      {/* Lado Direito - Formulário */}
       <div className="flex flex-col justify-center items-center w-full md:w-1/2 p-8">
         <div className="w-full max-w-md">
           <div className="text-center mb-6">
@@ -69,58 +68,56 @@ export default function RegisterPage() {
           </div>
 
           <form onSubmit={fazerCadastro} className="bg-slate-100 p-6 rounded-2xl shadow-inner space-y-3">
-            
-            {/* Aviso de Erro */}
+
             {erro && <div className="p-3 bg-red-100 text-red-600 rounded-lg text-sm text-center">{erro}</div>}
 
-            <input 
-              type="text" 
-              placeholder="👤 Nome:" 
+            <input
+              type="text"
+              placeholder="👤 Nome:"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-400" 
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
             />
-            <input 
-              type="email" 
-              placeholder="✉️ Email:" 
+            <input
+              type="email"
+              placeholder="✉️ Email:"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-400" 
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
             />
-            <input 
-              type="password" 
-              placeholder="🔒 Senha:" 
+            <input
+              type="password"
+              placeholder="🔒 Senha:"
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               required
-              minLength={6} // Exigindo pelo menos 6 caracteres por segurança
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-400" 
+              minLength={6}
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
             />
-            
-            {/* Seleção de Perfil */}
+
             <div className="pt-2 space-y-2">
               <label className={`flex items-center p-3 border rounded-xl cursor-pointer transition ${tipoPerfil === 'responsavel' ? 'bg-purple-50 border-purple-300' : 'bg-white border-slate-200 hover:bg-slate-50'}`}>
-                <input 
-                  type="radio" 
-                  name="role" 
+                <input
+                  type="radio"
+                  name="role"
                   value="responsavel"
                   checked={tipoPerfil === 'responsavel'}
                   onChange={(e) => setTipoPerfil(e.target.value)}
-                  className="mr-3 accent-purple-500" 
+                  className="mr-3 accent-purple-500"
                 />
                 <span>❤️ Responsável</span>
               </label>
-              
+
               <label className={`flex items-center p-3 border rounded-xl cursor-pointer transition ${tipoPerfil === 'especialista' ? 'bg-blue-50 border-blue-300' : 'bg-white border-slate-200 hover:bg-slate-50'}`}>
-                <input 
-                  type="radio" 
-                  name="role" 
+                <input
+                  type="radio"
+                  name="role"
                   value="especialista"
                   checked={tipoPerfil === 'especialista'}
                   onChange={(e) => setTipoPerfil(e.target.value)}
-                  className="mr-3 accent-blue-500" 
+                  className="mr-3 accent-blue-500"
                 />
                 <span>🧠 Especialista</span>
               </label>
@@ -134,7 +131,7 @@ export default function RegisterPage() {
           </form>
         </div>
       </div>
-      
+
     </div>
   );
 }

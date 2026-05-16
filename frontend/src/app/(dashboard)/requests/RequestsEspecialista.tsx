@@ -17,7 +17,7 @@ interface Solicitacao {
   dataEnvio: string;
 }
 
-// Simulação de banco de dados de pacientes para a busca
+
 const pacientesDB: Paciente[] = [
   { id: "123", nome: "Ana Silva", foto: "https://api.dicebear.com/7.x/pixel-art/svg?seed=Ana" },
   { id: "456", nome: "Davi Souza", foto: "https://api.dicebear.com/7.x/pixel-art/svg?seed=Davi" },
@@ -64,8 +64,8 @@ export default function RequestsS() {
   return (
     <div className="max-w-5xl mx-auto p-6 font-sans">
       <div className="fixed top-0 left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
-      
-      {/* HEADER E BUSCA */}
+
+
       <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] bg-clip-text text-transparent">
           Gerenciar Vínculos
@@ -74,15 +74,15 @@ export default function RequestsS() {
         <div className="relative flex gap-2">
           <div className="relative group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#4078A4] transition-colors" />
-            <input 
-              type="text" 
-              placeholder="Pesquisar ID do Jogador..." 
+            <input
+              type="text"
+              placeholder="Pesquisar ID do Jogador..."
               value={buscaId}
               onChange={(e) => setBuscaId(e.target.value)}
               className="pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4078A4]/20 focus:border-[#4078A4] transition-all w-64"
             />
           </div>
-          <button 
+          <button
             onClick={handleBuscar}
             className="bg-[#4078A4] text-white px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-[#3E89AE] transition-all shadow-lg shadow-blue-100"
           >
@@ -91,7 +91,7 @@ export default function RequestsS() {
         </div>
       </div>
 
-      {/* RESULTADO DA BUSCA */}
+
       {pacienteEncontrado && (
         <div className="mb-12 animate-in slide-in-from-top-4 duration-300">
           <div className="bg-gradient-to-r from-[#AC57EB]/10 to-[#4078A4]/10 border border-[#4078A4]/20 p-4 rounded-3xl flex items-center justify-between">
@@ -102,7 +102,7 @@ export default function RequestsS() {
                 <h3 className="font-bold text-slate-700">{pacienteEncontrado.nome}</h3>
               </div>
             </div>
-            <button 
+            <button
               onClick={enviarSolicitacao}
               className="flex items-center gap-2 bg-white text-[#4078A4] px-6 py-3 rounded-2xl text-xs font-black shadow-sm hover:shadow-md transition-all active:scale-95 border border-white"
             >
@@ -112,14 +112,14 @@ export default function RequestsS() {
         </div>
       )}
 
-      {/* SOLICITAÇÕES ENVIADAS */}
+
       <section className="mb-12">
         <div className="mb-6">
           <h3 className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] bg-clip-text text-transparent">
             Solicitações Enviadas
           </h3>
         </div>
-        
+
         {enviadas.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {enviadas.map((item) => (
@@ -151,7 +151,7 @@ export default function RequestsS() {
         )}
       </section>
 
-      {/* PERMISSÕES ACEITAS */}
+
       <section>
         <div className="mb-6">
           <h3 className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] bg-clip-text text-transparent">
@@ -175,7 +175,7 @@ export default function RequestsS() {
                     <MoreVertical className="w-4 h-4" />
                   </button>
                 </div>
-                {/* Botão sem o ícone Eye que causava o erro */}
+
                 <button className="flex items-center justify-center gap-2 bg-[#4078A4]/5 hover:bg-[#4078A4]/10 p-2 rounded-xl border border-[#4078A4]/10 text-[10px] font-black text-[#4078A4] transition-all">
                   VER RELATÓRIOS
                 </button>
@@ -189,7 +189,7 @@ export default function RequestsS() {
         )}
       </section>
 
-      {/* MODAL DE REMOÇÃO */}
+
       {modalExcluir && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-xs rounded-[40px] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200 p-7">
@@ -212,14 +212,14 @@ export default function RequestsS() {
             </p>
 
             <div className="flex gap-3">
-              <button 
-                onClick={() => handleRemover(modalExcluir.id)} 
+              <button
+                onClick={() => handleRemover(modalExcluir.id)}
                 className="flex-1 bg-red-500 text-white py-3.5 rounded-2xl shadow-lg shadow-red-100 flex justify-center hover:bg-red-600 transition-all active:scale-95"
               >
                 <Trash2 className="w-5 h-5" />
               </button>
-              <button 
-                onClick={() => setModalExcluir(null)} 
+              <button
+                onClick={() => setModalExcluir(null)}
                 className="flex-1 bg-slate-100 text-slate-400 py-3.5 rounded-2xl flex justify-center hover:bg-slate-200 transition-all active:scale-95"
               >
                 <X className="w-5 h-5" />

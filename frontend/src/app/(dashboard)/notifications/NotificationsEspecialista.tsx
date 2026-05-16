@@ -4,13 +4,13 @@ import { useState, useMemo, useEffect } from 'react';
 import { Bell, UserCheck, TrendingUp, ChevronRight, Star, ClipboardList } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-// Interface idêntica à do Responsável para manter a consistência do Back-end
+
 interface NotificationDTO {
   id: string;
   type: 'aceite' | 'desempenho' | 'sistema' | 'alerta';
   title: string;
   description: string;
-  createdAt: string; 
+  createdAt: string;
   isLink?: boolean;
   linkTo?: string;
 }
@@ -23,7 +23,7 @@ export default function NotificationsS() {
 
   useEffect(() => {
     const fetchNotifications = async () => {
-   
+
       const mockApiResponse: NotificationDTO[] = [
         {
           id: "s-1",
@@ -32,7 +32,7 @@ export default function NotificationsS() {
           description: 'Carla aceitou sua solicitação para acompanhar o Davi.',
           createdAt: new Date().toISOString(),
           isLink: true,
-          linkTo: '/manager' // Joga para a gerência de pacientes
+          linkTo: '/manager'
         },
         {
           id: "s-2",
@@ -70,7 +70,7 @@ export default function NotificationsS() {
     fetchNotifications();
   }, []);
 
-  // Mapeamento de ícones específico para a visão do Especialista
+
   const getIconConfig = (type: NotificationDTO['type']) => {
     const configs = {
       aceite: { icon: <UserCheck className="w-5 h-5 text-emerald-500" />, bg: 'bg-emerald-100' },
@@ -88,7 +88,7 @@ export default function NotificationsS() {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       list = list.filter(n => n.dateObj >= thirtyDaysAgo);
     }
-    filter === 'recentes' 
+    filter === 'recentes'
       ? list.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime())
       : list.sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
     return list;
@@ -110,12 +110,11 @@ export default function NotificationsS() {
       <div className="flex justify-end mb-6">
         <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200/50 shadow-inner">
           {['recentes', 'antigas', '30dias'].map((t) => (
-            <button 
+            <button
               key={t}
               onClick={() => setFilter(t as any)}
-              className={`px-4 py-2 text-[10px] font-black rounded-xl transition-all uppercase ${
-                filter === t ? 'bg-white text-[#AC57EB] shadow-sm' : 'text-slate-400 hover:text-slate-500'
-              }`}
+              className={`px-4 py-2 text-[10px] font-black rounded-xl transition-all uppercase ${filter === t ? 'bg-white text-[#AC57EB] shadow-sm' : 'text-slate-400 hover:text-slate-500'
+                }`}
             >
               {t === '30dias' ? '30 DIAS' : t}
             </button>
@@ -142,7 +141,7 @@ export default function NotificationsS() {
               </div>
 
               {notif.isLink && (
-                <button 
+                <button
                   onClick={() => router.push(notif.linkTo || '/')}
                   className="flex items-center gap-1.5 bg-[#AC57EB]/10 text-[#AC57EB] px-4 py-2 rounded-2xl text-[10px] font-black hover:bg-[#AC57EB] hover:text-white transition-all group shrink-0"
                 >

@@ -1,35 +1,38 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Lock, Save, Eye, EyeOff, CheckCircle2, Clock, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { error } from 'console';
+import { getApiUrl } from '@/utils/api';
 
 export default function AccountPage() {
   const router = useRouter();
-  const [usuario, setUsuario] = useState({ nome: '', tipo_perfil: '', email: '', registro: '' });
+  const [usuario, setUsuario] = useState({ nome: '', tipo_perfil: '', email: '', crp_especialista: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState('1');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Estados dos formulários
-  const [formData, setFormData] = useState({ nome: '', email: '', registro: '' });
+
+  const [formData, setFormData] = useState({ nome: '', email: '', crp_especialista: '' });
   const [passData, setPassData] = useState({ atual: '', nova: '', confirmar: '' });
-  
-  // Status de carregamento e pendências
+
+
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
-  const [emailPendente, setEmailPendente] = useState(''); // <-- NOVO ESTADO!
+  const [emailPendente, setEmailPendente] = useState('');
 
- useEffect(() => {
+  useEffect(() => {
     const dadosSalvos = localStorage.getItem('user_data');
     if (dadosSalvos) {
       const parsed = JSON.parse(dadosSalvos);
-      const emailReal = parsed.email || ''; 
+      const emailReal = parsed.email || '';
       setUsuario({ ...parsed, email: emailReal });
-      setFormData({ nome: parsed.nome, email: emailReal, registro: parsed.registro || '' });
-      
-      // LÊ O CACHE: Se tiver email pendente salvo, ativa o card amarelo na hora
+      setFormData({ nome: parsed.nome, email: emailReal, crp_especialista: parsed.crp_especialista || '' });
+      if (parsed.avatar) {
+        setSelectedAvatar(parsed.avatar.toString());
+      }
+
+
       if (parsed.email_pendente) {
         setEmailPendente(parsed.email_pendente);
       }
@@ -37,53 +40,78 @@ export default function AccountPage() {
     setIsLoading(false);
   }, []);
 
-  const avatares = [
-    { id: '1', cor: 'bg-gradient-to-br from-[#AC57EB] to-[#4078A4]', label: 'Padrão' },
-    { id: '2', cor: 'bg-gradient-to-br from-emerald-400 to-teal-500', label: 'Verde' },
-    { id: '3', cor: 'bg-gradient-to-br from-orange-400 to-rose-500', label: 'Fogo' },
-    { id: '4', cor: 'bg-gradient-to-br from-slate-700 to-slate-900', label: 'Dark' },
-  ];
+  const avatares = [1, 2, 3, 4];
 
-  // 1. FUNÇÃO QUE SALVA OS DADOS PESSOAIS
+  const handleAvatarChange = async (novoId: string) => {
+    setSelectedAvatar(novoId);
+    try {
+      await fetch(`${getApiUrl()}/conta/atualizar/${usuario.email}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          avatar: parseInt(novoId)
+        }),
+      });
+
+      const dadosSalvos = JSON.parse(localStorage.getItem('user_data') || '{}');
+      dadosSalvos.avatar = parseInt(novoId);
+      localStorage.setItem('user_data', JSON.stringify(dadosSalvos));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingProfile(true);
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/conta/atualizar/${usuario.email}`, {
+      const response = await fetch(`${getApiUrl()}/conta/atualizar/${usuario.email}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           nome: formData.nome,
           email: formData.email,
-          avatar: selectedAvatar,
-          ...(formData.registro && { registro: formData.registro }) 
+          avatar: parseInt(selectedAvatar),
+          ...(formData.crp_especialista && { crp_especialista: formData.crp_especialista })
         }),
       });
 
       const data = await response.json();
 
+      if (usuario.tipo_perfil === 'especialista') {
+        await fetch(`${getApiUrl()}/conta/crp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: usuario.email, crp: formData.crp_especialista })
+        });
+      }
+
       if (response.ok) {
-        const dadosSalvos = JSON.parse(localStorage.getItem('user_data') || '{}'); // Puxa o cache atual
+        const dadosSalvos = JSON.parse(localStorage.getItem('user_data') || '{}');
 
         if (data.email_trocado === "pendente") {
           alert('Um link de verificação foi enviado para o seu novo e-mail!');
-          setEmailPendente(formData.email); 
-          
-          // SALVA NO CACHE: Grava o email pendente para sobreviver ao F5
-          dadosSalvos.email_pendente = formData.email; 
-          
-          setFormData(prev => ({ ...prev, email: usuario.email })); 
-        } 
+          setEmailPendente(formData.email);
+
+
+          dadosSalvos.email_pendente = formData.email;
+
+          setFormData((prev: any) => ({ ...prev, email: usuario.email }));
+        }
         else {
           alert('Perfil atualizado com sucesso!');
         }
 
-        // Atualiza o resto e salva no LocalStorage
+
         dadosSalvos.nome = formData.nome;
+        if (usuario.tipo_perfil === 'especialista') {
+          dadosSalvos.crp_especialista = formData.crp_especialista;
+        }
         localStorage.setItem('user_data', JSON.stringify(dadosSalvos));
-        setUsuario(prev => ({ ...prev, nome: formData.nome }));
-        
+        setUsuario((prev: any) => ({ ...prev, nome: formData.nome }));
+
       } else {
         let mensagemErro = 'Erro desconhecido ao atualizar.';
         if (data.detail) {
@@ -99,10 +127,10 @@ export default function AccountPage() {
     }
   };
 
-  // 2. FUNÇÃO QUE TROCA A SENHA
+
   const handleSavePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (passData.nova !== passData.confirmar) {
       alert('As novas senhas não coincidem!');
       return;
@@ -116,7 +144,7 @@ export default function AccountPage() {
     setSavingPassword(true);
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/conta/senha/${usuario.email}`, {
+      const response = await fetch(`${getApiUrl()}/conta/senha/${usuario.email}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -129,9 +157,9 @@ export default function AccountPage() {
 
       if (response.ok) {
         alert('Senha alterada com segurança!');
-        setPassData({ atual: '', nova: '', confirmar: '' }); 
+        setPassData({ atual: '', nova: '', confirmar: '' });
       } else {
-        alert(`Erro: ${data.detail}`); 
+        alert(`Erro: ${data.detail}`);
       }
     } catch (error) {
       alert('Erro de conexão com o servidor.');
@@ -154,37 +182,39 @@ export default function AccountPage() {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* COLUNA ESQUERDA: Perfil e Avatares */}
+
+
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex flex-col items-center text-center">
-            <div className={`w-28 h-28 rounded-full flex items-center justify-center text-4xl font-black text-white shadow-lg mb-5 transition-all duration-300 ${avatares.find(a => a.id === selectedAvatar)?.cor}`}>
-              {usuario.nome.charAt(0)}
+            <div className="w-28 h-28 rounded-full shadow-lg mb-5 transition-all duration-300 overflow-hidden ring-4 ring-slate-100">
+              <img src={`/usuarios/foto${selectedAvatar}.png`} alt="Avatar do Usuário" className="w-full h-full object-cover" />
             </div>
             <h3 className="text-xl font-bold text-slate-800">{usuario.nome}</h3>
             <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-8">{usuario.tipo_perfil}</p>
-            
+
             <div className="w-full pt-6 border-t border-slate-100">
               <p className="text-xs text-slate-500 font-bold mb-4 text-left">ESTILO DO AVATAR</p>
               <div className="flex gap-4 justify-center">
-                {avatares.map((avatar) => (
+                {avatares.map((id) => (
                   <button
-                    key={avatar.id}
+                    key={id}
                     type="button"
-                    onClick={() => setSelectedAvatar(avatar.id)}
-                    className={`w-12 h-12 rounded-full transition-all duration-300 shadow-sm ${avatar.cor} ${selectedAvatar === avatar.id ? 'ring-4 ring-offset-2 ring-[#4078A4] scale-110' : 'opacity-50 hover:opacity-100 hover:scale-105'}`}
-                    title={avatar.label}
-                  />
+                    onClick={() => handleAvatarChange(id.toString())}
+                    className={`w-12 h-12 rounded-full transition-all duration-300 shadow-sm overflow-hidden ${selectedAvatar === id.toString() ? 'ring-4 ring-offset-2 ring-blue-500 scale-110' : 'opacity-50 hover:opacity-100 hover:scale-105 ring-1 ring-slate-200'}`}
+                    title={`Foto ${id}`}
+                  >
+                    <img src={`/usuarios/foto${id}.png`} alt={`Opção de avatar ${id}`} className="w-full h-full object-cover" />
+                  </button>
                 ))}
               </div>
             </div>
           </div>
         </div>
 
-        {/* COLUNA DIREITA: Formulários */}
+
         <div className="lg:col-span-2 space-y-6">
-          
-          {/* Form: Dados Pessoais */}
+
+
           <form onSubmit={handleSaveProfile} className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm">
             <div className="flex items-center gap-2 mb-6">
               <User className="w-5 h-5 text-[#4078A4]" />
@@ -194,39 +224,39 @@ export default function AccountPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-500 ml-1">NOME COMPLETO</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={formData.nome}
-                  onChange={(e) => setFormData({...formData, nome: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#4078A4] focus:ring-1 focus:ring-[#4078A4] transition-all"
                   required
                 />
               </div>
 
-              {/* LÓGICA DO CARD DE E-MAIL PENDENTE */}
+
               {emailPendente ? (
                 <div className="space-y-3">
-                  {/* Mostra o e-mail oficial bloqueado */}
+
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-slate-500 ml-1">E-MAIL ATUAL</label>
-                    <input 
-                      type="email" 
-                      value={usuario.email} 
+                    <input
+                      type="email"
+                      value={usuario.email}
                       disabled
                       className="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-400 cursor-not-allowed"
                     />
                   </div>
 
-                  {/* Card do e-mail pendente logo abaixo */}
+
                   <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 relative shadow-sm"> {/* <-- ESSA DIV HAVIA SUMIDO! */}
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={async () => {
                         setEmailPendente('');
-                        setFormData(prev => ({ ...prev, email: usuario.email }));
+                        setFormData((prev: any) => ({ ...prev, email: usuario.email }));
 
                         try {
-                          await fetch('http://127.0.0.1:8000/api/conta/cancelar-troca-email', {
+                          await fetch(`${getApiUrl()}/conta/cancelar-troca-email`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ email: usuario.email })
@@ -254,10 +284,10 @@ export default function AccountPage() {
               ) : (
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-500 ml-1">E-MAIL (LOGIN)</label>
-                  <input 
-                    type="email" 
+                  <input
+                    type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#4078A4] focus:ring-1 focus:ring-[#4078A4] transition-all"
                     required
                   />
@@ -265,32 +295,33 @@ export default function AccountPage() {
               )}
 
               {usuario.tipo_perfil === 'especialista' && (
-                <div className="space-y-1 md:col-span-2">
-                  <label className="text-xs font-bold text-slate-500 ml-1">REGISTRO PROFISSIONAL (CRP/CRM)</label>
-                  <input 
-                    type="text" 
-                    placeholder="Ex: CRP 00/00000"
-                    value={formData.registro}
-                    onChange={(e) => setFormData({...formData, registro: e.target.value})}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#4078A4] focus:ring-1 focus:ring-[#4078A4] transition-all"
+                <div className="bg-slate-50 p-4 rounded-2xl md:col-span-2 border border-slate-100">
+                  <label className="text-xs font-bold text-slate-500 ml-1">NÚMERO DO CRP (Opcional)</label>
+                  <input
+                    type="text"
+                    placeholder="Ex: 00/00000"
+                    value={formData.crp_especialista}
+                    onChange={(e) => setFormData({ ...formData, crp_especialista: e.target.value })}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#4078A4] focus:ring-1 focus:ring-[#4078A4] transition-all mt-1"
                   />
+                  <p className="text-[10px] text-slate-400 mt-2 ml-1">Obrigatório para emissão de laudos técnicos</p>
                 </div>
               )}
             </div>
 
             <div className="mt-6 flex justify-end">
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={savingProfile}
                 className="flex items-center gap-2 bg-[#4078A4] text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-[#3E89AE] transition-colors shadow-sm disabled:opacity-50"
               >
-                <Save className="w-4 h-4" /> 
+                <Save className="w-4 h-4" />
                 {savingProfile ? 'Salvando...' : 'Atualizar Perfil'}
               </button>
             </div>
           </form>
 
-          {/* Form: Segurança e Senha */}
+
           <form onSubmit={handleSavePassword} className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm">
             <div className="flex items-center gap-2 mb-6">
               <Lock className="w-5 h-5 text-[#AC57EB]" />
@@ -300,28 +331,28 @@ export default function AccountPage() {
             <div className="space-y-4 max-w-md">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-500 ml-1">SENHA ATUAL</label>
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   value={passData.atual}
-                  onChange={(e) => setPassData({...passData, atual: e.target.value})}
+                  onChange={(e) => setPassData({ ...passData, atual: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all"
                   placeholder="••••••••"
                   required
                 />
               </div>
-              
+
               <div className="space-y-1 relative">
                 <label className="text-xs font-bold text-slate-500 ml-1">NOVA SENHA</label>
                 <div className="relative">
-                  <input 
-                    type={showPassword ? "text" : "password"} 
+                  <input
+                    type={showPassword ? "text" : "password"}
                     value={passData.nova}
-                    onChange={(e) => setPassData({...passData, nova: e.target.value})}
+                    onChange={(e) => setPassData({ ...passData, nova: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all"
                     placeholder="••••••••"
                     required
                   />
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
@@ -333,10 +364,10 @@ export default function AccountPage() {
 
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-500 ml-1">CONFIRMAR NOVA SENHA</label>
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   value={passData.confirmar}
-                  onChange={(e) => setPassData({...passData, confirmar: e.target.value})}
+                  onChange={(e) => setPassData({ ...passData, confirmar: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all"
                   placeholder="••••••••"
                   required
@@ -348,8 +379,8 @@ export default function AccountPage() {
               <p className="text-xs text-slate-400 flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Senha criptografada
               </p>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={savingPassword}
                 className="flex items-center gap-2 bg-[#AC57EB] text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:brightness-110 transition-all shadow-sm disabled:opacity-50"
               >

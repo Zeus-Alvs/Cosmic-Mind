@@ -9,6 +9,7 @@ import { ChevronRight } from "lucide-react";
 type Usuario = {
   nome: string;
   tipo_perfil: string;
+  avatar?: number;
 };
 
 export default function DashboardLayout({
@@ -173,8 +174,12 @@ export default function DashboardLayout({
             href="/account"
             className="flex items-center gap-3 mb-4 p-2 rounded-xl hover:bg-slate-700 transition-colors cursor-pointer group w-full"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-[#AC57EB] to-[#4078A4] rounded-full flex items-center justify-center font-black text-lg shadow-inner uppercase text-white group-hover:scale-105 transition-transform shrink-0">
-              {usuario.nome ? usuario.nome.charAt(0) : ""}
+            <div className="w-10 h-10 rounded-full border-2 border-slate-600 shadow-inner overflow-hidden flex items-center justify-center shrink-0 bg-slate-800 group-hover:scale-105 transition-transform">
+              <img 
+                src={usuario.avatar ? `/usuarios/foto${usuario.avatar}.png` : "/usuarios/foto1.png"} 
+                alt="Avatar" 
+                className="w-full h-full object-cover" 
+              />
             </div>
             <div className="flex-1 min-w-0 text-left">
               <p className="text-sm font-bold truncate text-slate-100 group-hover:text-blue-300 transition-colors">

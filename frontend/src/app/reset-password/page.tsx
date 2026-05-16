@@ -4,6 +4,7 @@ import { useState, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { getApiUrl } from '@/utils/api';
 import { Lock, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 
 function RedefinirSenhaForm() {
@@ -38,7 +39,7 @@ function RedefinirSenhaForm() {
     setLoading(true);
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/auth/redefinir-senha', {
+      const res = await fetch(`${getApiUrl()}/auth/redefinir-senha`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, nova_senha: novaSenha }),
@@ -140,8 +141,7 @@ export default function RedefinirSenhaPage() {
         <div className="flex justify-center mb-6">
           <Image src="/icons/logo.png" alt="Cosmic Mind" width={150} height={40} />
         </div>
-        
-        {/* Suspense é necessário no Next.js ao usar useSearchParams() */}
+
         <Suspense fallback={<p className="text-center text-slate-400">Carregando formulário...</p>}>
           <RedefinirSenhaForm />
         </Suspense>

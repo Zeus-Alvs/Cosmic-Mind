@@ -3,25 +3,26 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getApiUrl } from '@/utils/api';
 
 export default function LoginPage() {
   const router = useRouter();
-  
+
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
 
   const fazerLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // --- RASTREADORES PARA O CONSOLE ---
+
+
     console.log("1. O botão Acessar foi clicado!");
     console.log("2. Dados que vão pro Python:", { email, senha });
-    
+
     setErro('');
 
     try {
-      const resposta = await fetch('http://127.0.0.1:8000/api/login', {
+      const resposta = await fetch(`${getApiUrl()}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha })
@@ -36,7 +37,7 @@ export default function LoginPage() {
         console.log("Usuário salvo no navegador!");
         router.push('/menu');
       } else {
-       console.log("4. Senha errada ou usuário não existe.");
+        console.log("4. Senha errada ou usuário não existe.");
         setErro('E-mail ou senha incorretos.');
       }
     } catch (error) {
@@ -47,17 +48,17 @@ export default function LoginPage() {
 
   return (
     <div className="flex h-screen w-full bg-white">
-      {/* Lado Esquerdo - Gradiente */}
+
       <div className="hidden md:flex flex-col justify-center items-start p-16 w-1/2 bg-gradient-to-br from-purple-500 to-blue-400 text-white relative overflow-hidden">
         <div className="absolute top-10 left-10 text-3xl">✨</div>
         <div className="absolute bottom-10 right-10 text-2xl">⭐</div>
-        <h1 className="text-4xl font-bold mb-8">Ainda não tem<br/>uma conta?</h1>
+        <h1 className="text-4xl font-bold mb-8">Ainda não tem<br />uma conta?</h1>
         <Link href="/register" className="flex items-center px-6 py-3 border-2 border-white rounded-full hover:bg-white hover:text-purple-500 transition font-medium">
           <span className="mr-2">←</span> Cadastra-se
         </Link>
       </div>
 
-      {/* Lado Direito - Formulário */}
+
       <div className="flex flex-col justify-center items-center w-full md:w-1/2 p-8">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
@@ -66,29 +67,29 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={fazerLogin} className="bg-slate-100 p-8 rounded-2xl shadow-inner space-y-4">
-            
+
             {erro && <div className="p-3 bg-red-100 text-red-600 rounded-lg text-sm text-center">{erro}</div>}
 
             <div>
-              <input 
-                type="email" 
-                placeholder="👤 E-mail:" 
+              <input
+                type="email"
+                placeholder="👤 E-mail:"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                autoComplete="email" /* Calando o aviso do Chrome */
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-400" 
+                autoComplete="email"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
               />
             </div>
             <div>
-              <input 
-                type="password" 
-                placeholder="🔒 Senha:" 
+              <input
+                type="password"
+                placeholder="🔒 Senha:"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
                 required
-                autoComplete="current-password" /* Calando o aviso do Chrome */
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-400" 
+                autoComplete="current-password"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
               />
             </div>
 

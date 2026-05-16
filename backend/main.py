@@ -22,7 +22,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        "http://127.0.0.1:3000"
+        "http://127.0.0.1:3000",
+        "http://85.31.63.53:7485"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -47,13 +48,17 @@ def cadastrar_usuario(novo_usuario: UsuarioCadastro):
 
     usuario_dict = novo_usuario.dict()
     usuario_dict["senha"] = pwd_context.hash(novo_usuario.senha)
+    usuario_dict["criado_em"] = datetime.now(timezone.utc)
+    usuario_dict["avatar"] = 1
+    
     resultado = colecao_usuarios.insert_one(usuario_dict)
     
     return UsuarioRetorno(
         id=str(resultado.inserted_id),
         nome=usuario_dict["nome"],
         email=usuario_dict["email"],
-        tipo_perfil=usuario_dict["tipo_perfil"]
+        tipo_perfil=usuario_dict["tipo_perfil"],
+        avatar=usuario_dict.get("avatar", 1)
     )
 
 @app.post("/api/login", response_model=UsuarioRetorno, status_code=status.HTTP_200_OK)
@@ -70,7 +75,8 @@ def login_usuario(credenciais: UsuarioLogin):
         nome=usuario_banco["nome"],
         email=usuario_banco["email"],
         tipo_perfil=usuario_banco["tipo_perfil"],
-        email_pendente=usuario_banco.get("email_pendente")
+        email_pendente=usuario_banco.get("email_pendente"),
+        avatar=usuario_banco.get("avatar", 1)
     )
 
 @app.put("/api/conta/atualizar/{email_usuario}")
@@ -156,7 +162,7 @@ def enviar_email_recuperacao(email_destino: str, token: str):
     msg.attach(MIMEText(corpo, 'plain'))
 
     try:
-        # Conecta no servidor do Google e envia
+    
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login(remetente, senha)
@@ -274,33 +280,24 @@ def cancelar_troca_email(dados: EsqueciSenha):
 
     return {"message": "Troca de e-mail cancelada no banco de dados."}
 
+@app.post("/api/conta/crp")
+def definir_crp(dados: DefinirCRP):
+    usuario = colecao_usuarios.find_one({"email": dados.email})
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+    
+    colecao_usuarios.update_one(
+        {"email": dados.email},
+        {"$set": {"crp_especialista": dados.crp}}
+    )
+    return {"message": "CRP atualizado com sucesso"}
 
-@app.post("/api/jogo/gerar-pin/{id_jogador}")
-def gerar_pin_jogo(id_jogador: str):
-
-    pin_gerado = str(random.randint(0, 999999)).zfill(6)
-    tempo_expiracao = datetime.now(timezone.utc) + timedelta(minutes=10)
-
-    nova_sessao = {
-        "codigo_pin": pin_gerado,
-        "id_jogador": id_jogador,
-        "token_acesso": None, 
-        "criado_em": datetime.now(timezone.utc),
-        "expira_em": tempo_expiracao
-    }
-
-    db["sessao"].insert_one(nova_sessao)
-
-    return {
-        "mensagem": "PIN gerado com sucesso!", 
-        "pin": pin_gerado, 
-        "expira_em": tempo_expiracao
-    }
 
 @app.post("/api/jogadores/{id_usuario}")
 def criar_jogador(id_usuario: str, dados: JogadorCadastro):
     novo_jogador = {
         "apelido": dados.apelido,
+        "data_nascimento": dados.data_nascimento,
         "foto_perfil": dados.foto_perfil,
         "preferencias_jogo": {"volume_musica": 50, "daltonismo_modo": False},
         "planetas_desbloqueados": [],
@@ -336,6 +333,7 @@ def listar_jogadores(id_usuario: str):
         resultado.append({
             "id": str(jogador["_id"]),
             "nome": jogador.get("apelido", "Jogador"),
+            "foto_perfil": jogador.get("foto_perfil", 1),
             "progresso": 0, 
             "tempoUso": "0 horas",
             "nivelFase": "1 - Mercúrio",
@@ -343,3 +341,108 @@ def listar_jogadores(id_usuario: str):
         })
 
     return resultado
+
+@app.post("/api/jogadores/{id_jogador}/desconectar")
+def desconectar_jogador(id_jogador: str):
+    sessao = db["sessao"].find_one({"id_jogador": id_jogador})
+    if not sessao:
+        raise HTTPException(status_code=404, detail="Sessão não encontrada.")
+    
+    db["sessao"].update_one(
+        {"id_jogador": id_jogador},
+        {"$set": {"expira_em": datetime.now(timezone.utc)}}
+    )
+    return {"message": "Dispositivos desconectados com sucesso."}
+
+@app.put("/api/jogadores/{id_jogador}")
+def atualizar_jogador(id_jogador: str, dados: JogadorUpdate):
+    campos_para_atualizar = {k: v for k, v in dados.dict(exclude_none=True).items()}
+    if not campos_para_atualizar:
+        return {"message": "Nenhum dado para atualizar."}
+    
+    resultado = db["jogador"].update_one(
+        {"_id": ObjectId(id_jogador)},
+        {"$set": campos_para_atualizar}
+    )
+    if resultado.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Jogador não encontrado.")
+    return {"message": "Jogador atualizado com sucesso!"}
+
+@app.delete("/api/jogadores/{id_usuario}/{id_jogador}")
+def excluir_jogador(id_usuario: str, id_jogador: str, payload: ExcluirJogador):
+    usuario = colecao_usuarios.find_one({"_id": ObjectId(id_usuario)})
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+        
+    senha_correta = pwd_context.verify(payload.senha, usuario["senha"])
+    if not senha_correta:
+        raise HTTPException(status_code=400, detail="Senha incorreta.")
+        
+   
+    colecao_usuarios.update_one(
+        {"_id": ObjectId(id_usuario)},
+        {"$pull": {"jogadores_vinculados": ObjectId(id_jogador)}}
+    )
+    
+  
+    resultado = db["jogador"].delete_one({"_id": ObjectId(id_jogador)})
+    if resultado.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Jogador não encontrado.")
+        
+  
+    db["sessao"].delete_many({"id_jogador": id_jogador})
+    
+    return {"message": "Jogador excluído permanentemente."}
+
+
+
+@app.post("/api/jogo/gerar-pin/{id_jogador}")
+def gerar_pin_jogo(id_jogador: str):
+
+    pin_gerado = str(random.randint(0, 999999)).zfill(6)
+    tempo_expiracao = datetime.now(timezone.utc) + timedelta(minutes=10)
+
+    nova_sessao = {
+        "codigo_pin": pin_gerado,
+        "id_jogador": id_jogador,
+        "token_acesso": None, 
+        "criado_em": datetime.now(timezone.utc),
+        "expira_em": tempo_expiracao
+    }
+
+    db["sessao"].insert_one(nova_sessao)
+
+    return {
+        "mensagem": "PIN gerado com sucesso!", 
+        "pin": pin_gerado, 
+        "expira_em": tempo_expiracao
+    }
+
+@app.post("/game-login")
+def game_login(dados: GameLoginRequest):
+    sessao = db["sessao"].find_one({"codigo_pin": dados.code})
+
+    if not sessao:
+        raise HTTPException(status_code=401, detail="Código inválido ou expirado.")
+
+
+    if datetime.now(timezone.utc) > sessao["expira_em"]:
+        raise HTTPException(status_code=401, detail="Código expirado.")
+
+
+    nova_expiracao = datetime.now(timezone.utc) + timedelta(hours=2)
+    db["sessao"].update_one(
+        {"_id": sessao["_id"]},
+        {"$set": {
+            "token_acesso": dados.code,
+            "expira_em": nova_expiracao
+        }}
+    )
+
+    return {"accessToken": dados.code}
+
+
+try:
+    db["sessao"].create_index("expira_em", expireAfterSeconds=0)
+except Exception:
+    pass  

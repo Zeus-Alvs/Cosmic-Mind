@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CheckCircle2, XCircle, Loader2, ArrowRight } from 'lucide-react';
+import { getApiUrl } from '@/utils/api';
 
 function ConfirmarEmailContent() {
   const searchParams = useSearchParams();
@@ -21,10 +22,10 @@ function ConfirmarEmailContent() {
       return;
     }
 
-    // Função que vai disparar automaticamente quando a página abrir
+
     const confirmarNoBackend = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/conta/confirmar-email', {
+        const response = await fetch(`${getApiUrl()}/conta/confirmar-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token }),
@@ -35,9 +36,8 @@ function ConfirmarEmailContent() {
         if (response.ok) {
           setStatus('sucesso');
           setMensagem('Seu e-mail foi atualizado com sucesso no Cosmic Mind!');
-          
-          // Opcional: Limpar o localStorage para forçar o usuário a logar de novo
-          // com o novo e-mail, garantindo a segurança total.
+
+
           localStorage.removeItem('user_data');
         } else {
           setStatus('erro');
@@ -106,8 +106,8 @@ export default function ConfirmarEmailPage() {
         <div className="flex justify-center mb-8 pb-6 border-b border-slate-100">
           <Image src="/icons/logo.png" alt="Cosmic Mind" width={150} height={40} />
         </div>
-        
-        {/* Suspense é necessário no Next.js ao usar useSearchParams() */}
+
+
         <Suspense fallback={<p className="text-center text-slate-400 py-10 font-bold">Iniciando verificação...</p>}>
           <ConfirmarEmailContent />
         </Suspense>

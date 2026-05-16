@@ -27,7 +27,7 @@ interface Planeta {
 export default function PerfomanceR() {
   const [jogador, setJogador] = useState(JOGADORES[0]);
   const [planetaAtivo, setPlanetaAtivo] = useState<Planeta | null>(null);
-  const [isOpen, setIsOpen] = useState(false); // Estado para o Dropdown
+  const [isOpen, setIsOpen] = useState(false);
 
   const planetas: Planeta[] = [
     { id: 'netuno', nome: 'Netuno', status: 'Finalizado', desafio: 'Resgate Crítico', cor: 'bg-[#4A59BD]', stats: { Agilidade: 85, Lógica: 70, Memorização: 60, Leitura: 90, Interpretação: 75, Concentração: 80 } },
@@ -41,12 +41,12 @@ export default function PerfomanceR() {
     { id: 'sol', nome: 'Pentas', status: 'Bloqueado', desafio: '---', cor: 'bg-[#A3A3A3]', stats: { Agilidade: 0, Lógica: 0, Memorização: 0, Leitura: 0, Interpretação: 0, Concentração: 0 } },
   ];
 
-  const radius = 28; 
+  const radius = 28;
   const circumference = 2 * Math.PI * radius;
 
   return (
     <div className="w-full max-w-6xl mx-auto p-5 bg-transparent font-sans text-slate-600 overflow-hidden">
-      
+
       <div className="mb-6 text-center">
         <div className="fixed top-0 left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
         <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">
@@ -56,21 +56,21 @@ export default function PerfomanceR() {
       </div>
 
       <div className="flex flex-row gap-8 items-start justify-center">
-        
-        {/* COLUNA ESQUERDA */}
+
+
         <div className="w-[260px] flex flex-col gap-4 shrink-0">
-          
-          {/* NOVO DROPDOWN CUSTOMIZADO */}
+
+
           <div className="relative">
-            <button 
+            <button
               onClick={() => setIsOpen(!isOpen)}
               className="w-full bg-white border border-slate-100 p-2.5 rounded-2xl shadow-sm flex items-center gap-3 hover:border-[#4A59BD]/40 transition-all duration-300 group"
             >
-              {/* Avatar */}
+
               <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#4A59BD] to-[#6372D6] flex items-center justify-center text-white text-lg font-bold shrink-0 shadow-md group-hover:scale-105 transition-transform">
                 {jogador.nome.charAt(0)}
               </div>
-              
+
               <div className="flex-1 text-left min-w-0">
                 <p className="text-[10px] font-bold text-[#4A59BD] uppercase tracking-wider mb-0.5 opacity-70">Jogador</p>
                 <div className="flex items-center justify-between gap-1">
@@ -81,12 +81,12 @@ export default function PerfomanceR() {
               </div>
             </button>
 
-            {/* Lista Suspensa com Animação */}
+
             {isOpen && (
               <>
-                {/* Overlay transparente para fechar ao clicar fora */}
+
                 <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-                
+
                 <ul className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white border border-slate-100 rounded-2xl shadow-xl z-20 py-2 animate-in fade-in zoom-in-95 duration-200">
                   {JOGADORES.map((j) => (
                     <li key={j.id}>
@@ -107,13 +107,13 @@ export default function PerfomanceR() {
             )}
           </div>
 
-          {/* MENU DE PLANETAS */}
+
           <div className="bg-white border border-slate-100 p-5 rounded-[2.5rem] shadow-sm">
             <h2 className="text-center font-semibold text-[#9D82CE] text-[10px] tracking-widest mb-4 opacity-80 uppercase">Progresso - Fase</h2>
             <div className="grid grid-cols-3 gap-4">
               {planetas.map((p) => (
-                <button 
-                  key={p.id} 
+                <button
+                  key={p.id}
                   onClick={() => p.status !== 'Bloqueado' && setPlanetaAtivo(p)}
                   className={`flex flex-col items-center gap-1.5 transition-all ${p.status === 'Bloqueado' ? 'opacity-30 grayscale cursor-not-allowed' : 'hover:scale-105'}`}
                 >
@@ -130,7 +130,7 @@ export default function PerfomanceR() {
           </div>
         </div>
 
-        {/* COLUNA DIREITA: CARD DE GRÁFICOS */}
+
         <div className="min-w-[480px] bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm self-stretch">
           {planetaAtivo ? (
             <div className="flex flex-col animate-in fade-in duration-500 h-full">
@@ -157,9 +157,9 @@ export default function PerfomanceR() {
                       <div className="relative w-20 h-20 flex items-center justify-center">
                         <svg className="w-full h-full transform -rotate-90">
                           <circle cx="40" cy="40" r={radius} stroke="#F1F5F9" strokeWidth="5" fill="transparent" />
-                          <circle 
-                            cx="40" cy="40" r={radius} 
-                            stroke="#4A59BD" strokeWidth="5" fill="transparent" 
+                          <circle
+                            cx="40" cy="40" r={radius}
+                            stroke="#4A59BD" strokeWidth="5" fill="transparent"
                             strokeDasharray={circumference}
                             strokeDashoffset={offset}
                             strokeLinecap="round"
@@ -181,7 +181,7 @@ export default function PerfomanceR() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-[340px] text-slate-300">
-               <p className="font-medium text-xs tracking-widest uppercase">Selecione uma fase liberada</p>
+              <p className="font-medium text-xs tracking-widest uppercase">Selecione uma fase liberada</p>
             </div>
           )}
         </div>

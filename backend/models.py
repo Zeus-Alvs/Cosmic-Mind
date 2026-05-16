@@ -1,32 +1,30 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-from pydantic import BaseModel, EmailStr
-from typing import Optional
-
 
 class UsuarioCadastro(BaseModel):
     nome: str
-    email: EmailStr  # Já verifica se o email tem o formato correto (@ e .com)
+    email: EmailStr  
     senha: str
-    tipo_perfil: str # Ex: "responsavel" ou "especialista"
+    tipo_perfil: str 
 
-# Este é o modelo para quando o usuário for fazer LOGIN
+
 class UsuarioLogin(BaseModel):
     email: EmailStr
     senha: str
 
-# Este é o modelo que o back-end vai DEVOLVER (sempre escondendo a senha!)
+
 class UsuarioRetorno(BaseModel):
     id: str
     nome: str
     email: EmailStr
     tipo_perfil: str
     email_pendente: Optional[str] = None
+    avatar: Optional[int] = 1
 
 class UsuarioUpdate(BaseModel):
     nome: Optional[str] = None
     email: Optional[EmailStr] = None
-    avatar: Optional[str] = None
+    avatar: Optional[int] = None
     tamanho_fonte: Optional[str] = None 
 
 class TrocarSenha(BaseModel):
@@ -45,5 +43,19 @@ class ConfirmarEmail(BaseModel):
 
 class JogadorCadastro(BaseModel):
     apelido: str
+    data_nascimento: str
     foto_perfil: int = 1
 
+class DefinirCRP(BaseModel):
+    email: str
+    crp: str
+
+class ExcluirJogador(BaseModel):
+    senha: str
+
+class JogadorUpdate(BaseModel):
+    apelido: Optional[str] = None
+    foto_perfil: Optional[int] = None
+
+class GameLoginRequest(BaseModel):
+    code: str

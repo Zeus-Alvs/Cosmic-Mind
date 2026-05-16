@@ -4,13 +4,13 @@ import { useState, useMemo, useEffect } from 'react';
 import { Bell, Zap, Trophy, ChevronRight, Star, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-// 1. Definição da Interface 
+
 interface NotificationDTO {
   id: string;
   type: 'pausa' | 'solicitacao' | 'conquista' | 'novidade' | 'info';
   title: string;
   description: string;
-  createdAt: string; // ISO Date string para facilitar manipulação
+  createdAt: string;
   isLink?: boolean;
   linkTo?: string;
 }
@@ -18,15 +18,15 @@ interface NotificationDTO {
 export default function NotificationsR() {
   const router = useRouter();
   const [filter, setFilter] = useState<'recentes' | 'antigas' | '30dias'>('recentes');
-  
-  // 2. Simulação do Estado da API
+
+
   const [notificationsData, setNotificationsData] = useState<NotificationDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 3. Efeito para carregar os dados (Simulando o Fetch)
+
   useEffect(() => {
     const fetchNotifications = async () => {
-      // Aqui você substituiria por: const res = await fetch('/api/notifications');
+
       const mockApiResponse: NotificationDTO[] = [
         {
           id: "uuid-1",
@@ -74,13 +74,13 @@ export default function NotificationsR() {
       setTimeout(() => {
         setNotificationsData(mockApiResponse);
         setIsLoading(false);
-      }, 800); // Simula delay de rede
+      }, 800);
     };
 
     fetchNotifications();
   }, []);
 
-  // 4. Helper para mapear ícones (Baseado no Type da API)
+
   const getIconConfig = (type: NotificationDTO['type']) => {
     const configs = {
       pausa: { icon: <Zap className="w-5 h-5 text-orange-500" />, bg: 'bg-orange-100' },
@@ -92,7 +92,7 @@ export default function NotificationsR() {
     return configs[type] || configs.info;
   };
 
-  // 5. Lógica de Transformação de Dados
+
   const filteredList = useMemo(() => {
     let list = notificationsData.map(n => ({
       ...n,
@@ -127,7 +127,7 @@ export default function NotificationsR() {
         <p className="text-slate-400 text-xs font-medium">Acompanhe os jogadores em tempo real</p>
       </header>
 
-      {/* Seletor de Filtro (Tabs) */}
+
       <div className="flex justify-end mb-6">
         <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200/50 shadow-inner">
           {[
@@ -135,12 +135,11 @@ export default function NotificationsR() {
             { id: 'antigas', label: 'ANTIGAS' },
             { id: '30dias', label: '30 DIAS' }
           ].map((tab) => (
-            <button 
+            <button
               key={tab.id}
               onClick={() => setFilter(tab.id as any)}
-              className={`px-4 py-2 text-[10px] font-black rounded-xl transition-all ${
-                filter === tab.id ? 'bg-white text-[#4078A4] shadow-sm' : 'text-slate-400 hover:text-slate-500'
-              }`}
+              className={`px-4 py-2 text-[10px] font-black rounded-xl transition-all ${filter === tab.id ? 'bg-white text-[#4078A4] shadow-sm' : 'text-slate-400 hover:text-slate-500'
+                }`}
             >
               {tab.label}
             </button>
@@ -152,15 +151,15 @@ export default function NotificationsR() {
         {filteredList.map((notif) => {
           const { icon, bg } = getIconConfig(notif.type);
           return (
-            <div 
-              key={notif.id} 
+            <div
+              key={notif.id}
               className="bg-white p-3 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between gap-4 transition-all hover:border-[#4078A4]/30"
             >
               <div className="flex items-center gap-4 flex-1">
                 <div className={`${bg} p-2.5 rounded-xl flex-shrink-0`}>
                   {icon}
                 </div>
-                
+
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-center mb-0.5">
                     <h4 className="font-bold text-slate-700 text-sm truncate">{notif.title}</h4>
@@ -175,7 +174,7 @@ export default function NotificationsR() {
               </div>
 
               {notif.isLink && (
-                <button 
+                <button
                   onClick={() => router.push(notif.linkTo || '/')}
                   className="flex items-center gap-1.5 bg-[#4078A4]/10 text-[#4078A4] px-4 py-2 rounded-2xl text-[10px] font-black hover:bg-[#4078A4] hover:text-white transition-all group shrink-0"
                 >

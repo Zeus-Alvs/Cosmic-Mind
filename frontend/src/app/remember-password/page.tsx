@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Mail, ArrowLeft, Send } from 'lucide-react';
+import { getApiUrl } from '@/utils/api';
 
 export default function EsqueciSenhaPage() {
   const [email, setEmail] = useState('');
@@ -15,7 +16,7 @@ export default function EsqueciSenhaPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/auth/esqueci-senha', {
+      const res = await fetch(`${getApiUrl()}/auth/esqueci-senha`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),

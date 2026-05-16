@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Check, X, Building2, Inbox, ShieldAlert, MoreVertical, Trash2, Eye } from 'lucide-react';
 
-{/*Solicitação Simulada*/}
+
 interface Solicitacao {
   id: string;
   profissional: string;
@@ -24,7 +24,7 @@ const initialData: Solicitacao[] = [
     clinica: "Clínica Mente Brilhante",
     cargo: "Psicopedagoga",
     paciente: "Ana Silva",
-    fotoPaciente: "https://api.dicebear.com/7.x/pixel-art/svg?seed=Ana", 
+    fotoPaciente: "https://api.dicebear.com/7.x/pixel-art/svg?seed=Ana",
     status: "pendente",
     permissoes: ["Visualizar dados de desempenho", "Informações do perfil", "Insights de diagnósticos"]
   },
@@ -63,8 +63,8 @@ export default function RequestsR() {
   return (
     <div className="max-w-5xl mx-auto p-6 font-sans">
       <div className="fixed top-0 left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
-      
-      {/* TÍTULO COM DEGRADÊ */}
+
+
       <div className="mb-10">
         <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] bg-clip-text text-transparent">
           Solicitações Recebidas
@@ -83,14 +83,14 @@ export default function RequestsR() {
                     <p className="text-[10px] text-slate-400 font-semibold uppercase">{item.cargo}</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-100">
-                   <div className="flex items-center gap-2">
-                      <img src={item.fotoPaciente} className="w-7 h-7 rounded-lg bg-white p-0.5 border border-slate-200" alt="" />
-                      <span className="text-xs font-bold text-slate-600">{item.paciente}</span>
-                   </div>
-                   <button 
-                    onClick={() => setModalConfira(item)} 
+                  <div className="flex items-center gap-2">
+                    <img src={item.fotoPaciente} className="w-7 h-7 rounded-lg bg-white p-0.5 border border-slate-200" alt="" />
+                    <span className="text-xs font-bold text-slate-600">{item.paciente}</span>
+                  </div>
+                  <button
+                    onClick={() => setModalConfira(item)}
                     className="text-[10px] font-black text-[#AC57EB] bg-white px-3 py-1.5 rounded-lg shadow-sm hover:bg-[#AC57EB] hover:text-white transition-all border border-purple-50"
                   >
                     CONFIRA
@@ -107,7 +107,7 @@ export default function RequestsR() {
         )}
       </section>
 
-      {/* SEÇÃO ACESSOS COM TÍTULO DEGRADÊ */}
+
       <section>
         <div className="mb-6">
           <h3 className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] bg-clip-text text-transparent">
@@ -127,16 +127,16 @@ export default function RequestsR() {
                       <p className="text-[10px] text-green-500 font-bold uppercase tracking-wider">Ativo</p>
                     </div>
                   </div>
-                  
-                  {/* BOTÃO TRÊS PONTINHOS PARA EXCLUIR */}
-                  <button 
+
+
+                  <button
                     onClick={() => setModalExcluir(item)}
                     className="p-1.5 hover:bg-slate-50 rounded-full text-slate-300 hover:text-red-400 transition-colors"
                   >
                     <MoreVertical className="w-4 h-4" />
                   </button>
                 </div>
-                
+
                 <div className="flex items-center gap-2 bg-[#4078A4]/5 p-2 rounded-xl border border-[#4078A4]/10">
                   <img src={item.fotoPaciente} className="w-6 h-6 rounded-md bg-white border border-slate-100" alt="" />
                   <p className="text-[10px] font-bold text-[#4078A4]">Acompanhando: {item.paciente}</p>
@@ -151,7 +151,7 @@ export default function RequestsR() {
         )}
       </section>
 
-      {/* MODAL DE ACEITAR (CONFIRA) */}
+
       {modalConfira && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-xs rounded-[40px] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200 p-7">
@@ -167,17 +167,17 @@ export default function RequestsR() {
             </div>
 
             <div className="bg-slate-50 p-4 rounded-2xl mb-8 border border-slate-100">
-                <p className="text-[9px] font-black text-slate-400 uppercase mb-2 flex items-center gap-1">
-                  <Eye className="w-3 h-3" /> Permissões solicitadas:
-                </p>
-                <div className="space-y-1.5">
-                  {modalConfira.permissoes.map((perm, index) => (
-                    <div key={index} className="flex gap-2 items-center text-[10px] text-slate-500 font-bold leading-tight">
-                      <div className="w-1 h-1 rounded-full bg-[#AC57EB] shrink-0" />
-                      <p>{perm}</p>
-                    </div>
-                  ))}
-                </div>
+              <p className="text-[9px] font-black text-slate-400 uppercase mb-2 flex items-center gap-1">
+                <Eye className="w-3 h-3" /> Permissões solicitadas:
+              </p>
+              <div className="space-y-1.5">
+                {modalConfira.permissoes.map((perm, index) => (
+                  <div key={index} className="flex gap-2 items-center text-[10px] text-slate-500 font-bold leading-tight">
+                    <div className="w-1 h-1 rounded-full bg-[#AC57EB] shrink-0" />
+                    <p>{perm}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="flex gap-3">
@@ -188,7 +188,7 @@ export default function RequestsR() {
         </div>
       )}
 
-      {/* MODAL DE EXCLUIR (SIMILAR AO DE ACEITAR) */}
+
       {modalExcluir && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-xs rounded-[40px] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200 p-7">
