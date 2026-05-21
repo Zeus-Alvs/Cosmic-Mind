@@ -463,9 +463,10 @@ setSpectrumIndex((prev) => (prev === listLength - 1 ? 0 : prev + 1));
         <h2 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-3xl text-white mb-8 uppercase tracking-widest">
           Quem Somos
         </h2>
-        <p style={{ fontFamily: "'Raleway', serif" }} className="text-2xl text-white/90 leading-relaxed max-w-4xl mx-auto italic">
-          "Somos a equipe Selenes e, em parceria com a equipe Spectrum, desenvolvedora de um jogo lúdico voltado para crianças com TDAH, nos unimos para criar o Cosmic Mind Dashboard."
-        </p>
+      {/* Texto com tamanho reduzido (text-lg) e fonte alterada para 'Inter' */}
+         <p style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg text-white/90 leading-relaxed max-w-4xl mx-auto italic mb-6">
+    "Somos a equipe Selenes e, em parceria com a equipe Spectrum, desenvolvedora de um jogo lúdico voltado para crianças com TDAH, nos unimos para criar o Cosmic Mind Dashboard."
+          </p>
         
         <p style={{ fontFamily: "'Raleway', sans-serif" }} className="text-base text-white/70 leading-relaxed max-w-3xl mx-auto font-light">
           Nosso projeto consiste em uma plataforma inteligente capaz de gerar métricas e análises sobre o desempenho das crianças dentro do jogo, auxiliando no acompanhamento de seu desenvolvimento de forma prática, acessível e intuitiva. 
@@ -595,44 +596,57 @@ setSpectrumIndex((prev) => (prev === listLength - 1 ? 0 : prev + 1));
       </div>
     </section>
 
-      {/* ── Seção Sobre o Projeto ── */}
-        <section id="about" className="flex flex-col items-center py-20 relative z-10 px-6 bg-black/20">
-          <div className="max-w-4xl text-center mb-16 animate-hero">
-            <h2 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-3xl text-white mb-6 uppercase tracking-widest">
-              Sobre o Cosmic Mind
-            </h2>
-            <p style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-xl text-white/80 leading-relaxed max-w-3xl mx-auto">
-              A plataforma tem como objetivo transformar dados gerados dentro do jogo educativo em métricas claras e acessíveis, auxiliando no acompanhamento do desempenho de crianças com TDAH de forma intuitiva e eficiente. 
-      Unindo tecnologia, inclusão e inovação, buscamos criar uma experiência moderna e acolhedora para análise e acompanhamento infantil. 
-            </p>
-          </div>
+{/* ── Seção Sobre o Projeto ── */}
+{/* Aumentei o padding do topo (pt-32) para empurrar TODO o bloco mais para baixo de forma limpa */}
+<section id="about" className="pt-32 pb-20 relative z-10 px-6 bg-black/20 w-full">
+  
+  {/* O 'alignItems: "center"' vai garantir que o meio do texto se alinhe com o meio dos cards horizontalmente */}
+  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '32px', justifyContent: 'center', alignItems: 'center' }} className="max-w-5xl mx-auto w-full">
+    
+    {/* CAIXA DA ESQUERDA: Texto limpo e perfeitamente alinhado */}
+    <div style={{ flex: '1 1 320px', maxWidth: '380px' }} className="text-left animate-hero">
+      <h2 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-3xl text-white mb-6 uppercase tracking-widest">
+        Sobre o Cosmic Mind
+      </h2>
+      <p style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-xl text-white/80 leading-relaxed">
+        A plataforma tem como objetivo transformar dados gerados dentro do jogo educativo em métricas claras e acessíveis, auxiliando no acompanhamento do desempenho de crianças com TDAH de forma intuitiva e eficiente. 
+        <br /><br />
+        Unindo tecnologia, inclusão e inovação, buscamos criar uma experiência moderna e acolhedora para análise e acompanhamento infantil. 
+      </p>
+    </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-7xl">
-            <div className="game-card p-8 border-t-2 border-cyan-500/50">
-              <div className="text-cyan-400 mb-4">🧠</div>
-              <h4 className="text-white font-bold mb-2">Métricas Inteligentes</h4>
-              <p className="text-white/60 text-sm text-pretty">Análise de desempenho em tempo real para identificar padrões e evolução.</p>
-            </div>
+    {/* CAIXA DA DIREITA: Cards compactos lado a lado */}
+    <div style={{ flex: '1 1 450px', maxWidth: '540px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+      
+      <div className="game-card p-5 border-t-2 border-cyan-500/50">
+        <div className="text-cyan-400 mb-2 text-xl">🧠</div>
+        <h4 className="text-white font-bold mb-1 text-sm">Métricas Inteligentes</h4>
+        <p className="text-white/60 text-[11px] text-pretty leading-normal">Análise de desempenho em tempo real para identificar padrões e evolução.</p>
+      </div>
 
-            <div className="game-card p-8 border-t-2 border-purple-500/50">
-              <div className="text-purple-400 mb-4">🎮</div>
-              <h4 className="text-white font-bold mb-2">Integração Total</h4>
-              <p className="text-white/60 text-sm text-pretty">Conectado diretamente ao universo lúdico criado pela equipe Spectrum.</p>
-            </div>
+      <div className="game-card p-5 border-t-2 border-purple-500/50">
+        <div className="text-purple-400 mb-2 text-xl">🎮</div>
+        <h4 className="text-white font-bold mb-1 text-sm">Integração Total</h4>
+        <p className="text-white/60 text-[11px] text-pretty leading-normal">Conectado diretamente ao universo lúdico criado pela equipe Spectrum.</p>
+      </div>
 
-            <div className="game-card p-8 border-t-2 border-cyan-500/50">
-              <div className="text-cyan-400 mb-4">📊</div>
-              <h4 className="text-white font-bold mb-2">Dashboard Interativo</h4>
-              <p className="text-white/60 text-sm text-pretty">Visualização simples de dados complexos para pais e especialistas.</p>
-            </div>
+      <div className="game-card p-5 border-t-2 border-cyan-500/50">
+        <div className="text-cyan-400 mb-2 text-xl">📊</div>
+        <h4 className="text-white font-bold mb-1 text-sm">Dashboard Interativo</h4>
+        <p className="text-white/60 text-[11px] text-pretty leading-normal">Visualização simples de dados complexos para pais e especialistas.</p>
+      </div>
 
-            <div className="game-card p-8 border-t-2 border-purple-500/50">
-              <div className="text-purple-400 mb-4">✨</div>
-              <h4 className="text-white font-bold mb-2">Foco em Inclusão</h4>
-              <p className="text-white/60 text-sm text-pretty">Tecnologia pensada para acessibilidade e suporte ao desenvolvimento infantil.</p>
-            </div>
-          </div>
-        </section>
+      <div className="game-card p-5 border-t-2 border-purple-500/50">
+        <div className="text-purple-400 mb-2 text-xl">✨</div>
+        <h4 className="text-white font-bold mb-1 text-sm">Foco em Inclusão</h4>
+        <p className="text-white/60 text-[11px] text-pretty leading-normal">Tecnologia pensada para acessibilidade e suporte ao desenvolvimento infantil.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+      
 
       {/* ── Contato ── */}
         <section id="contact" className="py-24 relative z-10 px-6 bg-gradient-to-b from-transparent to-purple-900/20">
@@ -696,36 +710,68 @@ setSpectrumIndex((prev) => (prev === listLength - 1 ? 0 : prev + 1));
           </div>
         </section>
 
-        {/* ── Footer ── */}
-        <footer className="relative z-10 pt-20 pb-10 px-6 bg-black/40 border-t border-white/5 backdrop-blur-md">
+{/* ── Footer ── */}
+        <footer className="relative z-10 pt-20 pb-10 px-6 bg-black/50 border-t border-white/5 backdrop-blur-md">
           <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+            {/* Grid de 3 colunas bem distribuído para desktop */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16 items-start">
               
+              {/* COLUNA 1: Bloco Institucional */}
               <div className="flex flex-col gap-4">
                 <h3 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-xl text-white tracking-widest uppercase">
-                  Cosmic Mind<span className="text-cyan-500"></span>
+                  Cosmic Mind<span className="text-cyan-400">.</span>
                 </h3>
-                <p style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-lg text-white/50 leading-tight">
+                <p style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-lg text-white/60 leading-relaxed">
                   Transformando dados de jogabilidade em acompanhamento inteligente e inclusivo.
                 </p>
               </div>
 
+{/* COLUNA 2: Bloco de Contatos */}
               <div className="flex flex-col gap-4">
-                <h4 className="text-white text-xs font-bold uppercase tracking-[0.2em] mb-2">Conecte-se</h4>
-                <div className="flex gap-4">
-                  <a href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:border-purple-500/50 hover:text-purple-400 transition-all">🐙</a>
-                  <a href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:border-cyan-500/50 hover:text-cyan-400 transition-all">📸</a>
-                  <a href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:border-purple-500/50 hover:text-purple-400 transition-all">✉️</a>
+                <h4 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-white text-xs font-bold uppercase tracking-[0.2em]">
+                  Contato
+                </h4>
+                <div className="flex flex-col gap-3 text-sm text-white/60">
+                  <a href="mailto:cosmicmind.site@gmail.com" className="hover:text-cyan-400 transition-colors flex items-center gap-2">
+                    <span>📧</span> cosmicmind.site@gmail.com
+                  </a>
+                  <a href="https://github.com/Zeus-Alvs" target="_blank" rel="noopener noreferrer" className="hover:text-purple-400 transition-colors flex items-center gap-2">
+                    <span>💻</span> GitHub: Zeus-Alves <span className="text-white/45 text-xs"></span>
+                  </a>
+                  {/* O Insta que estava faltando no texto aqui: */}
+                  <a href="https://instagram.com/spectrum.code" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition-colors flex items-center gap-2">
+                    <span>📸</span> Instagram: @spectrum.code
+                  </a>
                 </div>
               </div>
+
+              {/* COLUNA 3: Bloco de Redes Sociais */}
+              <div className="flex flex-col gap-4 md:items-end">
+                <h4 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-white text-xs font-bold uppercase tracking-[0.2em] md:text-right w-full">
+                  Conecte-se
+                </h4>
+                <div className="flex gap-4 md:justify-end">
+                  <a href="https://github.com/Zeus-Alvs" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-white/60 hover:border-purple-500 hover:text-purple-400 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:-translate-y-0.5 transition-all duration-300">
+                    🐙
+                  </a>
+                  <a href="https://instagram.com/spectrum.code" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-white/60 hover:border-cyan-500 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] hover:-translate-y-0.5 transition-all duration-300">
+                    📸
+                  </a>
+                  <a href="mailto:cosmicmind.site@gmail.com" className="w-11 h-11 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-white/60 hover:border-purple-500 hover:text-purple-400 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:-translate-y-0.5 transition-all duration-300">
+                    ✉️
+                  </a>
+                </div>
+              </div>
+
             </div>
 
+            {/* Linha de Créditos Inferior */}
             <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-white/20 text-[10px] uppercase tracking-[0.3em] text-center md:text-left">
+              <p className="text-white/30 text-[10px] uppercase tracking-[0.25em] text-center md:text-left leading-loose">
                 © 2026 Cosmic Mind Dashboard — Desenvolvido pela Equipe Selenes
               </p>
-              <p className="text-white/20 text-[10px] uppercase tracking-[0.3em]">
-                Parceria com Equipe Spectrum 💫
+              <p className="text-white/30 text-[10px] uppercase tracking-[0.25em] flex items-center gap-1.5 text-center">
+                Parceria com Equipe Spectrum <span className="animate-pulse text-cyan-400">💫</span>
               </p>
             </div>
           </div>
