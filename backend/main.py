@@ -461,7 +461,68 @@ def salvar_partida(partida: PartidaModel, authorization: str = Header(None)):
         "message": "Partida salva com sucesso!",
         "id_partida": str(resultado.inserted_id)
     }
-
+    
+@app.put('/api/progresso/jogador/update')
+def atualizar_progresso(update_data: AtualizarProgressoRequest, authorization: str = Header(None)):
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Token de acesso ausente.")
+    
+    token = authorization.replace('Bearer ', '')
+    sessao = db["sessao"].find_one({"token_acesso": token})
+    if not sessao:
+        raise HTTPException(status_code=401, detail="Token inválido ou expirado.")
+    id_jogador = ObjectId(sessao["id_jogador"])
+    
+    if update_data.tipo == 'planeta':
+        db["jogador"].update_one(
+            {"_id": id_jogador},
+            {"$push": {"planetasDesbloqueados": update_data.valor}}
+        )
+    elif update_data.tipo == 'pontuacao':
+        existente = db["jogador"].find_one({
+            "_id": id_jogador,
+            "melhoresPontuacoes.missionId": update_data.missionId
+        })
+        if existente:
+            db["jogador"].update_one(
+                {"_id": id_jogador, "melhoresPontuacoes.missionId": update_data.missionId},
+                {"$set": {
+                    "melhoresPontuacoes.$.score": update_data.score,
+                    "melhoresPontuacoes.$.starsEarned": update_data.starsEarned
+                }}
+            )
+        else:
+            db["jogador"].update_one(
+                {"_id": id_jogador},
+                {"$push": {"melhoresPontuacoes": {
+                    "missionId": update_data.missionId,
+                    "score": update_data.score,
+                    "starsEarned": update_data.starsEarned
+                }}}
+            )
+    elif update_data.tipo == 'pet':
+        db["jogador"].update_one(
+            {"_id": id_jogador},
+            {"$push": {"petsDesbloqueados": ObjectId(update_data.item_id)}}
+        )
+    elif update_data.tipo == 'conquista':
+        db["jogador"].update_one(
+            {"_id": id_jogador},
+            {"$push": {"conquistasObtidas": ObjectId(update_data.item_id)}}
+        )
+    elif update_data.tipo == 'preferencias':
+        prefs = {}
+        if update_data.volumeMusica is not None:
+            prefs["preferenciasJogo.volumeMusica"] = update_data.volumeMusica
+        if update_data.daltonismoModo is not None:
+            prefs["preferenciasJogo.daltonismoModo"] = update_data.daltonismoModo
+        if prefs:
+            db["jogador"].update_one(
+                {"_id": id_jogador},
+                {"$set": prefs}
+            )
+    return {"message": "Progresso atualizado com sucesso!"}
+    
 try:
     db["sessao"].create_index("expira_em", expireAfterSeconds=0)
 except Exception:

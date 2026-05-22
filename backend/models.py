@@ -72,3 +72,33 @@ class JogadorUpdate(BaseModel):
 
 class GameLoginRequest(BaseModel):
     code: str
+
+# desbloquear planeta
+class DesbloquearPlaneta(BaseModel):
+    planeta: str 
+
+# atualizar melhor pontuação
+class AtualizarPontuacao(BaseModel):
+    fase_id: str
+    pontuacao: int
+    estrelas: int 
+
+# Atualizar preferências
+class AtualizarPreferencias(BaseModel):
+    volume_musica: Optional[int] = None
+    daltonismo_modo: Optional[bool] = None
+
+# Para desbloquear item(pet/conquista)
+class DesbloquearItem(BaseModel):
+    item_type: str  
+    item_id: str
+
+class AtualizarProgressoRequest(BaseModel):
+    tipo: str  # "planeta", "pontuacao", "pet", "conquista", "preferencias"
+    valor: Optional[str] = None
+    missionId: Optional[str] = None
+    score: Optional[int] = None
+    starsEarned: Optional[int] = None
+    volumeMusica: Optional[int] = None
+    daltonismoModo: Optional[bool] = None
+    item_id: Optional[str] = None
