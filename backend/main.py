@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 from bson import ObjectId
@@ -11,7 +11,7 @@ import secrets
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import random
-from datetime import datetime, timedelta, timezone
+from datetime import datetime as dt_cls, timedelta, timezone
 
 
 load_dotenv()
@@ -34,6 +34,7 @@ MONGO_URL = os.getenv("MONGO_URL")
 client = MongoClient(MONGO_URL)
 db = client["cosmic_mind_db"]
 colecao_usuarios = db["usuario"]
+colecao_partidas = db["partidas"]
 
 @app.get("/")
 def read_root():
@@ -426,7 +427,7 @@ def game_login(dados: GameLoginRequest):
         raise HTTPException(status_code=401, detail="Código inválido ou expirado.")
 
 
-    if datetime.now(timezone.utc) > sessao["expira_em"]:
+    if datetime.utcnow() > sessao["expira_em"]:
         raise HTTPException(status_code=401, detail="Código expirado.")
 
 
@@ -441,6 +442,25 @@ def game_login(dados: GameLoginRequest):
 
     return {"accessToken": dados.code}
 
+@app.post("/api/partidas/salvar")
+def salvar_partida(partida: PartidaModel, authorization: str = Header(None)):
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Token de acesso ausente.")
+    token = authorization.replace('Bearer ', '')
+    # Buscar sessão pelo token
+    sessao = db["sessao"].find_one({"token_acesso": token})
+    if not sessao:
+        raise HTTPException(status_code=401, detail="Token inválido ou expirado.")
+    # Converter string para ObjectId se necessário
+    partida_dict = partida.dict()
+    partida_dict["id_jogador"] = ObjectId(sessao["id_jogador"])
+
+    # Inserir no banco
+    resultado = colecao_partidas.insert_one(partida_dict)
+    return {
+        "message": "Partida salva com sucesso!",
+        "id_partida": str(resultado.inserted_id)
+    }
 
 try:
     db["sessao"].create_index("expira_em", expireAfterSeconds=0)

@@ -1,6 +1,19 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
+from datetime import datetime
 
+class MetricasCognitivas(BaseModel):
+    acertos: int
+    erros: int
+    tempo_medio_reacao_ms: int
+    habilidade_foco: str
+
+class PartidaModel(BaseModel):
+    missionId: str
+    pontuacao_final: int
+    metricas_cognitivas: MetricasCognitivas
+    iniciado_em: datetime
+    finalizado_em: datetime
 class UsuarioCadastro(BaseModel):
     nome: str
     email: EmailStr  
