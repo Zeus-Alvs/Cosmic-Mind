@@ -12,11 +12,24 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import random
 from datetime import datetime as dt_cls, timedelta, timezone
+import jwt
 
 
 load_dotenv()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 app = FastAPI(title="Cosmic Mind API")
+
+JWT_SECRET = os.getenv("JWT_SECRET", secrets.token_hex(32))
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRATION_HOURS = 2
+# Opcional JWT_SECRET=sua_chave no .env depois
+def gerar_jwt(id_jogador: str):
+    payload = {
+        'id_jogador': id_jogador,
+        'exp': datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS),
+        'iat': datetime.utcnow()
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 app.add_middleware(
     CORSMiddleware,
@@ -399,14 +412,14 @@ def excluir_jogador(id_usuario: str, id_jogador: str, payload: ExcluirJogador):
 
 @app.post("/api/jogo/gerar-pin/{id_jogador}")
 def gerar_pin_jogo(id_jogador: str):
-
+    token_jwt = gerar_jwt(id_jogador)
     pin_gerado = str(random.randint(0, 999999)).zfill(6)
     tempo_expiracao = datetime.now(timezone.utc) + timedelta(minutes=10)
 
     nova_sessao = {
         "codigo_pin": pin_gerado,
         "id_jogador": id_jogador,
-        "token_acesso": None, 
+        "token_acesso": token_jwt,
         "criado_em": datetime.now(timezone.utc),
         "expira_em": tempo_expiracao
     }
@@ -416,7 +429,8 @@ def gerar_pin_jogo(id_jogador: str):
     return {
         "mensagem": "PIN gerado com sucesso!", 
         "pin": pin_gerado, 
-        "expira_em": tempo_expiracao
+        "expira_em": tempo_expiracao,
+        "token_acesso": token_jwt
     }
 
 @app.post("/game-login")
@@ -429,18 +443,18 @@ def game_login(dados: GameLoginRequest):
 
     if datetime.utcnow() > sessao["expira_em"]:
         raise HTTPException(status_code=401, detail="Código expirado.")
-
-
+    
+    token_jwt = gerar_jwt(sessao["id_jogador"])
     nova_expiracao = datetime.now(timezone.utc) + timedelta(hours=2)
     db["sessao"].update_one(
         {"_id": sessao["_id"]},
         {"$set": {
-            "token_acesso": dados.code,
+            "token_acesso": token_jwt,
             "expira_em": nova_expiracao
         }}
     )
 
-    return {"accessToken": dados.code}
+    return {"accessToken": token_jwt}
 
 @app.post("/api/partidas/salvar")
 def salvar_partida(partida: PartidaModel, authorization: str = Header(None)):
