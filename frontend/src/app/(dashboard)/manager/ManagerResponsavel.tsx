@@ -118,6 +118,7 @@ export default function ManagerS() {
       if (!resPin.ok) throw new Error("Falha ao gerar PIN");
       const dataPin = await resPin.json();
       setGeneratedPin(dataPin.pin);
+      localStorage.setItem('token_acesso', dataPin.token_acesso);
     } catch (error) {
       console.error("Erro ao gerar PIN:", error);
       alert("Erro ao gerar o código de conexão.");

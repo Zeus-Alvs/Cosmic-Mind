@@ -409,7 +409,6 @@ def excluir_jogador(id_usuario: str, id_jogador: str, payload: ExcluirJogador):
     return {"message": "Jogador excluído permanentemente."}
 
 
-
 @app.post("/api/jogo/gerar-pin/{id_jogador}")
 def gerar_pin_jogo(id_jogador: str):
     token_jwt = gerar_jwt(id_jogador)
@@ -461,11 +460,11 @@ def salvar_partida(partida: PartidaModel, authorization: str = Header(None)):
     if not authorization:
         raise HTTPException(status_code=401, detail="Token de acesso ausente.")
     token = authorization.replace('Bearer ', '')
-    # Buscar sessão pelo token
+
     sessao = db["sessao"].find_one({"token_acesso": token})
     if not sessao:
         raise HTTPException(status_code=401, detail="Token inválido ou expirado.")
-    # Converter string para ObjectId se necessário
+
     partida_dict = partida.dict()
     partida_dict["id_jogador"] = ObjectId(sessao["id_jogador"])
 
@@ -536,7 +535,105 @@ def atualizar_progresso(update_data: AtualizarProgressoRequest, authorization: s
                 {"$set": prefs}
             )
     return {"message": "Progresso atualizado com sucesso!"}
-    
+
+@app.get("/api/estatisticas/{id_jogador}")
+def obter_estatisticas(id_jogador: str, authorization: str = Header(None)):
+    """
+    Retorna o resumo de desempenho de um jogador para a plataforma web.
+    Precisa do token do responsável/especialista no cabeçalho:
+        Authorization: Bearer <token_acesso>
+    """
+
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Token de acesso ausente.")
+
+    token = authorization.replace("Bearer ", "")
+
+    sessao = db["sessao"].find_one({"token_acesso": token})
+    if not sessao:
+        raise HTTPException(status_code=401, detail="Token inválido ou expirado.")
+
+
+    try:
+        jogador_obj_id = ObjectId(id_jogador)
+    except Exception:
+        raise HTTPException(status_code=400, detail="ID de jogador inválido.")
+
+    jogador = db["jogador"].find_one({"_id": jogador_obj_id})
+    if not jogador:
+        raise HTTPException(status_code=404, detail="Jogador não encontrado.")
+
+    partidas = list(colecao_partidas.find({"id_jogador": jogador_obj_id}))
+
+    if not partidas:
+        return {
+            "id_jogador": id_jogador,
+            "nome_jogador": jogador.get("apelido", "Jogador"),
+            "total_partidas": 0,
+            "total_acertos": 0,
+            "total_erros": 0,
+            "media_tempo_reacao_ms": 0,
+            "pontuacao_maxima": 0,
+            "evolucao_por_missao": [],
+            "habilidades": {
+                "Agilidade": 0,
+                "Lógica": 0,
+                "Memorização": 0,
+                "Leitura": 0,
+                "Interpretação": 0,
+                "Concentração": 0
+            }
+        }
+
+    total_acertos = sum(p["metricas_cognitivas"]["acertos"] for p in partidas)
+    total_erros   = sum(p["metricas_cognitivas"]["erros"]   for p in partidas)
+
+    tempos = [p["metricas_cognitivas"]["tempo_medio_reacao_ms"] for p in partidas]
+    media_tempo = round(sum(tempos) / len(tempos)) if tempos else 0
+
+    pontuacao_maxima = max((p["pontuacao_final"] for p in partidas), default=0)
+
+    evolucao = []
+    for p in partidas:
+        evolucao.append({
+            "missionId":      p.get("missionId", ""),
+            "pontuacao":      p.get("pontuacao_final", 0),
+            "acertos":        p["metricas_cognitivas"]["acertos"],
+            "erros":          p["metricas_cognitivas"]["erros"],
+            "tempo_reacao_ms": p["metricas_cognitivas"]["tempo_medio_reacao_ms"],
+            "data":           p.get("finalizado_em", "").isoformat() if hasattr(p.get("finalizado_em", ""), "isoformat") else str(p.get("finalizado_em", ""))
+        })
+
+    mapa_habilidades: dict = {}
+    for p in partidas:
+        habilidade = p["metricas_cognitivas"].get("habilidade_foco", "")
+        acertos    = p["metricas_cognitivas"]["acertos"]
+        erros      = p["metricas_cognitivas"]["erros"]
+        total      = acertos + erros
+        if not habilidade or total == 0:
+            continue
+        taxa = round((acertos / total) * 100)
+        if habilidade not in mapa_habilidades:
+            mapa_habilidades[habilidade] = []
+        mapa_habilidades[habilidade].append(taxa)
+
+    habilidades_medias = {h: round(sum(v) / len(v)) for h, v in mapa_habilidades.items()}
+
+    habilidades_padrao = ["Agilidade", "Lógica", "Memorização", "Leitura", "Interpretação", "Concentração"]
+    habilidades_final = {h: habilidades_medias.get(h, 0) for h in habilidades_padrao}
+
+    return {
+        "id_jogador":          id_jogador,
+        "nome_jogador":        jogador.get("apelido", "Jogador"),
+        "total_partidas":      len(partidas),
+        "total_acertos":       total_acertos,
+        "total_erros":         total_erros,
+        "media_tempo_reacao_ms": media_tempo,
+        "pontuacao_maxima":    pontuacao_maxima,
+        "evolucao_por_missao": evolucao,
+        "habilidades":         habilidades_final
+    }
+
 try:
     db["sessao"].create_index("expira_em", expireAfterSeconds=0)
 except Exception:
