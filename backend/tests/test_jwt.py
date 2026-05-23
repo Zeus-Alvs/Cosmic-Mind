@@ -43,12 +43,8 @@ def teste_jwt_completo():
     pin_gerado = str(random.randint(0, 999999)).zfill(6)
     tempo_expiracao = datetime.now(timezone.utc) + timedelta(minutes=10)
 
-    # Gera JWT real
-    token_jwt = gerar_jwt(ID_JOGADOR_TESTE)
-
     resultado = {
         "pin_criado": pin_gerado,
-        "token_acesso": token_jwt,
         "expira_em": tempo_expiracao.isoformat(),
         "id_jogador": ID_JOGADOR_TESTE
     }
@@ -81,7 +77,7 @@ if __name__ == "__main__":
     print("Teste JWT - Cosmic Mind")
     print("=" * 60)
     print("\nRotas disponíveis:")
-    print("  GET  /teste-jwt     - Criar PIN e JWT (mostra ambos)")
+    print("  GET  /teste-jwt     - Criar PIN")
     print("  POST /teste-login   - Simular login com PIN")
     print("\nExemplo de uso:")
     print('  curl http://localhost:8001/teste-jwt')

@@ -71,10 +71,8 @@ def read_root():
 def gerar_pin(id_jogador: str):
     """Espelha /api/jogo/gerar-pin do main.py"""
     pin = str(random.randint(0, 999999)).zfill(6)
-    token_jwt = gerar_jwt(id_jogador)
     return {
         "pin": pin,
-        "token_acesso": token_jwt,
         "id_jogador": id_jogador
     }
 
@@ -143,11 +141,11 @@ def rodar_testes():
     try:
         resp = gerar_pin(ID_JOGADOR_TESTE)
         tem_pin = "pin" in resp and len(resp["pin"]) == 6
-        tem_jwt = "token_acesso" in resp and resp["token_acesso"].startswith("eyJ")
-        status_2 = "✅ OK" if (tem_pin and tem_jwt) else "❌ FALHA"
+        sem_jwt = "token_acesso" not in resp
+        status_2 = "✅ OK" if (tem_pin and sem_jwt) else "❌ FALHA"
     except Exception as e:
         status_2 = f"❌ ERRO: {e}"
-    resultados.append(("Gerar PIN + JWT (/api/jogo/gerar-pin)", status_2))
+    resultados.append(("Gerar PIN sem JWT (/api/jogo/gerar-pin)", status_2))
 
     # ── Teste 3: Game login ──
     try:
@@ -240,7 +238,7 @@ if __name__ == "__main__":
     print("=" * 60)
     print("\nRotas disponíveis:")
     print("  GET  /                    - Health check")
-    print("  POST /api/jogo/gerar-pin  - Gerar PIN+JWT")
+    print("  POST /api/jogo/gerar-pin  - Gerar PIN")
     print("  POST /game-login          - Login (retorna JWT)")
     print("  POST /api/partidas/salvar - Salvar partida (requer JWT)")
     print("  PUT  /api/progresso/...   - Atualizar progresso (requer JWT)")

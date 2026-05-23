@@ -411,14 +411,12 @@ def excluir_jogador(id_usuario: str, id_jogador: str, payload: ExcluirJogador):
 
 @app.post("/api/jogo/gerar-pin/{id_jogador}")
 def gerar_pin_jogo(id_jogador: str):
-    token_jwt = gerar_jwt(id_jogador)
     pin_gerado = str(random.randint(0, 999999)).zfill(6)
     tempo_expiracao = datetime.now(timezone.utc) + timedelta(minutes=10)
 
     nova_sessao = {
         "codigo_pin": pin_gerado,
         "id_jogador": id_jogador,
-        "token_acesso": token_jwt,
         "criado_em": datetime.now(timezone.utc),
         "expira_em": tempo_expiracao
     }
@@ -428,8 +426,7 @@ def gerar_pin_jogo(id_jogador: str):
     return {
         "mensagem": "PIN gerado com sucesso!", 
         "pin": pin_gerado, 
-        "expira_em": tempo_expiracao,
-        "token_acesso": token_jwt
+        "expira_em": tempo_expiracao
     }
 
 @app.post("/game-login")
