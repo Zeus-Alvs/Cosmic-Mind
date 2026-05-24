@@ -1,19 +1,28 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, Any
 from datetime import datetime
 
-class MetricasCognitivas(BaseModel):
-    acertos: int
-    erros: int
-    tempo_medio_reacao_ms: int
-    habilidade_foco: str
-
-class PartidaModel(BaseModel):
+class PartidaParaPersistirModel(BaseModel):
     missionId: str
-    pontuacao_final: int
-    metricas_cognitivas: MetricasCognitivas
+    start_time: datetime
+    end_time: datetime
+    metadata: dict[str, Any]
+
+
+class PartidaParaPersistirComPontuacaoModel(BaseModel):
+    missionId: str
     iniciado_em: datetime
     finalizado_em: datetime
+    pontuacao_final: float
+    metricas_cognitivas: dict[str, Any]
+
+
+class MelhorPartidaModel(BaseModel):
+    missionId: str
+    score: int
+    starsEarned: int
+
+
 class UsuarioCadastro(BaseModel):
     nome: str
     email: EmailStr  
