@@ -478,6 +478,20 @@ def salvar_partida(partida: PartidaModel, authorization: str = Header(None)):
         "message": "Partida salva com sucesso!",
         "id_partida": str(resultado.inserted_id)
     }
+
+@app.get("/api/planetas/{planetId}/melhores-pontuacoes")
+def melhores_pontuacoes(planetId: str, authorization: str = Header(None)):
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Token de acesso ausente.")
+    token = authorization.replace('Bearer ', '')
+
+    sessao = db["sessao"].find_one({"token_acesso": token})
+    if not sessao:
+        raise HTTPException(status_code=401, detail="Token inválido ou expirado.")
+
+    jogador = db["jogador"].find_one({"_id": ObjectId(sessao["id_jogador"])})
+
+    return [item for item in jogador.get("melhores_pontuacoes", []) if item.get("planetId") == planetId]
     
 @app.put('/api/progresso/jogador/update')
 def atualizar_progresso(update_data: AtualizarProgressoRequest, authorization: str = Header(None)):
