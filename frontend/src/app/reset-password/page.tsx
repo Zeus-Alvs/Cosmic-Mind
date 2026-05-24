@@ -141,7 +141,7 @@ function RedefinirSenhaForm() {
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mt-2 text-xs text-amber-900 space-y-1.5 shadow-sm">
             <div className="flex items-center font-bold text-amber-800 gap-1.5 mb-1">
               <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-              ⚠️ Regras para uma senha segura:
+              Regras para uma senha segura:
             </div>
             
             <div className="flex items-center gap-2">
