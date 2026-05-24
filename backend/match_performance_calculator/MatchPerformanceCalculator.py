@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Dict, Any
 from models import PartidaParaPersistirModel
 from .BackpackLoadingStrategy import BackpackLoadingStrategy
 
@@ -8,7 +8,7 @@ class MatchPerformanceCalculator:
             "72ce71b2dec599547b9de77be9419227": BackpackLoadingStrategy()
         }
 
-    def calcular_pontuacao(self, match: PartidaParaPersistirModel) -> Tuple[int, int]:
+    def calcular_pontuacao(self, match: PartidaParaPersistirModel) -> Tuple[int, int, Dict[str, Any]]:
         strategy = self.strategies.get(match.missionId)
         if not strategy:
             # Caso não encontre a estratégia para o missionId, retorna 0, 0 e vazio por padrão
