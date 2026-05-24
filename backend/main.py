@@ -486,8 +486,6 @@ def salvar_partida(partida: PartidaParaPersistirModel, authorization: str = Head
 
     partida_dict = partida_para_salvar.dict()
     partida_dict["id_jogador"] = id_jogador
-    partida_dict["estrelas"] = estrelas
-    partida_dict["metadata"] = partida.metadata # Preservando metadados originais por segurança
 
     # Inserir no banco
     colecao_partidas.insert_one(partida_dict)
