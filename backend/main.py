@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, status, Header
+from fastapi import FastAPI, HTTPException, status, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 from bson import ObjectId
@@ -77,21 +77,28 @@ def cadastrar_usuario(novo_usuario: UsuarioCadastro):
 
 @app.post("/api/login", response_model=UsuarioRetorno, status_code=status.HTTP_200_OK)
 def login_usuario(credenciais: UsuarioLogin):
-
     usuario_banco = colecao_usuarios.find_one({"email": credenciais.email})
-    
-
     if not usuario_banco or not pwd_context.verify(credenciais.senha, usuario_banco["senha"]):
         raise HTTPException(status_code=401, detail="E-mail ou senha incorretos.")
-    
-    return UsuarioRetorno(
-        id=str(usuario_banco["_id"]),
-        nome=usuario_banco["nome"],
-        email=usuario_banco["email"],
-        tipo_perfil=usuario_banco["tipo_perfil"],
-        email_pendente=usuario_banco.get("email_pendente"),
-        avatar=usuario_banco.get("avatar", 1)
-    )
+
+    token_jwt = gerar_jwt(str(usuario_banco["_id"]))
+    expira = datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS)
+
+    db["sessao"].insert_one({
+        "token_acesso": token_jwt,
+        "id_usuario": str(usuario_banco["_id"]),
+        "expira_em": expira
+    })
+
+    return {
+        "id": str(usuario_banco["_id"]),
+        "nome": usuario_banco["nome"],
+        "email": usuario_banco["email"],
+        "tipo_perfil": usuario_banco["tipo_perfil"],
+        "email_pendente": usuario_banco.get("email_pendente"),
+        "avatar": usuario_banco.get("avatar", 1),
+        "token_acesso": token_jwt
+    }
 
 @app.put("/api/conta/atualizar/{email_usuario}")
 def atualizar_perfil(email_usuario: str, dados: UsuarioUpdate):
@@ -533,23 +540,43 @@ def atualizar_progresso(update_data: AtualizarProgressoRequest, authorization: s
             )
     return {"message": "Progresso atualizado com sucesso!"}
 
-@app.get("/api/estatisticas/{id_jogador}")
-def obter_estatisticas(id_jogador: str, authorization: str = Header(None)):
-    """
-    Retorna o resumo de desempenho de um jogador para a plataforma web.
-    Precisa do token do responsável/especialista no cabeçalho:
-        Authorization: Bearer <token_acesso>
-    """
-
+def get_current_user(authorization: str = Header(None)):
     if not authorization:
-        raise HTTPException(status_code=401, detail="Token de acesso ausente.")
-
+        raise HTTPException(status_code=401, detail="Token ausente.")
     token = authorization.replace("Bearer ", "")
-
     sessao = db["sessao"].find_one({"token_acesso": token})
     if not sessao:
-        raise HTTPException(status_code=401, detail="Token inválido ou expirado.")
+        raise HTTPException(status_code=401, detail="Sessão inválida ou expirada.")
+    exp = sessao.get("expira_em")
+    if exp and datetime.utcnow() > exp:
+        raise HTTPException(status_code=401, detail="Sessão expirada.")
+    usuario = colecao_usuarios.find_one({"_id": ObjectId(sessao.get("id_usuario"))})
+    if not usuario:
+        raise HTTPException(status_code=401, detail="Usuário não encontrado.")
+    return usuario
 
+def require_especialista(usuario = Depends(get_current_user)):
+    if usuario.get("tipo_perfil") != "especialista":
+        raise HTTPException(status_code=403, detail="Acesso restrito a especialistas.")
+    return usuario
+
+@app.get("/api/jogadores")
+def listar_todos_jogadores(_: dict = Depends(require_especialista)):
+    jogadores = list(db["jogador"].find())
+    return [{'id': str(j['_id']), 'nome': j.get('apelido', 'Jogador')} for j in jogadores]
+
+@app.get("/api/estatisticas/{id_jogador}")
+def obter_estatisticas(id_jogador: str, current_user: dict = Depends(get_current_user)):
+    # permitir se especialista
+    if current_user.get("tipo_perfil") == "responsavel":
+        vinculos = current_user.get("jogadores_vinculados", [])
+        # vinculos podem ser ObjectId ou strings — adeque conforme o formato no DB
+        if ObjectId(id_jogador) not in vinculos and id_jogador not in [str(v) for v in vinculos]:
+            raise HTTPException(status_code=403, detail="Você não tem permissão para ver esse jogador.")
+    # segue a lógica existente para agregar e retornar estatísticas
+
+    if not id_jogador:
+        raise HTTPException(status_code=400, detail="ID de jogador inválido.")
 
     try:
         jogador_obj_id = ObjectId(id_jogador)
@@ -634,4 +661,4 @@ def obter_estatisticas(id_jogador: str, authorization: str = Header(None)):
 try:
     db["sessao"].create_index("expira_em", expireAfterSeconds=0)
 except Exception:
-    pass  
+    pass
