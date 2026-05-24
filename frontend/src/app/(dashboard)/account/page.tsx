@@ -1,24 +1,27 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { User, Lock, Save, Eye, EyeOff, CheckCircle2, Clock, X } from 'lucide-react';
+import { User, Lock, Save, Eye, EyeOff, CheckCircle2, Clock, X, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getApiUrl } from '@/utils/api';
 
 export default function AccountPage() {
   const router = useRouter();
   const [usuario, setUsuario] = useState({ nome: '', tipo_perfil: '', email: '', crp_especialista: '' });
-  const [showPassword, setShowPassword] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState('1');
   const [isLoading, setIsLoading] = useState(true);
-
 
   const [formData, setFormData] = useState({ nome: '', email: '', crp_especialista: '' });
   const [passData, setPassData] = useState({ atual: '', nova: '', confirmar: '' });
 
+  // Estados individuais para visibilidade de cada senha
+  const [showAtual, setShowAtual] = useState(false);
+  const [showNova, setShowNova] = useState(false);
+  const [showConfirmar, setShowConfirmar] = useState(false);
 
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [emailPendente, setEmailPendente] = useState('');
 
   useEffect(() => {
@@ -31,7 +34,6 @@ export default function AccountPage() {
       if (parsed.avatar) {
         setSelectedAvatar(parsed.avatar.toString());
       }
-
 
       if (parsed.email_pendente) {
         setEmailPendente(parsed.email_pendente);
@@ -60,7 +62,6 @@ export default function AccountPage() {
       console.error(err);
     }
   };
-
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,16 +95,11 @@ export default function AccountPage() {
         if (data.email_trocado === "pendente") {
           alert('Um link de verificação foi enviado para o seu novo e-mail!');
           setEmailPendente(formData.email);
-
-
           dadosSalvos.email_pendente = formData.email;
-
           setFormData((prev: any) => ({ ...prev, email: usuario.email }));
+        } else {
+          alert('Perfil updated com sucesso!');
         }
-        else {
-          alert('Perfil atualizado com sucesso!');
-        }
-
 
         dadosSalvos.nome = formData.nome;
         if (usuario.tipo_perfil === 'especialista') {
@@ -127,7 +123,6 @@ export default function AccountPage() {
     }
   };
 
-
   const handleSavePassword = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -136,8 +131,29 @@ export default function AccountPage() {
       return;
     }
 
-    if (passData.nova.length < 6) {
-      alert('A nova senha deve ter pelo menos 6 caracteres.');
+    // Validação do tamanho mínimo (8 caracteres)
+    if (passData.nova.length < 8) {
+      alert('A nova senha deve conter no mínimo 8 caracteres.');
+      return;
+    }
+
+    // Regex para validar: pelo menos uma letra maiúscula, pelo menos um número e pelo menos um caractere especial
+    const regexLetraMaiuscula = /[A-Z]/;
+    const regexNumero = /[0-9]/;
+    const regexCaractereEspecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+
+    if (!regexLetraMaiuscula.test(passData.nova)) {
+      alert('A nova senha deve incluir pelo menos uma letra maiúscula.');
+      return;
+    }
+
+    if (!regexNumero.test(passData.nova)) {
+      alert('A nova senha deve conter pelo menos um número.');
+      return;
+    }
+
+    if (!regexCaractereEspecial.test(passData.nova)) {
+      alert('A nova senha deve conter pelo menos um caractere especial (ex: @, #, $).');
       return;
     }
 
@@ -168,6 +184,32 @@ export default function AccountPage() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    const confirmacao = window.confirm("Tem certeza absoluta que deseja excluir permanentemente sua conta? Esta ação não pode ser desfeita.");
+    if (!confirmacao) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`${getApiUrl()}/conta/deletar/${usuario.email}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.ok) {
+        alert('Sua conta foi excluída com sucesso.');
+        localStorage.clear();
+        router.push('/login');
+      } else {
+        const data = await response.json();
+        alert(`Erro ao excluir conta: ${data.detail || 'Ocorreu um erro.'}`);
+      }
+    } catch (error) {
+      alert('Erro de conexão com o servidor ao tentar excluir a conta.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (isLoading) return <div className="p-10 text-slate-400 font-bold text-center">Carregando dados da conta...</div>;
 
   return (
@@ -183,7 +225,7 @@ export default function AccountPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-
+        {/* Coluna Esquerda: Avatar e Exclusão */}
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex flex-col items-center text-center">
             <div className="w-28 h-28 rounded-full shadow-lg mb-5 transition-all duration-300 overflow-hidden ring-4 ring-slate-100">
@@ -200,7 +242,7 @@ export default function AccountPage() {
                     key={id}
                     type="button"
                     onClick={() => handleAvatarChange(id.toString())}
-                    className={`w-12 h-12 rounded-full transition-all duration-300 shadow-sm overflow-hidden ${selectedAvatar === id.toString() ? 'ring-4 ring-offset-2 ring-blue-500 scale-110' : 'opacity-50 hover:opacity-100 hover:scale-105 ring-1 ring-slate-200'}`}
+                    className={`w-12 h-12 rounded-full transition-all duration-300 shadow-sm overflow-hidden cursor-pointer ${selectedAvatar === id.toString() ? 'ring-4 ring-offset-2 ring-blue-500 scale-110' : 'opacity-50 hover:opacity-100 hover:scale-105 ring-1 ring-slate-200'}`}
                     title={`Foto ${id}`}
                   >
                     <img src={`/usuarios/foto${id}.png`} alt={`Opção de avatar ${id}`} className="w-full h-full object-cover" />
@@ -209,12 +251,27 @@ export default function AccountPage() {
               </div>
             </div>
           </div>
+
+          {/* Seção Excluir Conta */}
+          <div className="bg-red-50/50 p-6 rounded-[24px] border border-red-100 shadow-sm text-center">
+            <h4 className="text-sm font-bold text-red-800 mb-1">Zona de Perigo</h4>
+            <p className="text-xs text-slate-500 mb-4">A exclusão da conta apagará todos os seus dados permanentemente do sistema.</p>
+            <button
+              type="button"
+              onClick={handleDeleteAccount}
+              disabled={isDeleting}
+              className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
+            >
+              <Trash2 className="w-4 h-4" />
+              {isDeleting ? 'Excluindo...' : 'Excluir Minha Conta'}
+            </button>
+          </div>
         </div>
 
-
+        {/* Coluna Direita: Formulários */}
         <div className="lg:col-span-2 space-y-6">
 
-
+          {/* Form Dados Pessoais */}
           <form onSubmit={handleSaveProfile} className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm">
             <div className="flex items-center gap-2 mb-6">
               <User className="w-5 h-5 text-[#4078A4]" />
@@ -233,10 +290,8 @@ export default function AccountPage() {
                 />
               </div>
 
-
               {emailPendente ? (
                 <div className="space-y-3">
-
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-slate-500 ml-1">E-MAIL ATUAL</label>
                     <input
@@ -247,8 +302,7 @@ export default function AccountPage() {
                     />
                   </div>
 
-
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 relative shadow-sm"> {/* <-- ESSA DIV HAVIA SUMIDO! */}
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 relative shadow-sm">
                     <button
                       type="button"
                       onClick={async () => {
@@ -269,7 +323,7 @@ export default function AccountPage() {
                         delete dadosSalvos.email_pendente;
                         localStorage.setItem('user_data', JSON.stringify(dadosSalvos));
                       }}
-                      className="absolute top-3 right-3 text-amber-500 hover:bg-amber-100 rounded-md p-1 transition-colors"
+                      className="absolute top-3 right-3 text-amber-500 hover:bg-amber-100 rounded-md p-1 transition-colors cursor-pointer"
                       title="Cancelar troca de e-mail"
                     >
                       <X className="w-4 h-4" />
@@ -313,7 +367,7 @@ export default function AccountPage() {
               <button
                 type="submit"
                 disabled={savingProfile}
-                className="flex items-center gap-2 bg-[#4078A4] text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-[#3E89AE] transition-colors shadow-sm disabled:opacity-50"
+                className="flex items-center gap-2 bg-[#4078A4] text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-[#3E89AE] transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
               >
                 <Save className="w-4 h-4" />
                 {savingProfile ? 'Salvando...' : 'Atualizar Perfil'}
@@ -321,7 +375,7 @@ export default function AccountPage() {
             </div>
           </form>
 
-
+          {/* Form Segurança */}
           <form onSubmit={handleSavePassword} className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm">
             <div className="flex items-center gap-2 mb-6">
               <Lock className="w-5 h-5 text-[#AC57EB]" />
@@ -329,49 +383,110 @@ export default function AccountPage() {
             </div>
 
             <div className="space-y-4 max-w-md">
+              {/* Campo: Senha Atual */}
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-500 ml-1">SENHA ATUAL</label>
-                <input
-                  type="password"
-                  value={passData.atual}
-                  onChange={(e) => setPassData({ ...passData, atual: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all"
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1 relative">
-                <label className="text-xs font-bold text-slate-500 ml-1">NOVA SENHA</label>
                 <div className="relative">
                   <input
-                    type={showPassword ? "text" : "password"}
-                    value={passData.nova}
-                    onChange={(e) => setPassData({ ...passData, nova: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all"
+                    type={showAtual ? "text" : "password"}
+                    value={passData.atual}
+                    onChange={(e) => setPassData({ ...passData, atual: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all pr-12"
                     placeholder="••••••••"
                     required
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
+                    onClick={() => setShowAtual(!showAtual)}
+                    className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 cursor-pointer"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showAtual ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                   </button>
                 </div>
+                {/* Regras da Senha Atual */}
+                {!showAtual && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-left mt-1.5">
+                    <p className="text-[10px] font-black text-amber-600 uppercase tracking-wider mb-1">Validação Obrigatória:</p>
+                    <div className="flex items-center gap-2 text-[11px] text-amber-700 font-medium">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <span>Informe sua senha atual para confirmar que é você mesmo.</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
+              {/* Campo: Nova Senha */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-500 ml-1">NOVA SENHA</label>
+                <div className="relative">
+                  <input
+                    type={showNova ? "text" : "password"}
+                    value={passData.nova}
+                    onChange={(e) => setPassData({ ...passData, nova: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all pr-12"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNova(!showNova)}
+                    className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  >
+                    {showNova ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                  </button>
+                </div>
+                {/* Regras da Nova Senha */}
+                {!showNova && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-left mt-1.5">
+                    <p className="text-[10px] font-black text-amber-600 uppercase tracking-wider mb-1.5">⚠️ Regras para uma senha segura:</p>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-[11px] text-amber-700 font-medium">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                        <span>Deve conter no mínimo 8 caracteres.</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] text-amber-700 font-medium">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                        <span>Inclua pelo menos uma letra maiúscula.</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] text-amber-700 font-medium">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                        <span>Use números e um caractere especial (ex: @, #, $).</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Campo: Confirmar Nova Senha */}
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-500 ml-1">CONFIRMAR NOVA SENHA</label>
-                <input
-                  type="password"
-                  value={passData.confirmar}
-                  onChange={(e) => setPassData({ ...passData, confirmar: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all"
-                  placeholder="••••••••"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={showConfirmar ? "text" : "password"}
+                    value={passData.confirmar}
+                    onChange={(e) => setPassData({ ...passData, confirmar: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all pr-12"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmar(!showConfirmar)}
+                    className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  >
+                    {showConfirmar ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                  </button>
+                </div>
+                {/* Regras da Confirmação */}
+                {!showConfirmar && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-left mt-1.5">
+                    <p className="text-[10px] font-black text-amber-600 uppercase tracking-wider mb-1">Confirmação de segurança:</p>
+                    <div className="flex items-center gap-2 text-[11px] text-amber-700 font-medium">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <span>Deve ser idêntica à nova senha digitada acima.</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -382,7 +497,7 @@ export default function AccountPage() {
               <button
                 type="submit"
                 disabled={savingPassword}
-                className="flex items-center gap-2 bg-[#AC57EB] text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:brightness-110 transition-all shadow-sm disabled:opacity-50"
+                className="flex items-center gap-2 bg-[#AC57EB] text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:brightness-110 transition-all shadow-sm disabled:opacity-50 cursor-pointer"
               >
                 {savingPassword ? 'Alterando...' : 'Alterar Senha'}
               </button>

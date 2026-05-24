@@ -4,7 +4,6 @@ import { useState, useMemo, useEffect } from 'react';
 import { Bell, Zap, Trophy, ChevronRight, Star, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-
 interface NotificationDTO {
   id: string;
   type: 'pausa' | 'solicitacao' | 'conquista' | 'novidade' | 'info';
@@ -19,14 +18,11 @@ export default function NotificationsR() {
   const router = useRouter();
   const [filter, setFilter] = useState<'recentes' | 'antigas' | '30dias'>('recentes');
 
-
   const [notificationsData, setNotificationsData] = useState<NotificationDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-
   useEffect(() => {
     const fetchNotifications = async () => {
-
       const mockApiResponse: NotificationDTO[] = [
         {
           id: "uuid-1",
@@ -80,7 +76,6 @@ export default function NotificationsR() {
     fetchNotifications();
   }, []);
 
-
   const getIconConfig = (type: NotificationDTO['type']) => {
     const configs = {
       pausa: { icon: <Zap className="w-5 h-5 text-orange-500" />, bg: 'bg-orange-100' },
@@ -91,7 +86,6 @@ export default function NotificationsR() {
     };
     return configs[type] || configs.info;
   };
-
 
   const filteredList = useMemo(() => {
     let list = notificationsData.map(n => ({
@@ -127,7 +121,7 @@ export default function NotificationsR() {
         <p className="text-slate-400 text-xs font-medium">Acompanhe os jogadores em tempo real</p>
       </header>
 
-
+      {/* Abas Filtro */}
       <div className="flex justify-end mb-6">
         <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200/50 shadow-inner">
           {[
@@ -138,8 +132,9 @@ export default function NotificationsR() {
             <button
               key={tab.id}
               onClick={() => setFilter(tab.id as any)}
-              className={`px-4 py-2 text-[10px] font-black rounded-xl transition-all ${filter === tab.id ? 'bg-white text-[#4078A4] shadow-sm' : 'text-slate-400 hover:text-slate-500'
-                }`}
+              className={`px-4 py-2 text-[10px] font-black rounded-xl transition-all cursor-pointer ${
+                filter === tab.id ? 'bg-white text-[#4078A4] shadow-sm' : 'text-slate-400 hover:text-slate-500'
+              }`}
             >
               {tab.label}
             </button>
@@ -176,7 +171,7 @@ export default function NotificationsR() {
               {notif.isLink && (
                 <button
                   onClick={() => router.push(notif.linkTo || '/')}
-                  className="flex items-center gap-1.5 bg-[#4078A4]/10 text-[#4078A4] px-4 py-2 rounded-2xl text-[10px] font-black hover:bg-[#4078A4] hover:text-white transition-all group shrink-0"
+                  className="flex items-center gap-1.5 bg-[#4078A4]/10 text-[#4078A4] px-4 py-2 rounded-2xl text-[10px] font-black hover:bg-[#4078A4] hover:text-white transition-all group shrink-0 cursor-pointer"
                 >
                   CONFIRA
                   <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />

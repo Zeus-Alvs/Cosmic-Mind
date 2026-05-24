@@ -12,7 +12,6 @@ function EditPageContent() {
 
     const [isLoading, setIsLoading] = useState(true);
 
-
     const [nomeJogador, setNomeJogador] = useState('');
     const [avatarIndex, setAvatarIndex] = useState(1);
     const [usuarioId, setUsuarioId] = useState('');
@@ -143,7 +142,7 @@ function EditPageContent() {
             <div className="flex items-center justify-center relative mb-6">
                 <button
                     onClick={voltar}
-                    className="absolute left-0 text-slate-500 hover:text-slate-800 transition-colors"
+                    className="absolute left-0 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
                 >
                     <ArrowLeft className="w-6 h-6" />
                 </button>
@@ -154,12 +153,11 @@ function EditPageContent() {
 
             <div className="text-center mb-16">
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                    Você pode <strong>trocar o avatar</strong>, <strong>alterar</strong> o nome, <strong>excluir</strong> ou <strong>desconectar</strong> a <span className="underline cursor-pointer">CONTA DO JOGADOR</span>
+                    Você pode <strong>trocar o avatar</strong>, <strong>alterar</strong> o nome, <strong>excluir</strong> ou <strong>desconectar</strong> a <span className="underline">CONTA DO JOGADOR</span>
                 </p>
             </div>
 
             <div className="max-w-md mx-auto bg-[#F7F4F5] rounded-[30px] border border-[#EBE5E8] shadow-sm relative pt-20 pb-8 px-8 mb-10">
-
 
                 <div className="absolute -top-16 left-1/2 transform -translate-x-1/2">
                     <div className="w-32 h-32 rounded-full border-4 border-[#F7F4F5] shadow-lg overflow-hidden bg-slate-100">
@@ -167,19 +165,17 @@ function EditPageContent() {
                     </div>
                 </div>
 
-
                 <div className="flex items-center justify-center gap-4 mb-8">
                     {[1, 2, 3, 4].map((idx) => (
                         <button
                             key={idx}
                             onClick={() => setAvatarIndex(idx)}
-                            className={`w-12 h-12 rounded-full border-2 transition-all overflow-hidden bg-slate-200 flex items-center justify-center ${avatarIndex === idx ? 'border-[#AC57EB] scale-110 shadow-md' : 'border-transparent hover:scale-105'}`}
+                            className={`w-12 h-12 rounded-full border-2 transition-all overflow-hidden bg-slate-200 flex items-center justify-center cursor-pointer ${avatarIndex === idx ? 'border-[#AC57EB] scale-110 shadow-md' : 'border-transparent hover:scale-105'}`}
                         >
                             <img src={`/jogadores/foto${idx}.png`} alt={`Avatar ${idx}`} className="w-full h-full object-cover" />
                         </button>
                     ))}
                 </div>
-
 
                 <div className="relative mb-8">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -194,22 +190,20 @@ function EditPageContent() {
                     />
                 </div>
 
-
                 <button
                     onClick={handleSalvar}
                     disabled={isSaving || !nomeJogador.trim()}
-                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#4078A4] to-[#AC57EB] text-white font-bold text-sm shadow-lg hover:brightness-110 transition-all disabled:opacity-50"
+                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#4078A4] to-[#AC57EB] text-white font-bold text-sm shadow-lg hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer"
                 >
                     {isSaving ? 'SALVANDO...' : 'SALVAR ALTERAÇÕES'}
                 </button>
 
             </div>
 
-
             <div className="max-w-md mx-auto flex items-center gap-4">
                 <button
                     onClick={() => setIsDeleteModalOpen(true)}
-                    className="flex-1 py-3.5 rounded-xl bg-[#EB5757] text-white font-bold text-sm shadow-md hover:bg-red-600 transition-all flex items-center justify-center gap-2"
+                    className="flex-1 py-3.5 rounded-xl bg-[#EB5757] text-white font-bold text-sm shadow-md hover:bg-red-600 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                     <Trash2 className="w-5 h-5" />
                     Excluir Conta
@@ -217,13 +211,12 @@ function EditPageContent() {
 
                 <button
                     onClick={handleDesconectar}
-                    className="flex-1 py-3.5 rounded-xl bg-[#595959] text-white font-bold text-sm shadow-md hover:bg-black transition-all flex items-center justify-center gap-2"
+                    className="flex-1 py-3.5 rounded-xl bg-[#595959] text-white font-bold text-sm shadow-md hover:bg-black transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                     <LogOut className="w-5 h-5" />
                     Desconectar
                 </button>
             </div>
-
 
             {isDeleteModalOpen && (
                 <div className="fixed inset-0 z-[300] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
@@ -231,7 +224,7 @@ function EditPageContent() {
 
                         <button
                             onClick={() => setIsDeleteModalOpen(false)}
-                            className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors"
+                            className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
                         >
                             <X className="w-5 h-5" />
                         </button>
@@ -252,7 +245,7 @@ function EditPageContent() {
                         <button
                             onClick={handleConfirmarExclusao}
                             disabled={!senha}
-                            className="w-full py-3.5 rounded-xl bg-red-600 text-white font-bold text-sm hover:bg-red-700 shadow-md transition-colors disabled:opacity-50"
+                            className="w-full py-3.5 rounded-xl bg-red-600 text-white font-bold text-sm hover:bg-red-700 shadow-md transition-colors disabled:opacity-50 cursor-pointer"
                         >
                             Confirmar Exclusão
                         </button>

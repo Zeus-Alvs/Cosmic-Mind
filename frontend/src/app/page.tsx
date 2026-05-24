@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react"; 
 import { useRouter } from "next/navigation";
 
 interface StarPosition {
@@ -27,101 +27,110 @@ const starPositions: StarPosition[] = [
 ];
 
 interface TeamMember {
-name: string;
-role: string;
-icon: string; 
-color: string; 
-bg: string;
-desc: string; 
+  name: string;
+  role: string;
+  icon: string; 
+  color: string; 
+  bg: string;
+  desc: string; 
+  image: string;
 }
 
 const selenesTeam: TeamMember[] = [
-{
-name: "Eduarda Belles",
-role: "Líder e desenvolvedora front-end",
-icon: "👑",
-color: "from-purple-500 to-indigo-500",
-bg: "bg-teal-500/10",
-desc: "UI/UX designer. Focada na experiência do usuário."
-},
-{
-name: "Brenno D'Luca",
-role: "Desenvolvedor Back-end",
-icon: "🪐",
-color: "from-blue-600 to-cyan-500",
-bg: "bg-teal-500/10",
-desc: "Foco na lógica por trás do sistema."
-},
-{
-name: "Zeus Machado",
-role: "Engenheiro de Software",
-icon: "⚡",
-color: "from-amber-500 to-orange-600",
-bg: "bg-teal-500/10",
-desc: "Foco em trazer um sistema bom e funcional."
-},
-{
-name: "Ellen Gouveia",
-role: "Analista e Desenvolvedora front-end",
-icon: "🎨",
-color: "from-pink-500 to-purple-500",
-bg: "bg-teal-500/10",
-desc: "Artista e game designer, focando no lado criativo do projeto."
-},
-{
-name: "Luana",
-role: "Desenvolvedora front-end e game designer",
-icon: "✨",
-color: "from-teal-400 to-blue-500",
-bg: "bg-teal-500/10",
-desc: "Foco em priorizar o lado criativo e lúdico do projeto."
-}
+  {
+    name: "Eduarda Belles",
+    role: "Líder e desenvolvedora front-end",
+    icon: "👑",
+    color: "from-purple-500 to-indigo-500",
+    bg: "bg-teal-500/10",
+    desc: "UI/UX designer. Focada na experiência do usuário.",
+    image: "/members/eduarda.jpeg"
+  },
+  {
+    name: "Brenno D'Luca",
+    role: "Desenvolvedor Back-end",
+    icon: "🪐",
+    color: "from-blue-600 to-cyan-500",
+    bg: "bg-teal-500/10",
+    desc: "Foco na lógica por trás do sistema.",
+    image: "/members/brenno.jpeg"
+  },
+  {
+    name: "Zeus Machado",
+    role: "Engenheiro de Software",
+    icon: "⚡",
+    color: "from-amber-500 to-orange-600",
+    bg: "bg-teal-500/10",
+    desc: "Foco em trazer um sistema bom e funcional.",
+    image: "/members/zeus.jpeg"
+  },
+  {
+    name: "Ellen Gouveia",
+    role: "Analista e Desenvolvedora front-end",
+    icon: "🎨",
+    color: "from-pink-500 to-purple-500",
+    bg: "bg-teal-500/10",
+    desc: "Artista e game designer, focando no lado criativo do projeto.",
+    image: "/members/ellen.jpeg"
+  },
+  {
+    name: "Luana",
+    role: "Desenvolvedora front-end e game designer",
+    icon: "✨",
+    color: "from-teal-400 to-blue-500",
+    bg: "bg-teal-500/10",
+    desc: "Foco em priorizar o lado criativo e lúdico do projeto.",
+    image: "/members/luana.jpeg"
+  }
 ];
 
 const spectrumTeam: TeamMember[] = [
-{
-name: "Eduarda Belles",
-role: "Líder & UX/UI Designer",
-icon: "💫",
-color: "from-purple-500 to-pink-500",
-bg: "bg-teal-500/10",
-desc: "UI/UX designer. Focada na experiência do usuário."
-},
-{
-name: "Raiza Antoneli",
-role: "Engenheira de Software",
-icon: "🛡️",
-color: "from-indigo-600 to-blue-500",
-bg: "bg-teal-500/10",
-desc: "Prioriza um sistema bom e funcional."
-},
-{
-name: "Luigi Campregher",
-role: "Desenvolvedor de Jogos",
-icon: "👾",
-color: "from-green-500 to-teal-500",
-bg: "bg-teal-500/10",
-desc: "Foco em trazer um jogo lúdico e funcional para os usuários."
-},
-{
-name: "Ângelo Ferreira",
-role: "Desenvolvedor Back-end",
-icon: "📡",
-color: "from-cyan-600 to-indigo-500",
-bg: "bg-teal-500/10",
-desc: "Foco na lógica por trás do sistema."
-},
-{
-name: "Takeshi Aoki",
-role: "Desenvolvedor e Designer de Jogos",
-icon: "🎮",
-color: "from-rose-500 to-orange-500",
-bg: "bg-teal-500/10",
-desc: "Foco no lado criativo e lúdico do jogo."
-}
+  {
+    name: "Eduarda Belles",
+    role: "Líder & UX/UI Designer",
+    icon: "💫",
+    color: "from-purple-500 to-pink-500",
+    bg: "bg-teal-500/10",
+    desc: "UI/UX designer. Focada na experiência do usuário.",
+    image: "/members/eduarda.jpeg"
+  },
+  {
+    name: "Raiza Antoneli",
+    role: "Engenheira de Software",
+    icon: "🛡️",
+    color: "from-indigo-600 to-blue-500",
+    bg: "bg-teal-500/10",
+    desc: "Prioriza um sistema bom e funcional.",
+    image: "/members/raiza.jpeg"
+  },
+  {
+    name: "Luigi Campregher",
+    role: "Desenvolvedor de Jogos",
+    icon: "👾",
+    color: "from-green-500 to-teal-500",
+    bg: "bg-teal-500/10",
+    desc: "Foco em trazer um jogo lúdico e funcional para os usuários.",
+    image: "/members/luigi.jpeg"
+  },
+  {
+    name: "Ângelo Ferreira",
+    role: "Desenvolvedor Back-end",
+    icon: "📡",
+    color: "from-cyan-600 to-indigo-500",
+    bg: "bg-teal-500/10",
+    desc: "Foco na lógica por trás do sistema.",
+    image: "/members/angelo.jpeg"
+  },
+  {
+    name: "Takeshi Aoki",
+    role: "Desenvolvedor e Designer de Jogos",
+    icon: "🎮",
+    color: "from-rose-500 to-orange-500",
+    bg: "bg-teal-500/10",
+    desc: "Foco no lado criativo e lúdico do jogo.",
+    image: "/members/takeshi.jpeg"
+  }
 ];
-
-
 
 function StarSVG({ size }: { size: number }) {
   const points: string[] = [];
@@ -148,37 +157,66 @@ function StarSVG({ size }: { size: number }) {
 export default function Home() {
   const [selenesIndex, setSelenesIndex] = useState(0);
   const [spectrumIndex, setSpectrumIndex] = useState(0);
+  const [activeSection, setActiveSection] = useState("hero"); // Estado para monitorar a seção ativa
   const pageRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const handlePrev = (team: "selenes" | "spectrum", listLength: number) => {
-if (team === "selenes") {
-setSelenesIndex((prev) => (prev === 0 ? listLength - 1 : prev - 1));
-} else {
-setSpectrumIndex((prev) => (prev === 0 ? listLength - 1 : prev - 1));
-}
-};
+  // Monitora qual seção está visível na tela
+  useEffect(() => {
+    const sections = ["hero", "download", "aboutus", "about", "contact"];
+    
+    const observerOptions = {
+      root: null,
+      rootMargin: "-30% 0px -60% 0px", // Dispara quando a seção ocupa a parte central da tela
+      threshold: 0,
+    };
 
-const handleNext = (team: "selenes" | "spectrum", listLength: number) => {
-if (team === "selenes") {
-setSelenesIndex((prev) => (prev === listLength - 1 ? 0 : prev + 1));
-} else {
-setSpectrumIndex((prev) => (prev === listLength - 1 ? 0 : prev + 1));
-}
-};
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    sections.forEach((id) => {
+      const element = document.getElementById(id);
+      if (element) observer.observe(element);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const handlePrev = (team: "selenes" | "spectrum", listLength: number) => {
+    if (team === "selenes") {
+      setSelenesIndex((prev) => (prev === 0 ? listLength - 1 : prev - 1));
+    } else {
+      setSpectrumIndex((prev) => (prev === 0 ? listLength - 1 : prev - 1));
+    }
+  };
+
+  const handleNext = (team: "selenes" | "spectrum", listLength: number) => {
+    if (team === "selenes") {
+      setSelenesIndex((prev) => (prev === listLength - 1 ? 0 : prev + 1));
+    } else {
+      setSpectrumIndex((prev) => (prev === listLength - 1 ? 0 : prev + 1));
+    }
+  };
 
   const menuItems = [
-    { label: "Início", href: "#hero" }, 
-    { label: "Download", href: "#download" },
-    { label: "Quem Somos", href: "#aboutus" },
-    { label: "Sobre", href: "#about" },
-    { label: "Contato", href: "#contact" },
+    { label: "Início", href: "#hero", id: "hero" }, 
+    { label: "Download", href: "#download", id: "download" },
+    { label: "Quem Somos", href: "#aboutus", id: "aboutus" },
+    { label: "Sobre", href: "#about", id: "about" },
+    { label: "Contato", href: "#contact", id: "contact" },
   ];
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Raleway:wght@300;400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Cormorant+Garamond:ital,wght=0,300;0,400;1,300&family=Raleway:wght@300;400;500&display=swap');
 
         .page-wrapper {
           min-height: 100vh;
@@ -298,7 +336,7 @@ setSpectrumIndex((prev) => (prev === listLength - 1 ? 0 : prev + 1));
         }
       `}</style>
 
-      <div className="page-wrapper" ref={pageRef}>
+      <div className="page-wrapper" ref={pageRef} id="hero-wrapper">
 
         {/* ── Stars ── */}
         {starPositions.map((sp, i) => (
@@ -316,19 +354,28 @@ setSpectrumIndex((prev) => (prev === listLength - 1 ? 0 : prev + 1));
           </div>
         ))}
 
-        {/* ── Header ── */}
-        <header className="flex items-center justify-between px-12 py-5 relative z-10">
+        {/* ── Header Fixo ── */}
+        <header className="fixed top-0 left-0 w-full flex items-center justify-between px-12 py-5 z-50 bg-black/40 backdrop-blur-md border-b border-white/5">
           <nav className="flex gap-9">
-            {menuItems.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                className="text-white/90 hover:text-white transition-colors text-sm font-medium tracking-wide"
-                style={{ fontFamily: "'Raleway', sans-serif" }}
-              >
-                {item.label}
-              </a>
-            ))}
+            {menuItems.map((item) => {
+              const isActive = activeSection === item.id;
+              return (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className={`transition-all text-sm font-medium tracking-wide duration-300 relative py-1
+                    ${isActive 
+                      ? "text-cyan-400 font-semibold scale-105" 
+                      : "text-white/70 hover:text-cyan-300 hover:scale-105"
+                    }`}
+                  style={{ fontFamily: "'Raleway', sans-serif" }}
+                >
+                  {item.label}
+                  {/* Linha decorativa embaixo do link ativo */}
+                  <span className={`absolute bottom-0 left-0 h-[2px] bg-cyan-400 transition-all duration-300 ${isActive ? 'w-full' : 'w-0'}`}></span>
+                </a>
+              );
+            })}
           </nav>
           <div className="flex gap-3">
             <button 
@@ -347,7 +394,7 @@ setSpectrumIndex((prev) => (prev === listLength - 1 ? 0 : prev + 1));
         </header>
 
         {/* ── Hero ── */}
-        <div className="flex flex-col items-center text-center px-6 pt-32 pb-20 relative z-10 min-h-[70vh] justify-center">
+        <div className="flex flex-col items-center text-center px-6 pt-40 pb-20 relative z-10 min-h-[70vh] justify-center">
           <h1
             className="animate-hero mb-10"
             style={{
@@ -375,18 +422,16 @@ setSpectrumIndex((prev) => (prev === listLength - 1 ? 0 : prev + 1));
           </p>
 
           <button 
-          className="animate-hero-3 px-10 py-4 rounded-full bg-gradient-to-r  to-cyan-500 from-purple-500 text-white font-bold tracking-[0.2em] hover:to-cyan-600 hover:from-purple-600 hover:scale-105 active:scale-95 transition-all shadow-lg"
-          onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
-        >
-          CONHECER
-        </button>
-          
+            className="animate-hero-3 px-10 py-4 rounded-full bg-gradient-to-r to-cyan-500 from-purple-500 text-white font-bold tracking-[0.2em] hover:to-cyan-600 hover:from-purple-600 hover:scale-105 active:scale-95 transition-all shadow-lg"
+            onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
+          >
+            CONHECER
+          </button>
         </div>
 
         {/* ── Cards ── */}
         <div className="animate-hero-3 flex justify-center gap-9 px-12 pb-16 flex-wrap relative z-10">
-
-          {/* Card 1 — com estrela decorativa no canto inferior esquerdo */}
+          {/* Card 1 */}
           <div
             className="game-card flex items-center justify-center relative"
             style={{ width: "clamp(260px, 34vw, 380px)", aspectRatio: "16/9" }}
@@ -426,7 +471,6 @@ setSpectrumIndex((prev) => (prev === listLength - 1 ? 0 : prev + 1));
               Imagem do jogo
             </span>
           </div>
-
         </div>
 
         {/* ── Download ── */}
@@ -452,203 +496,220 @@ setSpectrumIndex((prev) => (prev === listLength - 1 ? 0 : prev + 1));
             </a>
             
             <span className="text-white/40 text-xs mt-4">
-             Desenvolvido em Unity 
+               Desenvolvido em Unity 
             </span>
           </div>
         </section>
 
-      {/* ── Quem somos ── */}
-    <section id="aboutus" className="py-24 relative z-10 px-6 backdrop-blur-sm border-y border-white/5">
-      <div className="max-w-5xl mx-auto text-center mb-16">
-        <h2 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-3xl text-white mb-8 uppercase tracking-widest">
-          Quem Somos
-        </h2>
-      {/* Texto com tamanho reduzido (text-lg) e fonte alterada para 'Inter' */}
-         <p style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg text-white/90 leading-relaxed max-w-4xl mx-auto italic mb-6">
-    "Somos a equipe Selenes e, em parceria com a equipe Spectrum, desenvolvedora de um jogo lúdico voltado para crianças com TDAH, nos unimos para criar o Cosmic Mind Dashboard."
-          </p>
-        
-        <p style={{ fontFamily: "'Raleway', sans-serif" }} className="text-base text-white/70 leading-relaxed max-w-3xl mx-auto font-light">
-          Nosso projeto consiste em uma plataforma inteligente capaz de gerar métricas e análises sobre o desempenho das crianças dentro do jogo, auxiliando no acompanhamento de seu desenvolvimento de forma prática, acessível e intuitiva. 
-          Buscamos unir tecnologia, inclusão e inovação para contribuir com uma experiência mais eficiente e acolhedora.
-        </p>
-      </div>
+        {/* ── Quem somos ── */}
+        <section id="aboutus" className="py-24 relative z-10 px-6 backdrop-blur-sm border-y border-white/5">
+          <div className="max-w-5xl mx-auto text-center mb-16">
+            <h2 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-3xl text-white mb-8 uppercase tracking-widest">
+              Quem Somos
+            </h2>
+            <p style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg text-white/90 leading-relaxed max-w-4xl mx-auto italic mb-6">
+              "Somos a equipe Selenes e, em parceria com a equipe Spectrum, desenvolvedora de um jogo lúdico voltado para crianças com TDAH, nos unimos para criar o Cosmic Mind Dashboard."
+            </p>
+            
+            <p style={{ fontFamily: "'Raleway', sans-serif" }} className="text-base text-white/70 leading-relaxed max-w-3xl mx-auto font-light">
+              Nosso projeto consiste em uma platforma inteligente capaz de gerar métricas e análises sobre o desempenho das crianças dentro do jogo, auxiliando no acompanhamento de seu desenvolvimento de forma prática, acessível e intuitiva. 
+              Buscamos unir tecnologia, inclusão e inovação para contribuir com uma experiência mais eficiente e acolhedora.
+            </p>
+          </div>
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 pt-4">
-        
-        {/* ── CARROSSEL 1: SELENES ── */}
-        <div className="flex flex-col items-center">
-          <h3 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-xl text-cyan-400 mb-6 uppercase tracking-wider font-semibold">
-            🌙 Equipe Selenes
-          </h3>
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 pt-4">
+            
+            {/* ── CARROSSEL 1: SELENES ── */}
+            <div className="flex flex-col items-center">
+              <h3 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-xl text-cyan-400 mb-6 uppercase tracking-wider font-semibold">
+                🌙 Equipe Selenes
+              </h3>
 
-          <div className="relative w-full max-w-sm px-4">
-            <div className="overflow-hidden py-4">
-              <div 
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${selenesIndex * 100}%)` }}
-              >
-                {selenesTeam.map((member, idx) => (
-                  <div key={idx} className="w-full flex-shrink-0 px-2">
-                    <div className={`game-card ${member.bg} p-6 flex flex-col items-center text-center h-[340px] justify-between border border-white/10`}>
-                      {/* Avatar Cósmico */}
-                      <div className={`w-20 h-20 rounded-full bg-gradient-to-tr ${member.color} flex items-center justify-center text-3xl shadow-lg shadow-black/45 ring-2 ring-white/15`}>
-                        {member.icon}
+              <div className="relative w-full max-w-sm px-4">
+                <div className="overflow-hidden py-4">
+                  <div 
+                    className="flex transition-transform duration-500 ease-in-out"
+                    style={{ transform: `translateX(-${selenesIndex * 100}%)` }}
+                  >
+                    {selenesTeam.map((member, idx) => (
+                      <div key={idx} className="w-full flex-shrink-0 px-2">
+                        <div className={`game-card ${member.bg} p-6 flex flex-col items-center text-center h-[340px] justify-between border border-white/10`}>
+                          
+                          {/* Avatar Modificado */}
+                          <div className={`w-22 h-22 rounded-full bg-gradient-to-tr ${member.color} flex items-center justify-center shadow-lg shadow-black/45 ring-2 ring-white/15 relative`}>
+                            <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
+                              <img 
+                                src={member.image} 
+                                alt={member.name} 
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.style.opacity = '0';
+                                }}
+                              />
+                            </div>
+                            <span className="absolute -bottom-1 -right-1 text-sm bg-black/80 w-6 h-6 rounded-full flex items-center justify-center ring-1 ring-white/20 z-10">
+                              {member.icon}
+                            </span>
+                          </div>
+                          
+                          <div className="mt-4 flex-grow flex flex-col justify-center">
+                            <h4 className="text-white text-lg font-bold tracking-wide">{member.name}</h4>
+                            <p className="text-cyan-400 text-xs uppercase tracking-widest font-semibold mt-1 mb-3">{member.role}</p>
+                            <p className="text-white/60 text-xs font-light px-2 line-clamp-3 leading-relaxed">{member.desc}</p>
+                          </div>
+                        </div>
                       </div>
-                      
-                      <div className="mt-4 flex-grow flex flex-col justify-center">
-                        <h4 className="text-white text-lg font-bold tracking-wide">{member.name}</h4>
-                        <p className="text-cyan-400 text-xs uppercase tracking-widest font-semibold mt-1 mb-3">{member.role}</p>
-                        <p className="text-white/60 text-xs font-light px-2 line-clamp-3 leading-relaxed">{member.desc}</p>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+
+                <button 
+                  onClick={() => handlePrev("selenes", selenesTeam.length)}
+                  className="absolute -left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-cyan-500/30 hover:border-cyan-400 text-cyan-400 flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-10"
+                  aria-label="Membro Anterior"
+                >
+                  ◀
+                </button>
+                <button 
+                  onClick={() => handleNext("selenes", selenesTeam.length)}
+                  className="absolute -right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-cyan-500/30 hover:border-cyan-400 text-cyan-400 flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-10"
+                  aria-label="Próximo Membro"
+                >
+                  ▶
+                </button>
+
+                <div className="flex justify-center gap-2 mt-4">
+                  {selenesTeam.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelenesIndex(idx)}
+                      className={`h-2 rounded-full transition-all duration-300 ${selenesIndex === idx ? "w-6 bg-cyan-400" : "w-2 bg-white/25"}`}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 
-            <button 
-              onClick={() => handlePrev("selenes", selenesTeam.length)}
-              className="absolute -left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-cyan-500/30 hover:border-cyan-400 text-cyan-400 flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-10"
-              aria-label="Membro Anterior"
-            >
-              ◀
-            </button>
-            <button 
-              onClick={() => handleNext("selenes", selenesTeam.length)}
-              className="absolute -right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-cyan-500/30 hover:border-cyan-400 text-cyan-400 flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-10"
-              aria-label="Próximo Membro"
-            >
-              ▶
-            </button>
+            {/* ── CARROSSEL 2: SPECTRUM ── */}
+            <div className="flex flex-col items-center">
+              <h3 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-xl text-purple-400 mb-6 uppercase tracking-wider font-semibold">
+                👾 Equipe Spectrum
+              </h3>
 
-            <div className="flex justify-center gap-2 mt-4">
-              {selenesTeam.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelenesIndex(idx)}
-                  className={`h-2 rounded-full transition-all duration-300 ${selenesIndex === idx ? "w-6 bg-cyan-400" : "w-2 bg-white/25"}`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+              <div className="relative w-full max-w-sm px-4">
+                <div className="overflow-hidden py-4">
+                  <div 
+                    className="flex transition-transform duration-500 ease-in-out"
+                    style={{ transform: `translateX(-${spectrumIndex * 100}%)` }}
+                  >
+                    {spectrumTeam.map((member, idx) => (
+                      <div key={idx} className="w-full flex-shrink-0 px-2">
+                        <div className={`game-card ${member.bg} p-6 flex flex-col items-center text-center h-[340px] justify-between border border-white/10`}>
 
-        {/* ── CARROSSEL 2: SPECTRUM ── */}
-        <div className="flex flex-col items-center">
-          <h3 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-xl text-purple-400 mb-6 uppercase tracking-wider font-semibold">
-            👾 Equipe Spectrum
-          </h3>
-
-          <div className="relative w-full max-w-sm px-4">
-            <div className="overflow-hidden py-4">
-              <div 
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${spectrumIndex * 100}%)` }}
-              >
-                {spectrumTeam.map((member, idx) => (
-                  <div key={idx} className="w-full flex-shrink-0 px-2">
-                    <div className={`game-card ${member.bg} p-6 flex flex-col items-center text-center h-[340px] justify-between border border-white/10`}>
-
-                      <div className={`w-20 h-20 rounded-full bg-gradient-to-tr ${member.color} flex items-center justify-center text-3xl shadow-lg shadow-black/45 ring-2 ring-white/15`}>
-                        {member.icon}
+                          {/* Avatar Modificado */}
+                          <div className={`w-22 h-22 rounded-full bg-gradient-to-tr ${member.color} flex items-center justify-center shadow-lg shadow-black/45 ring-2 ring-white/15 relative`}>
+                            <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
+                              <img 
+                                src={member.image} 
+                                alt={member.name} 
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.style.opacity = '0';
+                                }}
+                              />
+                            </div>
+                            <span className="absolute -bottom-1 -right-1 text-sm bg-black/80 w-6 h-6 rounded-full flex items-center justify-center ring-1 ring-white/20 z-10">
+                              {member.icon}
+                            </span>
+                          </div>
+                          
+                          <div className="mt-4 flex-grow flex flex-col justify-center">
+                            <h4 className="text-white text-lg font-bold tracking-wide">{member.name}</h4>
+                            <p className="text-purple-400 text-xs uppercase tracking-widest font-semibold mt-1 mb-3">{member.role}</p>
+                            <p className="text-white/60 text-xs font-light px-2 line-clamp-3 leading-relaxed">{member.desc}</p>
+                          </div>
+                        </div>
                       </div>
-                      
-                      <div className="mt-4 flex-grow flex flex-col justify-center">
-                        <h4 className="text-white text-lg font-bold tracking-wide">{member.name}</h4>
-                        <p className="text-purple-400 text-xs uppercase tracking-widest font-semibold mt-1 mb-3">{member.role}</p>
-                        <p className="text-white/60 text-xs font-light px-2 line-clamp-3 leading-relaxed">{member.desc}</p>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+
+                <button 
+                  onClick={() => handlePrev("spectrum", spectrumTeam.length)}
+                  className="absolute -left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-purple-500/30 hover:border-purple-400 text-purple-400 flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-10"
+                  aria-label="Membro Anterior"
+                >
+                  ◀
+                </button>
+                <button 
+                  onClick={() => handleNext("spectrum", spectrumTeam.length)}
+                  className="absolute -right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-purple-500/30 hover:border-purple-400 text-purple-400 flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-10"
+                  aria-label="Próximo Membro"
+                >
+                  ▶
+                </button>
+
+                <div className="flex justify-center gap-2 mt-4">
+                  {spectrumTeam.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSpectrumIndex(idx)}
+                      className={`h-2 rounded-full transition-all duration-300 ${spectrumIndex === idx ? "w-6 bg-purple-400" : "w-2 bg-white/25"}`}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Controles de Navegação */}
-            <button 
-              onClick={() => handlePrev("spectrum", spectrumTeam.length)}
-              className="absolute -left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-purple-500/30 hover:border-purple-400 text-purple-400 flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-10"
-              aria-label="Membro Anterior"
-            >
-              ◀
-            </button>
-            <button 
-              onClick={() => handleNext("spectrum", spectrumTeam.length)}
-              className="absolute -right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-purple-500/30 hover:border-purple-400 text-purple-400 flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-10"
-              aria-label="Próximo Membro"
-            >
-              ▶
-            </button>
+          </div>
+        </section>
 
-            <div className="flex justify-center gap-2 mt-4">
-              {spectrumTeam.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSpectrumIndex(idx)}
-                  className={`h-2 rounded-full transition-all duration-300 ${spectrumIndex === idx ? "w-6 bg-purple-400" : "w-2 bg-white/25"}`}
-                />
-              ))}
+        {/* ── Seção Sobre o Projeto ── */}
+        <section id="about" className="pt-32 pb-20 relative z-10 px-6 bg-black/20 w-full">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '32px', justifyContent: 'center', alignItems: 'center' }} className="max-w-5xl mx-auto w-full">
+            
+            {/* CAIXA DA ESQUERDA */}
+            <div style={{ flex: '1 1 320px', maxWidth: '380px' }} className="text-left animate-hero">
+              <h2 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-3xl text-white mb-6 uppercase tracking-widest">
+                Sobre o Cosmic Mind
+              </h2>
+              <p style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-xl text-white/80 leading-relaxed">
+                A plataforma tem como objetivo transformar dados gerados dentro do jogo educativo em métricas claras e acessíveis, auxiliando no acompanhamento do desempenho de crianças com TDAH de forma intuitiva e eficiente. 
+                <br /><br />
+                Unindo tecnologia, inclusão e inovação, buscamos criar uma experiência moderna e acolhedora para análise e acompanhamento infantil. 
+              </p>
+            </div>
+
+            {/* CAIXA DA DIREITA */}
+            <div style={{ flex: '1 1 450px', maxWidth: '540px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+              <div className="game-card p-5 border-t-2 border-cyan-500/50">
+                <div className="text-cyan-400 mb-2 text-xl">🧠</div>
+                <h4 className="text-white font-bold mb-1 text-sm">Métricas Inteligentes</h4>
+                <p className="text-white/60 text-[11px] text-pretty leading-normal">Análise de desempenho em tempo real para identificar padrões e evolução.</p>
+              </div>
+
+              <div className="game-card p-5 border-t-2 border-purple-500/50">
+                <div className="text-purple-400 mb-2 text-xl">🎮</div>
+                <h4 className="text-white font-bold mb-1 text-sm">Integração Total</h4>
+                <p className="text-white/60 text-[11px] text-pretty leading-normal">Conectado diretamente ao universo lúdico criado pela equipe Spectrum.</p>
+              </div>
+
+              <div className="game-card p-5 border-t-2 border-cyan-500/50">
+                <div className="text-cyan-400 mb-2 text-xl">📊</div>
+                <h4 className="text-white font-bold mb-1 text-sm">Dashboard Interativo</h4>
+                <p className="text-white/60 text-[11px] text-pretty leading-normal">Visualização simples de dados complexos para pais e especialistas.</p>
+              </div>
+
+              <div className="game-card p-5 border-t-2 border-purple-500/50">
+                <div className="text-purple-400 mb-2 text-xl">✨</div>
+                <h4 className="text-white font-bold mb-1 text-sm">Foco em Inclusão</h4>
+                <p className="text-white/60 text-[11px] text-pretty leading-normal">Tecnologia pensada para acessibilidade e suporte ao desenvolvimento infantil.</p>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
 
-      </div>
-    </section>
-
-{/* ── Seção Sobre o Projeto ── */}
-{/* Aumentei o padding do topo (pt-32) para empurrar TODO o bloco mais para baixo de forma limpa */}
-<section id="about" className="pt-32 pb-20 relative z-10 px-6 bg-black/20 w-full">
-  
-  {/* O 'alignItems: "center"' vai garantir que o meio do texto se alinhe com o meio dos cards horizontalmente */}
-  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '32px', justifyContent: 'center', alignItems: 'center' }} className="max-w-5xl mx-auto w-full">
-    
-    {/* CAIXA DA ESQUERDA: Texto limpo e perfeitamente alinhado */}
-    <div style={{ flex: '1 1 320px', maxWidth: '380px' }} className="text-left animate-hero">
-      <h2 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-3xl text-white mb-6 uppercase tracking-widest">
-        Sobre o Cosmic Mind
-      </h2>
-      <p style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-xl text-white/80 leading-relaxed">
-        A plataforma tem como objetivo transformar dados gerados dentro do jogo educativo em métricas claras e acessíveis, auxiliando no acompanhamento do desempenho de crianças com TDAH de forma intuitiva e eficiente. 
-        <br /><br />
-        Unindo tecnologia, inclusão e inovação, buscamos criar uma experiência moderna e acolhedora para análise e acompanhamento infantil. 
-      </p>
-    </div>
-
-    {/* CAIXA DA DIREITA: Cards compactos lado a lado */}
-    <div style={{ flex: '1 1 450px', maxWidth: '540px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
-      
-      <div className="game-card p-5 border-t-2 border-cyan-500/50">
-        <div className="text-cyan-400 mb-2 text-xl">🧠</div>
-        <h4 className="text-white font-bold mb-1 text-sm">Métricas Inteligentes</h4>
-        <p className="text-white/60 text-[11px] text-pretty leading-normal">Análise de desempenho em tempo real para identificar padrões e evolução.</p>
-      </div>
-
-      <div className="game-card p-5 border-t-2 border-purple-500/50">
-        <div className="text-purple-400 mb-2 text-xl">🎮</div>
-        <h4 className="text-white font-bold mb-1 text-sm">Integração Total</h4>
-        <p className="text-white/60 text-[11px] text-pretty leading-normal">Conectado diretamente ao universo lúdico criado pela equipe Spectrum.</p>
-      </div>
-
-      <div className="game-card p-5 border-t-2 border-cyan-500/50">
-        <div className="text-cyan-400 mb-2 text-xl">📊</div>
-        <h4 className="text-white font-bold mb-1 text-sm">Dashboard Interativo</h4>
-        <p className="text-white/60 text-[11px] text-pretty leading-normal">Visualização simples de dados complexos para pais e especialistas.</p>
-      </div>
-
-      <div className="game-card p-5 border-t-2 border-purple-500/50">
-        <div className="text-purple-400 mb-2 text-xl">✨</div>
-        <h4 className="text-white font-bold mb-1 text-sm">Foco em Inclusão</h4>
-        <p className="text-white/60 text-[11px] text-pretty leading-normal">Tecnologia pensada para acessibilidade e suporte ao desenvolvimento infantil.</p>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-      
-
-      {/* ── Contato ── */}
+        {/* ── Contato ── */}
         <section id="contact" className="py-24 relative z-10 px-6 bg-gradient-to-b from-transparent to-purple-900/20">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
             
@@ -706,77 +767,8 @@ setSpectrumIndex((prev) => (prev === listLength - 1 ? 0 : prev + 1));
                 </button>
               </form>
             </div>
-
           </div>
         </section>
-
-{/* ── Footer ── */}
-        <footer className="relative z-10 pt-20 pb-10 px-6 bg-black/50 border-t border-white/5 backdrop-blur-md">
-          <div className="max-w-6xl mx-auto">
-            {/* Grid de 3 colunas bem distribuído para desktop */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16 items-start">
-              
-              {/* COLUNA 1: Bloco Institucional */}
-              <div className="flex flex-col gap-4">
-                <h3 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-xl text-white tracking-widest uppercase">
-                  Cosmic Mind<span className="text-cyan-400">.</span>
-                </h3>
-                <p style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-lg text-white/60 leading-relaxed">
-                  Transformando dados de jogabilidade em acompanhamento inteligente e inclusivo.
-                </p>
-              </div>
-
-{/* COLUNA 2: Bloco de Contatos */}
-              <div className="flex flex-col gap-4">
-                <h4 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-white text-xs font-bold uppercase tracking-[0.2em]">
-                  Contato
-                </h4>
-                <div className="flex flex-col gap-3 text-sm text-white/60">
-                  <a href="mailto:cosmicmind.site@gmail.com" className="hover:text-cyan-400 transition-colors flex items-center gap-2">
-                    <span>📧</span> cosmicmind.site@gmail.com
-                  </a>
-                  <a href="https://github.com/Zeus-Alvs" target="_blank" rel="noopener noreferrer" className="hover:text-purple-400 transition-colors flex items-center gap-2">
-                    <span>💻</span> GitHub: Zeus-Alves <span className="text-white/45 text-xs"></span>
-                  </a>
-                  {/* O Insta que estava faltando no texto aqui: */}
-                  <a href="https://instagram.com/spectrum.code" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition-colors flex items-center gap-2">
-                    <span>📸</span> Instagram: @spectrum.code
-                  </a>
-                </div>
-              </div>
-
-              {/* COLUNA 3: Bloco de Redes Sociais */}
-              <div className="flex flex-col gap-4 md:items-end">
-                <h4 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-white text-xs font-bold uppercase tracking-[0.2em] md:text-right w-full">
-                  Conecte-se
-                </h4>
-                <div className="flex gap-4 md:justify-end">
-                  <a href="https://github.com/Zeus-Alvs" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-white/60 hover:border-purple-500 hover:text-purple-400 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:-translate-y-0.5 transition-all duration-300">
-                    🐙
-                  </a>
-                  <a href="https://instagram.com/spectrum.code" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-white/60 hover:border-cyan-500 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] hover:-translate-y-0.5 transition-all duration-300">
-                    📸
-                  </a>
-                  <a href="mailto:cosmicmind.site@gmail.com" className="w-11 h-11 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-white/60 hover:border-purple-500 hover:text-purple-400 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:-translate-y-0.5 transition-all duration-300">
-                    ✉️
-                  </a>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Linha de Créditos Inferior */}
-            <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-white/30 text-[10px] uppercase tracking-[0.25em] text-center md:text-left leading-loose">
-                © 2026 Cosmic Mind Dashboard — Desenvolvido pela Equipe Selenes
-              </p>
-              <p className="text-white/30 text-[10px] uppercase tracking-[0.25em] flex items-center gap-1.5 text-center">
-                Parceria com Equipe Spectrum <span className="animate-pulse text-cyan-400">💫</span>
-              </p>
-            </div>
-          </div>
-        </footer>
-
       </div>
     </>
   );

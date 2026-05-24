@@ -46,7 +46,6 @@ export default function PerfomanceR() {
 
   return (
     <div className="w-full max-w-6xl mx-auto p-5 bg-transparent font-sans text-slate-600 overflow-hidden">
-
       <div className="mb-6 text-center">
         <div className="fixed top-0 left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
         <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">
@@ -56,17 +55,12 @@ export default function PerfomanceR() {
       </div>
 
       <div className="flex flex-row gap-8 items-start justify-center">
-
-
         <div className="w-[260px] flex flex-col gap-4 shrink-0">
-
-
           <div className="relative">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="w-full bg-white border border-slate-100 p-2.5 rounded-2xl shadow-sm flex items-center gap-3 hover:border-[#4A59BD]/40 transition-all duration-300 group"
+              className="w-full bg-white border border-slate-100 p-2.5 rounded-2xl shadow-sm flex items-center gap-3 hover:border-[#4A59BD]/40 transition-all duration-300 group cursor-pointer"
             >
-
               <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#4A59BD] to-[#6372D6] flex items-center justify-center text-white text-lg font-bold shrink-0 shadow-md group-hover:scale-105 transition-transform">
                 {jogador.nome.charAt(0)}
               </div>
@@ -81,10 +75,8 @@ export default function PerfomanceR() {
               </div>
             </button>
 
-
             {isOpen && (
               <>
-
                 <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
 
                 <ul className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white border border-slate-100 rounded-2xl shadow-xl z-20 py-2 animate-in fade-in zoom-in-95 duration-200">
@@ -95,7 +87,7 @@ export default function PerfomanceR() {
                           setJogador(j);
                           setIsOpen(false);
                         }}
-                        className={`w-full px-4 py-2 text-left text-sm flex items-center justify-between hover:bg-slate-50 transition-colors ${jogador.id === j.id ? 'text-[#4A59BD] font-bold bg-blue-50/50' : 'text-slate-600 font-medium'}`}
+                        className={`w-full px-4 py-2 text-left text-sm flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${jogador.id === j.id ? 'text-[#4A59BD] font-bold bg-blue-50/50' : 'text-slate-600 font-medium'}`}
                       >
                         {j.nome}
                         {jogador.id === j.id && <div className="w-1.5 h-1.5 rounded-full bg-[#4A59BD]" />}
@@ -107,29 +99,31 @@ export default function PerfomanceR() {
             )}
           </div>
 
-
           <div className="bg-white border border-slate-100 p-5 rounded-[2.5rem] shadow-sm">
             <h2 className="text-center font-semibold text-[#9D82CE] text-[10px] tracking-widest mb-4 opacity-80 uppercase">Progresso - Fase</h2>
             <div className="grid grid-cols-3 gap-4">
-              {planetas.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => p.status !== 'Bloqueado' && setPlanetaAtivo(p)}
-                  className={`flex flex-col items-center gap-1.5 transition-all ${p.status === 'Bloqueado' ? 'opacity-30 grayscale cursor-not-allowed' : 'hover:scale-105'}`}
-                >
-                  <div className={`w-10 h-10 rounded-full ${p.cor} flex items-center justify-center relative shadow-inner`}>
-                    {p.status === 'Bloqueado' && <Lock className="w-3.5 h-3.5 text-white" />}
-                    {planetaAtivo?.id === p.id && (
-                      <div className="absolute -inset-1.5 border-2 border-[#4A59BD] rounded-full opacity-30" />
-                    )}
-                  </div>
-                  <span className="text-[9px] font-medium text-slate-400 truncate w-full text-center">{p.nome}</span>
-                </button>
-              ))}
+              {planetas.map((p) => {
+                const isBloqueado = p.status === 'Bloqueado';
+                return (
+                  <button
+                    key={p.id}
+                    disabled={isBloqueado}
+                    onClick={() => setPlanetaAtivo(p)}
+                    className={`flex flex-col items-center gap-1.5 transition-all ${isBloqueado ? 'opacity-30 grayscale cursor-not-allowed' : 'hover:scale-105 cursor-pointer'}`}
+                  >
+                    <div className={`w-10 h-10 rounded-full ${p.cor} flex items-center justify-center relative shadow-inner`}>
+                      {isBloqueado && <Lock className="w-3.5 h-3.5 text-white" />}
+                      {planetaAtivo?.id === p.id && (
+                        <div className="absolute -inset-1.5 border-2 border-[#4A59BD] rounded-full opacity-30" />
+                      )}
+                    </div>
+                    <span className="text-[9px] font-medium text-slate-400 truncate w-full text-center">{p.nome}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
-
 
         <div className="min-w-[480px] bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm self-stretch">
           {planetaAtivo ? (
@@ -158,7 +152,9 @@ export default function PerfomanceR() {
                         <svg className="w-full h-full transform -rotate-90">
                           <circle cx="40" cy="40" r={radius} stroke="#F1F5F9" strokeWidth="5" fill="transparent" />
                           <circle
-                            cx="40" cy="40" r={radius}
+                            cx="40"
+                            cy="40"
+                            r={radius}
                             stroke="#4A59BD" strokeWidth="5" fill="transparent"
                             strokeDasharray={circumference}
                             strokeDashoffset={offset}

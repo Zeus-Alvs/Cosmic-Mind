@@ -21,13 +21,11 @@ export default function ManagerS() {
   const [players, setPlayers] = useState<PlayerPerformanceDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-
 
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [connectPlayerName, setConnectPlayerName] = useState('');
@@ -58,7 +56,6 @@ export default function ManagerS() {
     loadPlayers();
   }, []);
 
-
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
@@ -88,7 +85,6 @@ export default function ManagerS() {
 
       if (!resCriar.ok) throw new Error("Falha ao criar jogador");
 
-
       setIsModalOpen(false);
       setNewPlayerName('');
       setBirthDate('');
@@ -102,7 +98,6 @@ export default function ManagerS() {
       setIsCreating(false);
     }
   };
-
 
   const handleConectar = async (jogadorId: string, jogadorNome: string) => {
     setConnectPlayerName(jogadorNome);
@@ -128,7 +123,6 @@ export default function ManagerS() {
     }
   };
 
-
   const allCards = [...players, { id: 'add-card', isAdd: true }];
 
   const nextSlide = () => {
@@ -150,14 +144,12 @@ export default function ManagerS() {
       </div>
 
       <div className="relative w-full flex items-center justify-center h-[350px]">
-
         <button
           onClick={prevSlide}
-          className={`absolute left-0 lg:left-10 z-[100] p-2 transition-all ${currentIndex === 0 ? 'opacity-10 pointer-events-none' : 'hover:scale-110 text-slate-400'}`}
+          className={`absolute left-0 lg:left-10 z-[100] p-2 transition-all cursor-pointer ${currentIndex === 0 ? 'opacity-10 pointer-events-none' : 'hover:scale-110 text-slate-400'}`}
         >
           <ChevronLeft className="w-12 h-12 stroke-[1px]" />
         </button>
-
 
         <div className="relative flex items-center justify-center w-full">
           {allCards.map((card, index) => {
@@ -171,17 +163,16 @@ export default function ManagerS() {
                 key={card.id}
                 onClick={!("isAdd" in card) ? undefined : () => setIsModalOpen(true)}
                 className={`
-              absolute transition-all duration-500 ease-in-out rounded-[35px] shadow-lg
-              ${isCenter ? 'z-50 scale-100 opacity-100 shadow-2xl translate-x-0' : ''}
-              ${isLeft ? 'z-30 scale-[0.82] opacity-30 -translate-x-[240px] blur-[1px]' : ''}
-              ${isRight ? 'z-30 scale-[0.82] opacity-30 translate-x-[240px] blur-[1px]' : ''}
-              ${!isVisible ? 'opacity-0 scale-50 z-0 pointer-events-none' : ''}
-              ${!("isAdd" in card) ? 'bg-[#F2ECEF] border border-white' : 'bg-white border-2 border-dashed border-slate-200'}
-            `}
+                  absolute transition-all duration-500 ease-in-out rounded-[35px] shadow-lg
+                  ${isCenter ? 'z-50 scale-100 opacity-100 shadow-2xl translate-x-0' : ''}
+                  ${isLeft ? 'z-30 scale-[0.82] opacity-30 -translate-x-[240px] blur-[1px]' : ''}
+                  ${isRight ? 'z-30 scale-[0.82] opacity-30 translate-x-[240px] blur-[1px]' : ''}
+                  ${!isVisible ? 'opacity-0 scale-50 z-0 pointer-events-none' : ''}
+                  ${!("isAdd" in card) ? 'bg-[#F2ECEF] border border-white' : 'bg-white border-2 border-dashed border-slate-200 cursor-pointer'}
+                `}
                 style={{ width: '340px', height: '260px' }}
               >
                 {!("isAdd" in card) ? (
-
                   <div className="p-8 h-full flex flex-col justify-between">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -211,19 +202,19 @@ export default function ManagerS() {
                     <div className="space-y-1 ml-1">
                       <p className="text-[11px] text-slate-600"><span className="font-black mr-2">Tempo:</span>{card.tempoUso}</p>
                       <p className="text-[11px] text-slate-600"><span className="font-black mr-2">Fase:</span>{card.nivelFase}</p>
-                      <p className="text-[11px] text-slate-600"><span className="font-black mr-2">Pontos:</span>{card.pontuacao} pontos</p>
+                      <p className="text-[11px] text-slate-600"><span className="font-black mr-2">Points:</span>{card.pontuacao} pontos</p>
                     </div>
 
                     <div className="flex gap-2">
                       <button
                         onClick={(e) => { e.stopPropagation(); router.push(`/edit?id=${card.id}`); }}
-                        className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#69A1C9] to-[#9D70D6] text-white font-bold text-xs shadow-md hover:brightness-110 transition-all"
+                        className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#69A1C9] to-[#9D70D6] text-white font-bold text-xs shadow-md hover:brightness-110 transition-all cursor-pointer"
                       >
                         Editar
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); handleConectar(card.id, card.nome); }}
-                        className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#3E89AE] to-[#4078A4] text-white font-bold text-xs shadow-md hover:brightness-110 transition-all flex items-center justify-center gap-1.5"
+                        className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#3E89AE] to-[#4078A4] text-white font-bold text-xs shadow-md hover:brightness-110 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         <Smartphone className="w-3.5 h-3.5" />
                         Conectar
@@ -231,7 +222,6 @@ export default function ManagerS() {
                     </div>
                   </div>
                 ) : (
-
                   <div className="h-full flex flex-col items-center justify-center p-8 text-center">
                     <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100">
                       <Plus className="w-8 h-8 text-slate-300" />
@@ -247,12 +237,11 @@ export default function ManagerS() {
 
         <button
           onClick={nextSlide}
-          className={`absolute right-0 lg:right-10 z-[100] p-2 transition-all ${currentIndex === allCards.length - 1 ? 'opacity-10 pointer-events-none' : 'hover:scale-110 text-slate-400'}`}
+          className={`absolute right-0 lg:right-10 z-[100] p-2 transition-all cursor-pointer ${currentIndex === allCards.length - 1 ? 'opacity-10 pointer-events-none' : 'hover:scale-110 text-slate-400'}`}
         >
           <ChevronRight className="w-12 h-12 stroke-[1px]" />
         </button>
       </div>
-
 
       <div className="flex gap-2 mt-8">
         {allCards.map((_, i) => (
@@ -263,15 +252,12 @@ export default function ManagerS() {
         ))}
       </div>
 
-
       {isModalOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-[30px] p-8 w-full max-w-md shadow-2xl relative animate-in fade-in zoom-in duration-200">
-
-
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors"
+              className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -315,7 +301,7 @@ export default function ManagerS() {
                 <button
                   type="submit"
                   disabled={isCreating}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#4078A4] to-[#AC57EB] text-white font-bold text-sm shadow-md hover:brightness-110 transition-all disabled:opacity-50 mt-4"
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#4078A4] to-[#AC57EB] text-white font-bold text-sm shadow-md hover:brightness-110 transition-all disabled:opacity-50 mt-4 cursor-pointer"
                 >
                   {isCreating ? 'Criando...' : 'Criar Perfil'}
                 </button>
@@ -325,15 +311,13 @@ export default function ManagerS() {
         </div>
       )}
 
-
       {isConnectModalOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-[30px] p-8 w-full max-w-md shadow-2xl relative animate-in fade-in zoom-in duration-200">
-
             {generatedPin && (
               <button
                 onClick={() => { setIsConnectModalOpen(false); setGeneratedPin(null); }}
-                className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors"
+                className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -365,7 +349,7 @@ export default function ManagerS() {
 
                 <button
                   onClick={() => { setIsConnectModalOpen(false); setGeneratedPin(null); }}
-                  className="w-full py-3.5 rounded-xl bg-slate-800 text-white font-bold text-sm shadow-md hover:bg-slate-700 transition-colors"
+                  className="w-full py-3.5 rounded-xl bg-slate-800 text-white font-bold text-sm shadow-md hover:bg-slate-700 transition-colors cursor-pointer"
                 >
                   Fechar
                 </button>

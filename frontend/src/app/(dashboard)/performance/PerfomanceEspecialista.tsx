@@ -70,18 +70,18 @@ export default function PerfomanceS() {
     
   // ---- Buscar lista de jogadores do responsável logado ----
   useEffect(() => {
-  const usuario = JSON.parse(localStorage.getItem('user_data') || '{}');
-  const token   = localStorage.getItem('token_acesso') || '';
+    const usuario = JSON.parse(localStorage.getItem('user_data') || '{}');
+    const token   = localStorage.getItem('token_acesso') || '';
 
-  if (!usuario?.id) return;
-  fetch(`${getApiUrl()}/jogadores/${usuario.id}`)
-    .then(r => r.json())
-    .then((lista: { id: string; nome: string }[]) => {
-      setJogadores(lista);
-      if (lista.length > 0) setJogadorAtivo(lista[0]);
-    })
-    .catch(() => setErro('Não foi possível carregar os jogadores.'));
-}, []);
+    if (!usuario?.id) return;
+    fetch(`${getApiUrl()}/jogadores/${usuario.id}`)
+      .then(r => r.json())
+      .then((lista: { id: string; nome: string }[]) => {
+        setJogadores(lista);
+        if (lista.length > 0) setJogadorAtivo(lista[0]);
+      })
+      .catch(() => setErro('Não foi possível carregar os jogadores.'));
+  }, []);
 
   // ---- Buscar estatísticas sempre que o jogador selecionado mudar ----
   useEffect(() => {
@@ -91,7 +91,6 @@ export default function PerfomanceS() {
     setErro(null);
     setStats(null);
 
-    // O token fica salvo no localStorage após o login
     const usuario = JSON.parse(localStorage.getItem('user_data') || '{}');
     const token   = localStorage.getItem('token_acesso') || '';
 
@@ -108,13 +107,11 @@ export default function PerfomanceS() {
   }, [jogadorAtivo]);
 
   // ---- Quais planetas estão desbloqueados (baseado nas partidas reais) ----
-  // Por ora consideramos desbloqueados os 3 primeiros se houver partidas;
-  // você pode ajustar essa lógica quando integrar o campo planetasDesbloqueados.
   const planetasDesbloqueados = stats && stats.total_partidas > 0
     ? PLANETAS_LISTA.slice(0, 3).map(p => p.id)
     : [];
 
-  // ---- Planetas com status calculado ----
+  // ---- Planetas com status calculated ----
   const planetas = PLANETAS_LISTA.map(p => ({
     ...p,
     cor:    PLANETA_CORES[p.id],
@@ -130,9 +127,6 @@ export default function PerfomanceS() {
     Leitura: 0, Interpretação: 0, Concentração: 0,
   };
 
-  // ===========================================================
-  //  RENDER
-  // ===========================================================
   return (
     <div className="w-full max-w-6xl mx-auto p-5 bg-transparent font-sans text-slate-600 overflow-hidden">
 
@@ -154,7 +148,7 @@ export default function PerfomanceS() {
           <div className="relative">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="w-full bg-white border border-slate-100 p-2.5 rounded-2xl shadow-sm flex items-center gap-3 hover:border-[#4A59BD]/40 transition-all duration-300 group"
+              className="w-full bg-white border border-slate-100 p-2.5 rounded-2xl shadow-sm flex items-center gap-3 hover:border-[#4A59BD]/40 transition-all duration-300 group cursor-pointer"
             >
               <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#4A59BD] to-[#6372D6] flex items-center justify-center text-white text-lg font-bold shrink-0 shadow-md group-hover:scale-105 transition-transform">
                 {jogadorAtivo ? jogadorAtivo.nome.charAt(0) : '?'}
@@ -179,7 +173,7 @@ export default function PerfomanceS() {
                     <li key={j.id}>
                       <button
                         onClick={() => { setJogadorAtivo(j); setIsOpen(false); setPlanetaAtivo(null); }}
-                        className={`w-full px-4 py-2 text-left text-sm flex items-center justify-between hover:bg-slate-50 transition-colors ${jogadorAtivo?.id === j.id ? 'text-[#4A59BD] font-bold bg-blue-50/50' : 'text-slate-600 font-medium'}`}
+                        className={`w-full px-4 py-2 text-left text-sm flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${jogadorAtivo?.id === j.id ? 'text-[#4A59BD] font-bold bg-blue-50/50' : 'text-slate-600 font-medium'}`}
                       >
                         {j.nome}
                         {jogadorAtivo?.id === j.id && <div className="w-1.5 h-1.5 rounded-full bg-[#4A59BD]" />}
@@ -197,25 +191,29 @@ export default function PerfomanceS() {
               Progresso - Fase
             </h2>
             <div className="grid grid-cols-3 gap-4">
-              {planetas.map(p => (
-                <button
-                  key={p.id}
-                  onClick={() => p.status !== 'Bloqueado' && setPlanetaAtivo(p.id)}
-                  className={`flex flex-col items-center gap-1.5 transition-all ${p.status === 'Bloqueado' ? 'opacity-30 grayscale cursor-not-allowed' : 'hover:scale-105'}`}
-                >
-                  <div className={`w-10 h-10 rounded-full ${p.cor} flex items-center justify-center relative shadow-inner`}>
-                    {p.status === 'Bloqueado' && <Lock className="w-3.5 h-3.5 text-white" />}
-                    {planetaAtivo === p.id && (
-                      <div className="absolute -inset-1.5 border-2 border-[#4A59BD] rounded-full opacity-30" />
-                    )}
-                  </div>
-                  <span className="text-[9px] font-medium text-slate-400 truncate w-full text-center">{p.nome}</span>
-                </button>
-              ))}
+              {planetas.map(p => {
+                const isBloqueado = p.status === 'Bloqueado';
+                return (
+                  <button
+                    key={p.id}
+                    disabled={isBloqueado}
+                    onClick={() => setPlanetaAtivo(p.id)}
+                    className={`flex flex-col items-center gap-1.5 transition-all ${isBloqueado ? 'opacity-30 grayscale cursor-not-allowed' : 'hover:scale-105 cursor-pointer'}`}
+                  >
+                    <div className={`w-10 h-10 rounded-full ${p.cor} flex items-center justify-center relative shadow-inner`}>
+                      {isBloqueado && <Lock className="w-3.5 h-3.5 text-white" />}
+                      {planetaAtivo === p.id && (
+                        <div className="absolute -inset-1.5 border-2 border-[#4A59BD] rounded-full opacity-30" />
+                      )}
+                    </div>
+                    <span className="text-[9px] font-medium text-slate-400 truncate w-full text-center">{p.nome}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Cards de resumo (dados reais da API) */}
+          {/* Cards de resumo */}
           {stats && (
             <div className="bg-white border border-slate-100 p-4 rounded-2xl shadow-sm flex flex-col gap-2 text-xs text-slate-500">
               <div className="flex justify-between">
@@ -284,7 +282,9 @@ export default function PerfomanceS() {
                         <svg className="w-full h-full transform -rotate-90">
                           <circle cx="40" cy="40" r={radius} stroke="#F1F5F9" strokeWidth="5" fill="transparent" />
                           <circle
-                            cx="40" cy="40" r={radius}
+                            cx="40"
+                            cy="40"
+                            r={radius}
                             stroke="#4A59BD" strokeWidth="5" fill="transparent"
                             strokeDasharray={circumference}
                             strokeDashoffset={offset}
@@ -305,15 +305,17 @@ export default function PerfomanceS() {
                 })}
               </div>
             </div>
-          ) : !carregando && !erro ? (
-            <div className="flex flex-col items-center justify-center h-[340px] text-slate-300">
-              <p className="font-medium text-xs tracking-widest uppercase">
-                {stats?.total_partidas === 0
-                  ? 'Nenhuma partida registrada ainda'
-                  : 'Selecione uma fase liberada'}
-              </p>
-            </div>
-          ) : null}
+          ) : (
+            !carregando && !erro && (
+              <div className="flex flex-col items-center justify-center h-[340px] text-slate-300">
+                <p className="font-medium text-xs tracking-widest uppercase">
+                  {stats?.total_partidas === 0
+                    ? 'Nenhuma partida registrada ainda'
+                    : 'Selecione uma fase liberada'}
+                </p>
+              </div>
+            )
+          )}
         </div>
 
       </div>

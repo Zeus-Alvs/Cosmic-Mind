@@ -4,7 +4,6 @@ import { useState, useMemo, useEffect } from 'react';
 import { Bell, UserCheck, TrendingUp, ChevronRight, Star, ClipboardList } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-
 interface NotificationDTO {
   id: string;
   type: 'aceite' | 'desempenho' | 'sistema' | 'alerta';
@@ -23,7 +22,6 @@ export default function NotificationsS() {
 
   useEffect(() => {
     const fetchNotifications = async () => {
-
       const mockApiResponse: NotificationDTO[] = [
         {
           id: "s-1",
@@ -70,7 +68,6 @@ export default function NotificationsS() {
     fetchNotifications();
   }, []);
 
-
   const getIconConfig = (type: NotificationDTO['type']) => {
     const configs = {
       aceite: { icon: <UserCheck className="w-5 h-5 text-emerald-500" />, bg: 'bg-emerald-100' },
@@ -107,14 +104,16 @@ export default function NotificationsS() {
         <p className="text-slate-400 text-xs font-medium">Gestão de vínculos e acompanhamento clínico</p>
       </header>
 
+      {/* Abas Filtro */}
       <div className="flex justify-end mb-6">
         <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200/50 shadow-inner">
           {['recentes', 'antigas', '30dias'].map((t) => (
             <button
               key={t}
               onClick={() => setFilter(t as any)}
-              className={`px-4 py-2 text-[10px] font-black rounded-xl transition-all uppercase ${filter === t ? 'bg-white text-[#AC57EB] shadow-sm' : 'text-slate-400 hover:text-slate-500'
-                }`}
+              className={`px-4 py-2 text-[10px] font-black rounded-xl transition-all uppercase cursor-pointer ${
+                filter === t ? 'bg-white text-[#AC57EB] shadow-sm' : 'text-slate-400 hover:text-slate-500'
+              }`}
             >
               {t === '30dias' ? '30 DIAS' : t}
             </button>
@@ -143,7 +142,7 @@ export default function NotificationsS() {
               {notif.isLink && (
                 <button
                   onClick={() => router.push(notif.linkTo || '/')}
-                  className="flex items-center gap-1.5 bg-[#AC57EB]/10 text-[#AC57EB] px-4 py-2 rounded-2xl text-[10px] font-black hover:bg-[#AC57EB] hover:text-white transition-all group shrink-0"
+                  className="flex items-center gap-1.5 bg-[#AC57EB]/10 text-[#AC57EB] px-4 py-2 rounded-2xl text-[10px] font-black hover:bg-[#AC57EB] hover:text-white transition-all group shrink-0 cursor-pointer"
                 >
                   CONFIRA
                   <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />

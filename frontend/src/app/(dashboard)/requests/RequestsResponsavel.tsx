@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Check, X, Building2, Inbox, ShieldAlert, MoreVertical, Trash2, Eye } from 'lucide-react';
 
-
 interface Solicitacao {
   id: string;
   profissional: string;
@@ -64,13 +63,13 @@ export default function RequestsR() {
     <div className="max-w-5xl mx-auto p-6 font-sans">
       <div className="fixed top-0 left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
 
-
       <div className="mb-10">
         <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] bg-clip-text text-transparent">
           Solicitações Recebidas
         </h2>
       </div>
 
+      {/* Seção Pendentes */}
       <section className="mb-12">
         {pendentes.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -91,7 +90,7 @@ export default function RequestsR() {
                   </div>
                   <button
                     onClick={() => setModalConfira(item)}
-                    className="text-[10px] font-black text-[#AC57EB] bg-white px-3 py-1.5 rounded-lg shadow-sm hover:bg-[#AC57EB] hover:text-white transition-all border border-purple-50"
+                    className="text-[10px] font-black text-[#AC57EB] bg-white px-3 py-1.5 rounded-lg shadow-sm hover:bg-[#AC57EB] hover:text-white transition-all border border-purple-50 cursor-pointer"
                   >
                     CONFIRA
                   </button>
@@ -107,7 +106,7 @@ export default function RequestsR() {
         )}
       </section>
 
-
+      {/* Seção Aprovados */}
       <section>
         <div className="mb-6">
           <h3 className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] bg-clip-text text-transparent">
@@ -128,10 +127,9 @@ export default function RequestsR() {
                     </div>
                   </div>
 
-
                   <button
                     onClick={() => setModalExcluir(item)}
-                    className="p-1.5 hover:bg-slate-50 rounded-full text-slate-300 hover:text-red-400 transition-colors"
+                    className="p-1.5 hover:bg-slate-50 rounded-full text-slate-300 hover:text-red-400 transition-colors cursor-pointer"
                   >
                     <MoreVertical className="w-4 h-4" />
                   </button>
@@ -151,10 +149,21 @@ export default function RequestsR() {
         )}
       </section>
 
-
+      {/* Modal CONFIRA */}
       {modalConfira && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-xs rounded-[40px] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200 p-7">
+          {/* Adicionado 'relative' para o X do topo se posicionar corretamente */}
+          <div className="bg-white w-full max-w-xs rounded-[40px] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200 p-7 relative">
+            
+            {/* Botão X lateral/superior para fechar sem responder */}
+            <button 
+              onClick={() => setModalConfira(null)}
+              className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-50 transition-colors cursor-pointer"
+              title="Fechar sem responder"
+            >
+              <X className="w-4 h-4 stroke-[2.5]" />
+            </button>
+
             <div className="text-center mb-6">
               <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Novo Vínculo</p>
               <h4 className="text-[#4078A4] font-black text-xl italic">Aprovar Acesso?</h4>
@@ -181,14 +190,28 @@ export default function RequestsR() {
             </div>
 
             <div className="flex gap-3">
-              <button onClick={() => handleAprovar(modalConfira.id)} className="flex-1 bg-green-500 text-white py-3.5 rounded-2xl shadow-lg flex justify-center"><Check /></button>
-              <button onClick={() => setModalConfira(null)} className="flex-1 bg-slate-100 text-slate-400 py-3.5 rounded-2xl flex justify-center"><X /></button>
+              {/* Botão de Confirmar (Verde) */}
+              <button 
+                onClick={() => handleAprovar(modalConfira.id)} 
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white py-3.5 rounded-2xl shadow-lg shadow-green-100 flex justify-center items-center transition-transform active:scale-95 cursor-pointer"
+              >
+                <Check className="w-5 h-5" />
+              </button>
+              
+              {/* Botão de Recusar (Vermelho com X Branco) */}
+              <button 
+                onClick={() => handleRemover(modalConfira.id)} 
+                className="flex-1 bg-red-500 hover:bg-red-600 text-white py-3.5 rounded-2xl shadow-lg shadow-red-100 flex justify-center items-center transition-transform active:scale-95 cursor-pointer"
+                title="Recusar solicitação"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </div>
       )}
 
-
+      {/* Modal EXCLUIR */}
       {modalExcluir && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-xs rounded-[40px] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200 p-7">
@@ -211,10 +234,10 @@ export default function RequestsR() {
             </p>
 
             <div className="flex gap-3">
-              <button onClick={() => handleRemover(modalExcluir.id)} className="flex-1 bg-red-500 text-white py-3.5 rounded-2xl shadow-lg shadow-red-100 flex justify-center transition-transform active:scale-95">
+              <button onClick={() => handleRemover(modalExcluir.id)} className="flex-1 bg-red-500 hover:bg-red-600 text-white py-3.5 rounded-2xl shadow-lg shadow-red-100 flex justify-center transition-transform active:scale-95 cursor-pointer">
                 <Trash2 className="w-5 h-5" />
               </button>
-              <button onClick={() => setModalExcluir(null)} className="flex-1 bg-slate-100 text-slate-400 py-3.5 rounded-2xl flex justify-center transition-transform active:scale-95">
+              <button onClick={() => setModalExcluir(null)} className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-400 py-3.5 rounded-2xl flex justify-center transition-transform active:scale-95 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>

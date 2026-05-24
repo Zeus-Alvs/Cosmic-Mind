@@ -54,7 +54,7 @@ export default function DashboardLayout({
       label: "Desempenho", 
       icon: "/icons/dashboard.png", 
       activeIcon: "/icons/dashboard-active.png",
-      roles: ["responsavel", "especialista"] // Liberado para ambos
+      roles: ["responsavel", "especialista"]
     },
     { 
       href: `/notifications`, 
@@ -68,7 +68,7 @@ export default function DashboardLayout({
       label: "Gerenciar Contas", 
       icon: "/icons/users.png", 
       activeIcon: "/icons/users-active.png",
-      roles: ["responsavel", "especialista"] // Liberado para ambos
+      roles: ["responsavel", "especialista"]
     },
     {
       href: `/requests`,
@@ -99,7 +99,7 @@ export default function DashboardLayout({
 
       {/* 🔘 BOTÃO MOBILE */}
       <button
-        className="md:hidden fixed top-4 left-4 z-50 bg-slate-800 text-white p-2 rounded-lg shadow-md"
+        className="md:hidden fixed top-4 left-4 z-50 bg-slate-800 text-white p-2 rounded-lg shadow-md cursor-pointer"
         onClick={() => setMenuOpen(!menuOpen)}
       >
         ☰
@@ -145,7 +145,7 @@ export default function DashboardLayout({
                   key={link.href}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group cursor-pointer
                     ${
                       isActive
                         ? "bg-gradient-to-r from-[#4078A4] to-[#3E89AE] shadow-lg font-bold"
@@ -169,7 +169,7 @@ export default function DashboardLayout({
         {/* USUÁRIO E LOGOUT */}
         <div className="p-4 mt-auto border-t border-slate-700/50 bg-slate-900/20">
           
-          {/* Card do Usuário Clicável -> Adicionada a Seta e w-full */}
+          {/* Card do Usuário Clicável */}
           <Link 
             href="/account"
             className="flex items-center gap-3 mb-4 p-2 rounded-xl hover:bg-slate-700 transition-colors cursor-pointer group w-full"
@@ -189,18 +189,18 @@ export default function DashboardLayout({
                 {usuario.tipo_perfil}
               </p>
             </div>
-            {/* A DICA VISUAL AQUI: A setinha que mostra que é clicável */}
             <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-white transition-colors shrink-0" />
           </Link>
 
           <div className="space-y-1">
-            {/* Botão de Logout -> Adicionada a borda visível (border-slate-600/50) */}
+            {/* Botão de Logout -> Adicionado cursor-pointer */}
             <button
               onClick={() => {
                 localStorage.removeItem("user_data");
+                localStorage.removeItem("token_acesso");
                 router.push("../");
               }}
-              className="flex items-center justify-center gap-2 w-full p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 border border-slate-600/50 hover:border-red-500/50 transition-all text-sm font-medium group"
+              className="flex items-center justify-center gap-2 w-full p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 border border-slate-600/50 hover:border-red-500/50 transition-all text-sm font-medium group cursor-pointer"
             >
               <Image src="/icons/logout.png" alt="Sair" width={18} height={18} className="group-hover:scale-110 transition-transform" />
               Sair
