@@ -321,7 +321,7 @@ def criar_jogador(id_usuario: str, dados: JogadorCadastro):
         "data_nascimento": dados.data_nascimento,
         "foto_perfil": dados.foto_perfil,
         "preferencias_jogo": {"volume_musica": 50, "daltonismo_modo": False},
-        "planetas_desbloqueados": [],
+        "planetas_desbloqueados": ["57b6d77617cbdc1499b06cab3d9f650e"],
         "melhores_pontuacoes": [],
         "pets_desbloqueados": [],
         "conquistas_obtidas": []
