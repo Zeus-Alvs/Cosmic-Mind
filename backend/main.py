@@ -478,6 +478,7 @@ def salvar_partida(partida: PartidaParaPersistirModel, authorization: str = Head
     # 2. Cria o modelo para persistir e salva no banco
     partida_para_salvar = PartidaParaPersistirComPontuacaoModel(
         missionId=partida.missionId,
+        planetId=partida.planetId,
         iniciado_em=partida.start_time,
         finalizado_em=partida.end_time,
         pontuacao_final=pontuacao,
@@ -498,6 +499,7 @@ def salvar_partida(partida: PartidaParaPersistirModel, authorization: str = Head
     
     novo_registro = {
         "missionId": partida.missionId,
+        "planetId": partida.planetId,
         "score": pontuacao,
         "starsEarned": estrelas
     }

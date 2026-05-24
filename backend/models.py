@@ -4,6 +4,7 @@ from datetime import datetime
 
 class PartidaParaPersistirModel(BaseModel):
     missionId: str
+    planetId: str
     start_time: datetime
     end_time: datetime
     metadata: dict[str, Any]
@@ -11,6 +12,7 @@ class PartidaParaPersistirModel(BaseModel):
 
 class PartidaParaPersistirComPontuacaoModel(BaseModel):
     missionId: str
+    planetId: str
     iniciado_em: datetime
     finalizado_em: datetime
     pontuacao_final: float
@@ -19,6 +21,7 @@ class PartidaParaPersistirComPontuacaoModel(BaseModel):
 
 class MelhorPartidaModel(BaseModel):
     missionId: str
+    planetId: str
     score: int
     starsEarned: int
 
