@@ -58,7 +58,6 @@ def create_partidas_for_players(jogador_ids):
             print(f"Inserted partida for jogador {jid} -> {res.inserted_id}")
     return partidas_ids
 
-
 def create_test_session(token='testtoken', id_jogador=None):
     exp = datetime.utcnow() + timedelta(hours=2)
     sess = {

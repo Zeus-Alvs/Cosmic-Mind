@@ -10,7 +10,6 @@ print('Using MONGO_URL:', MONGO_URL)
 client = MongoClient(MONGO_URL)
 db = client['cosmic_mind_db']
 
-# Desired percentages per player (values 0-100)
 players_skills = {
     'Alice': {
         'Agilidade': 80,
@@ -48,7 +47,6 @@ for nome, skills in players_skills.items():
     jid = jogador['_id']
     print(f"Inserindo partidas de habilidade para {nome} (id={jid})")
 
-    # For clarity, do not remove previous partidas; append skill-specific partidas
     for abil, pct in skills.items():
         total = 10
         acertos = int(round((pct / 100.0) * total))

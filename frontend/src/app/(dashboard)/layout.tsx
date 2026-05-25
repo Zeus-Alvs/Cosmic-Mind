@@ -40,7 +40,6 @@ export default function DashboardLayout({
     setAutorizado(true);
   }, [router]);
 
-  // Todos os botões agora possuem ambos os perfis liberados
   const links = [
     { 
       href: "/menu", 
@@ -97,7 +96,7 @@ export default function DashboardLayout({
   return (
     <div className="flex h-screen w-full bg-slate-50 text-slate-900">
 
-      {/* 🔘 BOTÃO MOBILE */}
+      {}
       <button
         className="md:hidden fixed top-4 left-4 z-50 bg-slate-800 text-white p-2 rounded-lg shadow-md cursor-pointer"
         onClick={() => setMenuOpen(!menuOpen)}
@@ -105,7 +104,7 @@ export default function DashboardLayout({
         ☰
       </button>
 
-      {/* 🌑 OVERLAY MOBILE */}
+      {}
       {menuOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-30 md:hidden backdrop-blur-sm transition-opacity"
@@ -113,7 +112,7 @@ export default function DashboardLayout({
         />
       )}
 
-      {/* SIDEBAR */}
+      {}
       <aside
         className={`
           fixed md:static z-40 w-64 bg-[#1E293B] text-white flex flex-col shadow-2xl h-full
@@ -121,7 +120,7 @@ export default function DashboardLayout({
           ${menuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
       >
-        {/* LOGO */}
+        {}
         <div className="pt-10 pb-6 px-6 flex items-center justify-center border-b border-slate-700/50">
           <Image
             src="/icons/logo.png"
@@ -133,7 +132,7 @@ export default function DashboardLayout({
           />
         </div>
 
-        {/* MENU DINÂMICO */}
+        {}
         <nav className="flex-1 px-4 space-y-1 mt-6 overflow-y-auto">
           {links
             .filter((link) => link.roles.includes(usuario.tipo_perfil))
@@ -166,10 +165,10 @@ export default function DashboardLayout({
             })}
         </nav>
 
-        {/* USUÁRIO E LOGOUT */}
+        {}
         <div className="p-4 mt-auto border-t border-slate-700/50 bg-slate-900/20">
-          
-          {/* Card do Usuário Clicável */}
+
+          {}
           <Link 
             href="/account"
             className="flex items-center gap-3 mb-4 p-2 rounded-xl hover:bg-slate-700 transition-colors cursor-pointer group w-full"
@@ -193,7 +192,7 @@ export default function DashboardLayout({
           </Link>
 
           <div className="space-y-1">
-            {/* Botão de Logout -> Adicionado cursor-pointer */}
+            {}
             <button
               onClick={() => {
                 localStorage.removeItem("user_data");
@@ -209,7 +208,7 @@ export default function DashboardLayout({
         </div>
       </aside>
 
-      {/* CONTEÚDO */}
+      {}
       <main className="flex-1 p-4 md:p-10 overflow-y-auto w-full relative">
         {children}
       </main>
