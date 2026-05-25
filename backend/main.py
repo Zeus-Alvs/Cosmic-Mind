@@ -60,19 +60,31 @@ def cadastrar_usuario(novo_usuario: UsuarioCadastro):
     if usuario_existente:
         raise HTTPException(status_code=400, detail="Este e-mail já está cadastrado.")
 
-    usuario_dict = novo_usuario.dict()
+    usuario_dict = novo_usuario.model_dump()
     usuario_dict["senha"] = pwd_context.hash(novo_usuario.senha)
     usuario_dict["criado_em"] = datetime.now(timezone.utc)
     usuario_dict["avatar"] = 1
-
+    
+    if usuario_dict.get('tipo_perfil') == 'especialista':
+        crm_val = usuario_dict.get('crm')
+        if not crm_val:
+            raise HTTPException(status_code=400, detail="O campo CRM é obrigatório para especialistas.")
+        usuario_dict['crp_especialista'] = crm_val
+        usuario_dict['clinica'] = usuario_dict.get('clinica')
+        usuario_dict['ocupacao'] = usuario_dict.get('ocupacao')
+        usuario_dict.pop('crm', None)     
+    
     resultado = colecao_usuarios.insert_one(usuario_dict)
 
     return UsuarioRetorno(
-        id=str(resultado.inserted_id),
-        nome=usuario_dict["nome"],
-        email=usuario_dict["email"],
-        tipo_perfil=usuario_dict["tipo_perfil"],
-        avatar=usuario_dict.get("avatar", 1)
+        id = str(resultado.inserted_id),
+        nome = usuario_dict["nome"],
+        email = usuario_dict["email"],
+        tipo_perfil = usuario_dict["tipo_perfil"],
+        avatar = usuario_dict.get("avatar", 1),
+        crm = usuario_dict.get("crp_especialista") or usuario_dict.get('crm'),
+        clinica = usuario_dict.get("clinica"),
+        ocupacao = usuario_dict.get("ocupacao")
     )
 
 @app.post("/api/login", response_model=UsuarioRetorno, status_code=status.HTTP_200_OK)

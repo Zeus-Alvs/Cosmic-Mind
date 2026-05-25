@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, root_validator
 from typing import Optional, List
 from datetime import datetime
 
@@ -19,6 +19,16 @@ class UsuarioCadastro(BaseModel):
     email: EmailStr  
     senha: str
     tipo_perfil: str 
+    crm: Optional[str] = None
+    clinica: Optional[str] = None
+    ocupacao: Optional[str] = None
+    
+    @root_validator(skip_on_failure=True)
+    def validar_especialista(cls, values):
+        if values.get('tipo_perfil') == 'especialista':
+            if not values.get('crm'):
+                raise ValueError('O campo CRM é obrigatório')
+        return values
 
 class UsuarioLogin(BaseModel):
     email: EmailStr
@@ -31,13 +41,19 @@ class UsuarioRetorno(BaseModel):
     tipo_perfil: str
     email_pendente: Optional[str] = None
     avatar: Optional[int] = 1
-    token_acesso: str
+    token_acesso: Optional[str] = None
+    crm: Optional[str] = None
+    clinica: Optional[str] = None
+    ocupacao: Optional[str] = None
 
 class UsuarioUpdate(BaseModel):
     nome: Optional[str] = None
     email: Optional[EmailStr] = None
     avatar: Optional[int] = None
-    tamanho_fonte: Optional[str] = None 
+    tamanho_fonte: Optional[str] = None
+    crm: Optional[str] = None
+    clinica: Optional[str] = None
+    ocupacao: Optional[str] = None
 
 class TrocarSenha(BaseModel):
     senha_atual: str
