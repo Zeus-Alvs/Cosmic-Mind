@@ -707,12 +707,12 @@ def listar_todos_jogadores(_: dict = Depends(require_especialista)):
     return [{'id': str(j['_id']), 'nome': j.get('apelido', 'Jogador')} for j in jogadores]
 
 # rota em uso --- /performance (ia q disse, eu n vejo funcionar)
+# Adicionamos o "planetId: str = None" ali nos parâmetros!
 @app.get("/api/estatisticas/{id_jogador}")
-def obter_estatisticas(id_jogador: str, current_user: dict = Depends(get_current_user)):
+def obter_estatisticas(id_jogador: str, planetId: str = None, current_user: dict = Depends(get_current_user)):
 
     if current_user.get("tipo_perfil") == "responsavel":
         vinculos = current_user.get("jogadores_vinculados", [])
-
         if ObjectId(id_jogador) not in vinculos and id_jogador not in [str(v) for v in vinculos]:
             raise HTTPException(status_code=403, detail="Você não tem permissão para ver esse jogador.")
 
@@ -728,12 +728,19 @@ def obter_estatisticas(id_jogador: str, current_user: dict = Depends(get_current
     if not jogador:
         raise HTTPException(status_code=404, detail="Jogador não encontrado.")
 
-    partidas = list(colecao_partidas.find({"id_jogador": jogador_obj_id}))
+    # 👇 A MÁGICA ACONTECE AQUI: Filtramos pelo planeta se o Front-end pedir! 👇
+    filtro_partida = {"id_jogador": jogador_obj_id}
+    if planetId:
+        filtro_partida["planetId"] = planetId
+
+    partidas = list(colecao_partidas.find(filtro_partida))
 
     if not partidas:
         return {
             "id_jogador": id_jogador,
             "nome_jogador": jogador.get("apelido", "Jogador"),
+            "foto_perfil": jogador.get("foto_perfil", 1),
+            "planetas_liberados": jogador.get("planetas_desbloqueados", []),
             "total_partidas": 0,
             "total_acertos": 0,
             "total_erros": 0,
@@ -741,12 +748,8 @@ def obter_estatisticas(id_jogador: str, current_user: dict = Depends(get_current
             "pontuacao_maxima": 0,
             "evolucao_por_missao": [],
             "habilidades": {
-                "Agilidade": 0,
-                "Lógica": 0,
-                "Memorização": 0,
-                "Leitura": 0,
-                "Interpretação": 0,
-                "Concentração": 0
+                "Agilidade": 0, "Lógica": 0, "Memorização": 0,
+                "Leitura": 0, "Interpretação": 0, "Concentração": 0
             }
         }
 
@@ -783,13 +786,14 @@ def obter_estatisticas(id_jogador: str, current_user: dict = Depends(get_current
         mapa_habilidades[habilidade].append(taxa)
 
     habilidades_medias = {h: round(sum(v) / len(v)) for h, v in mapa_habilidades.items()}
-
     habilidades_padrao = ["Agilidade", "Lógica", "Memorização", "Leitura", "Interpretação", "Concentração"]
     habilidades_final = {h: habilidades_medias.get(h, 0) for h in habilidades_padrao}
 
     return {
         "id_jogador":          id_jogador,
         "nome_jogador":        jogador.get("apelido", "Jogador"),
+        "foto_perfil":         jogador.get("foto_perfil", 1),
+        "planetas_liberados":  jogador.get("planetas_desbloqueados", []),
         "total_partidas":      len(partidas),
         "total_acertos":       total_acertos,
         "total_erros":         total_erros,

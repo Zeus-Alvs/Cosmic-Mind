@@ -22,6 +22,7 @@ export default function ManagerS() {
   const [players, setPlayers] = useState<PlayerPerformanceDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // 👇 Busca os pacientes e ENRIQUECE com as estatísticas reais do Back-end
   const loadPlayers = async () => {
     try {
       const dadosSalvos = JSON.parse(localStorage.getItem('user_data') || '{}');
@@ -32,13 +33,60 @@ export default function ManagerS() {
         return;
       }
 
+      // 1. Busca a lista básica de pacientes vinculados a este especialista
       const response = await fetch(`${getApiUrl()}/vinculo/meus-pacientes`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setPlayers(data);
+        const pacientesBase = await response.json();
+
+        // 2. Para cada paciente, busca as estatísticas para preencher o card
+        const pacientesEnriquecidos = await Promise.all(
+          pacientesBase.map(async (paciente: any) => {
+            try {
+              const resStats = await fetch(`${getApiUrl()}/estatisticas/${paciente.id || paciente._id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+
+              if (resStats.ok) {
+                const stats = await resStats.json();
+                
+                // Calcula o progresso baseado na quantidade de planetas liberados
+                const qtdPlanetas = stats.planetas_liberados?.length || 0;
+                let progressoCalc = Math.round((qtdPlanetas / 9) * 100);
+                if (progressoCalc > 100) progressoCalc = 100;
+
+                return {
+                  id: paciente.id || paciente._id,
+                  nome: paciente.nome || paciente.apelido || "Paciente",
+                  foto_perfil: stats.foto_perfil || paciente.foto_perfil || 1,
+                  codigo_vinculo: paciente.codigo_vinculo || stats.codigo_vinculo,
+                  progresso: progressoCalc,
+                  tempoUso: `${stats.total_partidas} partidas`,
+                  nivelFase: qtdPlanetas > 0 ? `Planeta ${qtdPlanetas}` : 'Iniciante',
+                  pontuacao: stats.pontuacao_maxima || 0
+                };
+              }
+            } catch (err) {
+              console.error(`Erro ao buscar stats do paciente ${paciente.nome}`, err);
+            }
+
+            // Fallback caso a rota de estatísticas falhe
+            return {
+              id: paciente.id || paciente._id,
+              nome: paciente.nome || "Paciente",
+              foto_perfil: paciente.foto_perfil || 1,
+              codigo_vinculo: paciente.codigo_vinculo,
+              progresso: 0,
+              tempoUso: '0 partidas',
+              nivelFase: 'Iniciante',
+              pontuacao: 0
+            };
+          })
+        );
+
+        setPlayers(pacientesEnriquecidos);
       }
     } catch (error) {
       console.error('Erro ao buscar pacientes:', error);
@@ -81,7 +129,7 @@ export default function ManagerS() {
           </p>
           <button 
             onClick={() => router.push('/requests')}
-            className="mt-6 bg-[#4078A4] text-white px-6 py-2 rounded-xl text-xs font-bold hover:bg-[#3E89AE] transition-colors"
+            className="mt-6 bg-[#4078A4] text-white px-6 py-2 rounded-xl text-xs font-bold hover:bg-[#3E89AE] transition-colors cursor-pointer"
           >
             Vincular Paciente
           </button>
@@ -119,18 +167,24 @@ export default function ManagerS() {
                     <div className="p-8 h-full flex flex-col justify-between">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-16 h-16 rounded-full border-2 border-white shadow-sm overflow-hidden bg-slate-100 flex items-center justify-center">
+                          <div className="w-16 h-16 rounded-full border-2 border-white shadow-sm overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
                             <img src={`/jogadores/foto${card.foto_perfil || 1}.png`} alt={card.nome} className="w-full h-full object-cover" />
                           </div>
-                          <div>
-                            <h3 className="text-md font-bold text-slate-800 leading-tight">{card.nome}</h3>
-                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
-                              Cód: {card.codigo_vinculo || '----'}
-                            </p>
+                          <div className="min-w-0">
+                            <h3 className="text-md font-bold text-slate-800 leading-tight truncate">{card.nome}</h3>
+                            <div className="mt-1.5 flex items-center gap-1.5">
+                              <span className="text-[9px] font-black uppercase text-slate-400">Cód:</span>
+                              <span 
+                                className="text-xs font-mono font-bold bg-white text-[#AC57EB] px-2 py-0.5 rounded-md tracking-widest border border-[#AC57EB]/20 shadow-sm"
+                                title="Código de vínculo do paciente"
+                              >
+                                {card.codigo_vinculo || '----'}
+                              </span>
+                            </div>
                           </div>
                         </div>
 
-                        <div className="relative w-16 h-16 flex items-center justify-center">
+                        <div className="relative w-16 h-16 flex items-center justify-center shrink-0">
                           <svg className="w-full h-full transform -rotate-90">
                             <circle cx="32" cy="32" r="26" stroke="#D1D5DB" strokeWidth="6" fill="transparent" />
                             <circle
@@ -150,13 +204,14 @@ export default function ManagerS() {
                       </div>
 
                       <div className="space-y-1 ml-1">
-                        <p className="text-[11px] text-slate-600"><span className="font-black mr-2">Tempo Uso:</span>{card.tempoUso}</p>
+                        <p className="text-[11px] text-slate-600"><span className="font-black mr-2">Atividade:</span>{card.tempoUso}</p>
                         <p className="text-[11px] text-slate-600"><span className="font-black mr-2">Fase Atual:</span>{card.nivelFase}</p>
-                        <p className="text-[11px] text-slate-600"><span className="font-black mr-2">Pontuação:</span>{card.pontuacao} pts</p>
+                        <p className="text-[11px] text-slate-600"><span className="font-black mr-2">Top Score:</span>{card.pontuacao} pts</p>
                       </div>
 
                       <button
-                        onClick={() => router.push(`/analytics?id=${card.id}`)}
+                        // 👇 Redirecionamento ajustado para /performance
+                        onClick={() => router.push(`/performance`)}
                         className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#3E89AE] to-[#AC57EB] text-white font-bold text-xs shadow-md hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
                       >
                         <Activity className="w-4 h-4" />

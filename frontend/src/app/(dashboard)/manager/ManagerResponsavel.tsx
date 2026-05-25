@@ -33,18 +33,71 @@ export default function ManagerR() {
   const [generatedPin, setGeneratedPin] = useState<string | null>(null);
   const [isGeneratingPin, setIsGeneratingPin] = useState(false);
 
+  // 👇 MÁGICA AQUI: Busca os jogadores e ENRIQUECE com as estatísticas reais
   const loadPlayers = async () => {
     try {
       const dadosSalvos = JSON.parse(localStorage.getItem('user_data') || '{}');
+      const token = dadosSalvos.token_acesso;
+      
       if (!dadosSalvos.id) {
         setIsLoading(false);
         return;
       }
 
-      const response = await fetch(`${getApiUrl()}/jogadores/` + dadosSalvos.id);
+      // 1. Busca a lista básica de jogadores
+      const response = await fetch(`${getApiUrl()}/jogadores/` + dadosSalvos.id, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
       if (response.ok) {
-        const data = await response.json();
-        setPlayers(data);
+        const jogadoresBase = await response.json();
+        
+        // 2. Para cada jogador, busca as estatísticas para preencher o card
+        const jogadoresEnriquecidos = await Promise.all(
+          jogadoresBase.map(async (jogador: any) => {
+            try {
+              const resStats = await fetch(`${getApiUrl()}/estatisticas/${jogador.id || jogador._id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+
+              if (resStats.ok) {
+                const stats = await resStats.json();
+                
+                // Calcula o progresso baseado na quantidade de planetas liberados (Máximo 9 planetas)
+                const qtdPlanetas = stats.planetas_liberados?.length || 0;
+                let progressoCalc = Math.round((qtdPlanetas / 9) * 100);
+                if (progressoCalc > 100) progressoCalc = 100;
+
+                return {
+                  id: jogador.id || jogador._id,
+                  nome: jogador.nome || jogador.apelido,
+                  foto_perfil: stats.foto_perfil || jogador.foto_perfil || 1,
+                  codigo_vinculo: jogador.codigo_vinculo || stats.codigo_vinculo,
+                  progresso: progressoCalc,
+                  tempoUso: `${stats.total_partidas} partidas`, // Trocamos "horas" por total de partidas
+                  nivelFase: qtdPlanetas > 0 ? `Planeta ${qtdPlanetas}` : 'Iniciante',
+                  pontuacao: stats.pontuacao_maxima || 0
+                };
+              }
+            } catch (err) {
+              console.error(`Erro ao buscar stats do jogador ${jogador.nome}`, err);
+            }
+
+            // Fallback caso a rota de estatísticas falhe para algum jogador
+            return {
+              id: jogador.id || jogador._id,
+              nome: jogador.nome || jogador.apelido,
+              foto_perfil: jogador.foto_perfil || 1,
+              codigo_vinculo: jogador.codigo_vinculo,
+              progresso: 0,
+              tempoUso: '0 partidas',
+              nivelFase: 'Iniciante',
+              pontuacao: 0
+            };
+          })
+        );
+
+        setPlayers(jogadoresEnriquecidos);
       }
     } catch (error) {
       console.error('Erro ao buscar jogadores:', error);
@@ -114,7 +167,6 @@ export default function ManagerR() {
       if (!resPin.ok) throw new Error("Falha ao gerar PIN");
       const dataPin = await resPin.json();
       setGeneratedPin(dataPin.pin);
-      localStorage.setItem('token_acesso', dataPin.token_acesso);
     } catch (error) {
       console.error("Erro ao gerar PIN:", error);
       alert("Erro ao gerar o código de conexão.");
@@ -134,13 +186,13 @@ export default function ManagerR() {
     if (currentIndex > 0) setCurrentIndex(prev => prev - 1);
   };
 
-  if (isLoading) return <div className="text-center p-10 text-slate-400 font-bold">Carregando...</div>;
+  if (isLoading) return <div className="text-center p-10 text-slate-400 font-bold">Carregando Perfis...</div>;
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-4 flex flex-col items-center">
+    <div className="w-full max-w-5xl mx-auto p-4 flex flex-col items-center overflow-hidden">
       <div className="fixed top-0 left-0 md:left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">Desempenho do Jogador</h2>
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">Gerenciar Contas</h2>
         <p className="text-slate-400 text-xs mt-1">Selecione um jogador para acompanhar o seu progresso</p>
       </div>
 
@@ -177,12 +229,11 @@ export default function ManagerR() {
                   <div className="p-8 h-full flex flex-col justify-between">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-16 h-16 rounded-full border-2 border-white shadow-sm overflow-hidden bg-slate-100 flex items-center justify-center">
+                        <div className="w-16 h-16 rounded-full border-2 border-white shadow-sm overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
                           <img src={`/jogadores/foto${card.foto_perfil || 1}.png`} alt={card.nome} className="w-full h-full object-cover" />
                         </div>
-                        <div>
-                          <h3 className="text-md font-bold text-slate-800 leading-tight">{card.nome}</h3>
-                          {}
+                        <div className="min-w-0">
+                          <h3 className="text-md font-bold text-slate-800 leading-tight truncate">{card.nome}</h3>
                           <div className="mt-1.5 flex items-center gap-1.5">
                             <span className="text-[9px] font-black uppercase text-slate-400">Cód:</span>
                             <span 
@@ -195,7 +246,7 @@ export default function ManagerR() {
                         </div>
                       </div>
 
-                      <div className="relative w-16 h-16 flex items-center justify-center">
+                      <div className="relative w-16 h-16 flex items-center justify-center shrink-0">
                         <svg className="w-full h-full transform -rotate-90">
                           <circle cx="32" cy="32" r="26" stroke="#D1D5DB" strokeWidth="6" fill="transparent" />
                           <circle
@@ -210,9 +261,10 @@ export default function ManagerR() {
                     </div>
 
                     <div className="space-y-1 ml-1">
-                      <p className="text-[11px] text-slate-600"><span className="font-black mr-2">Tempo:</span>{card.tempoUso}</p>
-                      <p className="text-[11px] text-slate-600"><span className="font-black mr-2">Fase:</span>{card.nivelFase}</p>
-                      <p className="text-[11px] text-slate-600"><span className="font-black mr-2">Points:</span>{card.pontuacao} pontos</p>
+                      {/* Trocamos 'Tempo' por 'Atividade' para refletir o total de partidas jogadas */}
+                      <p className="text-[11px] text-slate-600"><span className="font-black mr-2">Atividade:</span>{card.tempoUso}</p>
+                      <p className="text-[11px] text-slate-600"><span className="font-black mr-2">Fase Atual:</span>{card.nivelFase}</p>
+                      <p className="text-[11px] text-slate-600"><span className="font-black mr-2">Top Score:</span>{card.pontuacao} pontos</p>
                     </div>
 
                     <div className="flex gap-2">
