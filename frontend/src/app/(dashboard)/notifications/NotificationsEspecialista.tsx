@@ -95,7 +95,7 @@ export default function NotificationsS() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 font-sans">
-      <div className="fixed top-0 left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+      <div className="fixed top-0 left-0 md:left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
 
       <header className="text-center mb-8">
         <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">
@@ -125,24 +125,24 @@ export default function NotificationsS() {
         {filteredList.map((notif) => {
           const { icon, bg } = getIconConfig(notif.type);
           return (
-            <div key={notif.id} className="bg-white p-3 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between gap-4 transition-all hover:border-[#AC57EB]/30">
-              <div className="flex items-center gap-4 flex-1">
+            <div key={notif.id} className="bg-white p-3 rounded-[24px] border border-slate-100 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-[#AC57EB]/30">
+              <div className="flex items-start sm:items-center gap-4 flex-1 w-full">
                 <div className={`${bg} p-2.5 rounded-xl flex-shrink-0`}>{icon}</div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-center mb-0.5">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-0.5 gap-1 sm:gap-0">
                     <h4 className="font-bold text-slate-700 text-sm truncate">{notif.title}</h4>
-                    <span className="text-[9px] font-black text-[#4078A4] uppercase">
+                    <span className="text-[9px] font-black text-[#4078A4] uppercase shrink-0">
                       {new Date(notif.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 truncate pr-4">{notif.description}</p>
+                  <p className="text-xs text-slate-500 line-clamp-2 sm:truncate pr-0 sm:pr-4">{notif.description}</p>
                 </div>
               </div>
 
               {notif.isLink && (
                 <button
                   onClick={() => router.push(notif.linkTo || '/')}
-                  className="flex items-center gap-1.5 bg-[#AC57EB]/10 text-[#AC57EB] px-4 py-2 rounded-2xl text-[10px] font-black hover:bg-[#AC57EB] hover:text-white transition-all group shrink-0 cursor-pointer"
+                  className="flex items-center justify-center gap-1.5 bg-[#AC57EB]/10 text-[#AC57EB] px-4 py-2 rounded-2xl text-[10px] font-black hover:bg-[#AC57EB] hover:text-white transition-all group shrink-0 cursor-pointer w-full sm:w-auto"
                 >
                   CONFIRA
                   <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />

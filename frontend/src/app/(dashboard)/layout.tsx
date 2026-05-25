@@ -28,6 +28,7 @@ export default function DashboardLayout({
   const [autorizado, setAutorizado] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // --- EFEITO 1: AUTENTICAÇÃO ---
   useEffect(() => {
     const dadosSalvos = localStorage.getItem("user_data");
 
@@ -39,6 +40,48 @@ export default function DashboardLayout({
     setUsuario(JSON.parse(dadosSalvos));
     setAutorizado(true);
   }, [router]);
+
+
+  // --- EFEITO 2: FEEDBACK SONORO (O VIGIA) ---
+  useEffect(() => {
+    // Função que toca o bip
+    const tocarBeep = () => {
+      try {
+        const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        osc.type = 'sine'; // Som suave
+        osc.frequency.value = 600; // Frequência do bip
+        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // Volume baixo
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1); // Duração curtinha (100ms)
+      } catch (e) {
+        console.log("Áudio não suportado ou bloqueado");
+      }
+    };
+
+    // O "Vigia" que escuta todos os cliques do site
+    const handleGlobalClick = (e: MouseEvent) => {
+      // Verifica se a chavinha tá ligada no navegador
+      const somAtivado = localStorage.getItem('pref_som') === 'true';
+      if (!somAtivado) return;
+
+      // Verifica se o cara clicou num botão ou link
+      const target = e.target as HTMLElement;
+      if (target.closest('button') || target.closest('a')) {
+        tocarBeep();
+      }
+    };
+
+    document.addEventListener('click', handleGlobalClick);
+    return () => document.removeEventListener('click', handleGlobalClick);
+  }, []); // <--- O VIGIA VAI FICAR AQUI DENTRO BONITINHO
+
 
   const links = [
     { 
@@ -96,31 +139,31 @@ export default function DashboardLayout({
   return (
     <div className="flex h-screen w-full bg-slate-50 text-slate-900">
 
-      {}
+      {/* Botão Hambúrguer Mobile */}
       <button
-        className="md:hidden fixed top-4 left-4 z-50 bg-slate-800 text-white p-2 rounded-lg shadow-md cursor-pointer"
+        className="md:hidden fixed top-4 left-4 z-[100] bg-slate-800 text-white p-2 rounded-lg shadow-md cursor-pointer"
         onClick={() => setMenuOpen(!menuOpen)}
       >
         ☰
       </button>
 
-      {}
+      {/* Overlay Mobile */}
       {menuOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-30 md:hidden backdrop-blur-sm transition-opacity"
+          className="fixed inset-0 bg-black/40 z-[90] md:hidden backdrop-blur-sm transition-opacity"
           onClick={() => setMenuOpen(false)}
         />
       )}
 
-      {}
+      {/* Sidebar - Desktop (fixa) | Mobile (off-canvas) */}
       <aside
         className={`
-          fixed md:static z-40 w-64 bg-[#1E293B] text-white flex flex-col shadow-2xl h-full
+          fixed md:static z-[95] w-64 bg-[#1E293B] text-white flex flex-col shadow-2xl h-full
           transform transition-transform duration-300 ease-in-out
           ${menuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
       >
-        {}
+        {/* Logo */}
         <div className="pt-10 pb-6 px-6 flex items-center justify-center border-b border-slate-700/50">
           <Image
             src="/icons/logo.png"
@@ -132,7 +175,7 @@ export default function DashboardLayout({
           />
         </div>
 
-        {}
+        {/* Navigation Links */}
         <nav className="flex-1 px-4 space-y-1 mt-6 overflow-y-auto">
           {links
             .filter((link) => link.roles.includes(usuario.tipo_perfil))
@@ -165,10 +208,10 @@ export default function DashboardLayout({
             })}
         </nav>
 
-        {}
+        {/* Profile / Logout */}
         <div className="p-4 mt-auto border-t border-slate-700/50 bg-slate-900/20">
 
-          {}
+          {/* User Info Link */}
           <Link 
             href="/account"
             className="flex items-center gap-3 mb-4 p-2 rounded-xl hover:bg-slate-700 transition-colors cursor-pointer group w-full"
@@ -192,7 +235,7 @@ export default function DashboardLayout({
           </Link>
 
           <div className="space-y-1">
-            {}
+            {/* Botão Sair */}
             <button
               onClick={() => {
                 localStorage.removeItem("user_data");
@@ -208,7 +251,7 @@ export default function DashboardLayout({
         </div>
       </aside>
 
-      {}
+      {/* CONTEÚDO PRINCIPAL (ONDE AS OUTRAS PÁGINAS SÃO RENDERIZADAS) */}
       <main className="flex-1 p-4 md:p-10 overflow-y-auto w-full relative">
         {children}
       </main>

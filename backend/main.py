@@ -52,10 +52,12 @@ db = client["cosmic_mind_db"]
 colecao_usuarios = db["usuario"]
 colecao_partidas = db["partidas"]
 
+# rota não utilizada --- Nenhuma página do frontend
 @app.get("/")
 def read_root():
     return {"status": "A API do Cosmic Mind está viva!"}
 
+# rota em uso --- /register
 @app.post("/api/cadastrar", response_model=UsuarioRetorno, status_code=status.HTTP_201_CREATED)
 def cadastrar_usuario(novo_usuario: UsuarioCadastro):
     usuario_existente = colecao_usuarios.find_one({"email": novo_usuario.email})
@@ -89,6 +91,7 @@ def cadastrar_usuario(novo_usuario: UsuarioCadastro):
         ocupacao = usuario_dict.get("ocupacao")
     )
 
+# rota em uso --- /login
 @app.post("/api/login", response_model=UsuarioRetorno, status_code=status.HTTP_200_OK)
 def login_usuario(credenciais: UsuarioLogin):
     usuario_banco = colecao_usuarios.find_one({"email": credenciais.email})
@@ -114,6 +117,7 @@ def login_usuario(credenciais: UsuarioLogin):
         "token_acesso": token_jwt
     }
 
+# rota em uso --- /account
 @app.put("/api/conta/atualizar/{email_usuario}")
 def atualizar_perfil(email_usuario: str, dados: UsuarioUpdate):
     usuario = colecao_usuarios.find_one({"email": email_usuario})
@@ -153,6 +157,7 @@ def atualizar_perfil(email_usuario: str, dados: UsuarioUpdate):
 
     return {"message": mensagem_retorno, "email_trocado": "pendente" if "email" not in campos_para_atualizar else "nao"}
 
+# rota em uso --- /account
 @app.put("/api/conta/senha/{email_usuario}")
 def trocar_senha(email_usuario: str, dados: TrocarSenha):
     usuario = colecao_usuarios.find_one({"email": email_usuario})
@@ -239,6 +244,7 @@ def enviar_email_troca_email(email_novo: str, token: str):
     except Exception as e:
         print(f"Erro ao enviar e-mail: {e}")
 
+# rota em uso --- /remember-password
 @app.post("/api/auth/esqueci-senha")
 def solicitar_recuperacao(dados: EsqueciSenha):
     usuario = colecao_usuarios.find_one({"email": dados.email})
@@ -259,6 +265,7 @@ def solicitar_recuperacao(dados: EsqueciSenha):
 
     return {"message": "Se o e-mail existir, um link de recuperação será enviado."}
 
+# rota em uso --- /reset-password
 @app.post("/api/auth/redefinir-senha")
 def redefinir_senha(dados: RedefinirSenha):
     usuario = colecao_usuarios.find_one({
@@ -281,6 +288,7 @@ def redefinir_senha(dados: RedefinirSenha):
 
     return {"message": "Senha redefinida com sucesso! Você já pode fazer login."}
 
+# rota em uso --- /confirmar-email
 @app.post("/api/conta/confirmar-email")
 def confirmar_novo_email(dados: ConfirmarEmail):
     usuario = colecao_usuarios.find_one({"token_troca_email": dados.token})
@@ -300,6 +308,7 @@ def confirmar_novo_email(dados: ConfirmarEmail):
 
     return {"message": "Seu e-mail foi atualizado com sucesso!"}
 
+# rota em uso --- /account
 @app.post("/api/conta/cancelar-troca-email")
 def cancelar_troca_email(dados: EsqueciSenha):
     usuario = colecao_usuarios.find_one({"email": dados.email})
@@ -313,6 +322,7 @@ def cancelar_troca_email(dados: EsqueciSenha):
 
     return {"message": "Troca de e-mail cancelada no banco de dados."}
 
+# rota em uso --- /account
 @app.post("/api/conta/crp")
 def definir_crp(dados: DefinirCRP):
     usuario = colecao_usuarios.find_one({"email": dados.email})
@@ -325,6 +335,7 @@ def definir_crp(dados: DefinirCRP):
     )
     return {"message": "CRP atualizado com sucesso"}
 
+# rota em uso --- /account
 @app.delete("/api/conta/deletar/{email_usuario}")
 def deletar_conta(email_usuario: str, payload: DeletarContaRequest):
     usuario = colecao_usuarios.find_one({"email": email_usuario})
@@ -352,6 +363,7 @@ def gerar_codigo_unico():
         if not db["jogador"].find_one({"codigo_vinculo": codigo}):
             return codigo
 
+# rota em uso --- /manager (Responsável)
 @app.post("/api/jogadores/{id_usuario}")
 def criar_jogador(id_usuario: str, dados: JogadorCadastro):
 
@@ -379,6 +391,7 @@ def criar_jogador(id_usuario: str, dados: JogadorCadastro):
 
     return {"message": "Jogador criado!", "id_jogador": str(id_novo_jogador)}
 
+# rota em uso --- /edit, /manager, /performance
 @app.get("/api/jogadores/{id_usuario}")
 def listar_jogadores(id_usuario: str):
     usuario = colecao_usuarios.find_one({"_id": ObjectId(id_usuario)})
@@ -404,6 +417,7 @@ def listar_jogadores(id_usuario: str):
 
     return resultado
 
+# rota em uso --- /edit
 @app.post("/api/jogadores/{id_jogador}/desconectar")
 def desconectar_jogador(id_jogador: str):
     sessao = db["sessao"].find_one({"id_jogador": id_jogador})
@@ -416,6 +430,7 @@ def desconectar_jogador(id_jogador: str):
     )
     return {"message": "Dispositivos desconectados com sucesso."}
 
+# rota em uso --- /edit
 @app.put("/api/jogadores/{id_jogador}")
 def atualizar_jogador(id_jogador: str, dados: JogadorUpdate):
     campos_para_atualizar = {k: v for k, v in dados.dict(exclude_none=True).items()}
@@ -430,6 +445,7 @@ def atualizar_jogador(id_jogador: str, dados: JogadorUpdate):
         raise HTTPException(status_code=404, detail="Jogador não encontrado.")
     return {"message": "Jogador atualizado com sucesso!"}
 
+# rota em uso --- /edit
 @app.delete("/api/jogadores/{id_usuario}/{id_jogador}")
 def excluir_jogador(id_usuario: str, id_jogador: str, payload: ExcluirJogador):
     usuario = colecao_usuarios.find_one({"_id": ObjectId(id_usuario)})
@@ -453,6 +469,7 @@ def excluir_jogador(id_usuario: str, id_jogador: str, payload: ExcluirJogador):
 
     return {"message": "Jogador excluído permanentemente."}
 
+# rota em uso --- /manager (Responsável)
 @app.post("/api/jogo/gerar-pin/{id_jogador}")
 def gerar_pin_jogo(id_jogador: str):
     pin_gerado = str(random.randint(0, 999999)).zfill(6)
@@ -473,6 +490,7 @@ def gerar_pin_jogo(id_jogador: str):
         "expira_em": tempo_expiracao
     }
 
+# rota não utilizada no frontend --- Usada pelo jogo
 @app.post("/game-login")
 def game_login(dados: GameLoginRequest):
     sessao = db["sessao"].find_one({"codigo_pin": dados.code})
@@ -497,6 +515,7 @@ def game_login(dados: GameLoginRequest):
 
 calculator = MatchPerformanceCalculator()
 
+# rota não utilizada no frontend --- Usada pelo jogo
 @app.post("/api/partidas/salvar", response_model=MelhorPartidaModel)
 def salvar_partida(partida: PartidaParaPersistirModel, authorization: str = Header(None)):
     if not authorization:
@@ -543,7 +562,7 @@ def salvar_partida(partida: PartidaParaPersistirModel, authorization: str = Head
     
     registro_retornado = novo_registro
 
-if not registro_atual:
+    if not registro_atual:
 
         db["jogador"].update_one(
             {"_id": id_jogador},
@@ -566,6 +585,8 @@ if not registro_atual:
     return MelhorPartidaModel(**registro_retornado)
 
 
+#rota não utilizada --- Nenhuma
+
 @app.get("/api/planetas")
 def planetas_desbloqueados(authorization: str = Header(None)):
     if not authorization:
@@ -582,6 +603,7 @@ def planetas_desbloqueados(authorization: str = Header(None)):
     return jogador["planetas_desbloqueados"]
 
 
+# rota não utilizada --- Nenhuma
 @app.get("/api/planetas/{planetId}/melhores-pontuacoes")
 def melhores_pontuacoes(planetId: str, authorization: str = Header(None)):
     if not authorization:
@@ -596,6 +618,7 @@ def melhores_pontuacoes(planetId: str, authorization: str = Header(None)):
 
     return [item for item in jogador.get("melhores_pontuacoes", []) if item.get("planetId") == planetId]
     
+# rota não utilizada --- Nenhuma
 @app.put('/api/progresso/jogador/update')
 def atualizar_progresso(update_data: AtualizarProgressoRequest, authorization: str = Header(None)):
     if not authorization:
@@ -677,11 +700,13 @@ def require_especialista(usuario = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Acesso restrito a especialistas.")
     return usuario
 
+# rota não utilizada --- Nenhuma
 @app.get("/api/jogadores")
 def listar_todos_jogadores(_: dict = Depends(require_especialista)):
     jogadores = list(db["jogador"].find())
     return [{'id': str(j['_id']), 'nome': j.get('apelido', 'Jogador')} for j in jogadores]
 
+# rota em uso --- /performance (ia q disse, eu n vejo funcionar)
 @app.get("/api/estatisticas/{id_jogador}")
 def obter_estatisticas(id_jogador: str, current_user: dict = Depends(get_current_user)):
 
@@ -774,6 +799,7 @@ def obter_estatisticas(id_jogador: str, current_user: dict = Depends(get_current
         "habilidades":         habilidades_final
     }
 
+# rota em uso --- /requests 
 @app.post("/api/vinculo/solicitar")
 def solicitar_vinculo(dados: SolicitarVinculo, current_user: dict = Depends(get_current_user)):
     if current_user.get("tipo_perfil") != "especialista":
@@ -808,6 +834,7 @@ def solicitar_vinculo(dados: SolicitarVinculo, current_user: dict = Depends(get_
 
     return {"message": "Solicitação enviada com sucesso ao responsável!"}
 
+# rota em uso --- /requests
 @app.get("/api/vinculo/pendentes")
 def listar_solicitacoes_pendentes(current_user: dict = Depends(get_current_user)):
     if current_user.get("tipo_perfil") != "responsavel":
@@ -838,6 +865,7 @@ def listar_solicitacoes_pendentes(current_user: dict = Depends(get_current_user)
 
     return resultado
 
+# rota em uso --- /requests
 @app.post("/api/vinculo/responder")
 def responder_solicitacao(dados: ResponderVinculo, current_user: dict = Depends(get_current_user)):
     if current_user.get("tipo_perfil") != "responsavel":
@@ -872,6 +900,7 @@ def responder_solicitacao(dados: ResponderVinculo, current_user: dict = Depends(
     else:
         raise HTTPException(status_code=400, detail="Ação inválida. Use 'aprovar' ou 'rejeitar'.")
 
+# rota em uso --- /requests
 @app.get("/api/jogadores/buscar/{codigo}")
 def buscar_jogador_por_codigo(codigo: str, current_user: dict = Depends(get_current_user)):
     if current_user.get("tipo_perfil") != "especialista":
@@ -887,6 +916,7 @@ def buscar_jogador_por_codigo(codigo: str, current_user: dict = Depends(get_curr
         "foto_perfil": jogador.get("foto_perfil", 1)
     }
 
+# rota em uso --- /requests
 @app.get("/api/vinculo/meus-vinculos")
 def meus_vinculos_especialista(current_user: dict = Depends(get_current_user)):
     if current_user.get("tipo_perfil") != "especialista":
@@ -907,6 +937,7 @@ def meus_vinculos_especialista(current_user: dict = Depends(get_current_user)):
             })
     return resultado
 
+# rota em uso --- /manager
 @app.get("/api/vinculo/meus-pacientes")
 def listar_pacientes_especialista(current_user: dict = Depends(get_current_user)):
     if current_user.get("tipo_perfil") != "especialista":
@@ -929,6 +960,7 @@ def listar_pacientes_especialista(current_user: dict = Depends(get_current_user)
         })
     return resultado
 
+# rota em uso --- /requests
 @app.get("/api/vinculo/aprovados")
 def listar_vinculos_aprovados(current_user: dict = Depends(get_current_user)):
     if current_user.get("tipo_perfil") != "responsavel":
@@ -958,6 +990,7 @@ def listar_vinculos_aprovados(current_user: dict = Depends(get_current_user)):
         })
     return resultado
 
+# rota em uso --- /requests
 @app.delete("/api/vinculo/cancelar/{id_solicitacao}")
 def cancelar_vinculo(id_solicitacao: str, current_user: dict = Depends(get_current_user)):
     try:

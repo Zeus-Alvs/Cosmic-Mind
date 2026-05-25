@@ -63,7 +63,7 @@ export default function ManagerS() {
 
   return (
     <div className="w-full max-w-5xl mx-auto p-4 flex flex-col items-center">
-      <div className="fixed top-0 left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+      <div className="fixed top-0 left-0 md:left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
 
       <div className="text-center mb-10">
         <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">
@@ -93,7 +93,7 @@ export default function ManagerS() {
               onClick={prevSlide}
               className={`absolute left-0 lg:left-10 z-[100] p-2 transition-all cursor-pointer ${currentIndex === 0 ? 'opacity-10 pointer-events-none' : 'hover:scale-110 text-slate-400'}`}
             >
-              <ChevronLeft className="w-12 h-12 stroke-[1px]" />
+              <ChevronLeft className="w-8 h-8 md:w-12 md:h-12 stroke-[1px]" />
             </button>
 
             <div className="relative flex items-center justify-center w-full">
@@ -109,12 +109,12 @@ export default function ManagerS() {
                     className={`
                       absolute transition-all duration-500 ease-in-out rounded-[35px] shadow-lg
                       ${isCenter ? 'z-50 scale-100 opacity-100 shadow-2xl translate-x-0' : ''}
-                      ${isLeft ? 'z-30 scale-[0.82] opacity-30 -translate-x-[240px] blur-[1px]' : ''}
-                      ${isRight ? 'z-30 scale-[0.82] opacity-30 translate-x-[240px] blur-[1px]' : ''}
+                      ${isLeft ? 'z-30 scale-[0.82] opacity-30 -translate-x-[120px] md:-translate-x-[240px] blur-[1px]' : ''}
+                      ${isRight ? 'z-30 scale-[0.82] opacity-30 translate-x-[120px] md:translate-x-[240px] blur-[1px]' : ''}
                       ${!isVisible ? 'opacity-0 scale-50 z-0 pointer-events-none' : ''}
                       bg-[#F2ECEF] border border-white
                     `}
-                    style={{ width: '340px', height: '260px' }}
+                    style={{ width: '100%', maxWidth: '340px', height: '260px' }}
                   >
                     <div className="p-8 h-full flex flex-col justify-between">
                       <div className="flex items-start justify-between">
@@ -172,7 +172,7 @@ export default function ManagerS() {
               onClick={nextSlide}
               className={`absolute right-0 lg:right-10 z-[100] p-2 transition-all cursor-pointer ${currentIndex === players.length - 1 ? 'opacity-10 pointer-events-none' : 'hover:scale-110 text-slate-400'}`}
             >
-              <ChevronRight className="w-12 h-12 stroke-[1px]" />
+              <ChevronRight className="w-8 h-8 md:w-12 md:h-12 stroke-[1px]" />
             </button>
           </div>
 

@@ -153,7 +153,7 @@ export default function RequestsS() {
 
   return (
     <div className="max-w-5xl mx-auto p-6 font-sans">
-      <div className="fixed top-0 left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+      <div className="fixed top-0 left-0 md:left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
 
       <div className="mb-10">
         <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent">
@@ -167,7 +167,7 @@ export default function RequestsS() {
           <Search className="w-4 h-4 text-[#4078A4]" /> Novo Vínculo
         </h3>
 
-        <form onSubmit={handleBuscar} className="flex gap-3 mb-6">
+        <form onSubmit={handleBuscar} className="flex flex-col sm:flex-row gap-3 mb-6">
           <input
             type="text"
             value={buscaCodigo}
@@ -293,7 +293,7 @@ export default function RequestsS() {
       </section>
 
       {modalExcluir && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-xs rounded-[40px] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200 p-7">
             <div className="text-center mb-6">
               <p className="text-[9px] font-bold text-red-400 uppercase tracking-widest">Remover Paciente</p>

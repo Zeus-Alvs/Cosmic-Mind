@@ -146,6 +146,14 @@ export default function LoginPage() {
               <Link href="/remember-password" className="text-xs text-[#4078A4] underline hover:text-[#2d587a] font-bold mt-2 inline-block transition-colors">
                 Esqueceu a senha?
               </Link>
+              
+              {/* Link de Cadastro para Mobile */}
+              <div className="md:hidden text-sm text-slate-500 mt-2">
+                Não tem uma conta?{' '}
+                <Link href="/register" className="text-purple-500 font-bold hover:underline">
+                  Cadastre-se agora!
+                </Link>
+              </div>
             </div>
           </form>
         </div>

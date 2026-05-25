@@ -221,7 +221,7 @@ export default function AccountPage() {
 
   return (
     <div className="max-w-6xl mx-auto p-2 lg:p-6 font-sans">
-      <div className="fixed top-0 left-0 md:left-64 right-0 h-1 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+      <div className="fixed top-0 left-0 md:left-0 md:left-64 right-0 h-1 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
 
       <header className="mb-8 pl-2">
         <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">

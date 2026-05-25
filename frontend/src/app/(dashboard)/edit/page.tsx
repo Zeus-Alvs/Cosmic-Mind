@@ -136,7 +136,7 @@ function EditPageContent() {
 
     return (
         <div className="w-full max-w-4xl mx-auto p-8 relative -mt-5">
-            <div className="fixed top-0 left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+            <div className="fixed top-0 left-0 md:left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
 
             {}
             <div className="flex items-center justify-center relative mb-6">
@@ -200,10 +200,10 @@ function EditPageContent() {
 
             </div>
 
-            <div className="max-w-md mx-auto flex items-center gap-4">
+            <div className="max-w-md mx-auto flex flex-col sm:flex-row items-center gap-4 w-full">
                 <button
                     onClick={() => setIsDeleteModalOpen(true)}
-                    className="flex-1 py-3.5 rounded-xl bg-[#EB5757] text-white font-bold text-sm shadow-md hover:bg-red-600 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full sm:flex-1 py-3.5 rounded-xl bg-[#EB5757] text-white font-bold text-sm shadow-md hover:bg-red-600 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                     <Trash2 className="w-5 h-5" />
                     Excluir Conta
@@ -211,7 +211,7 @@ function EditPageContent() {
 
                 <button
                     onClick={handleDesconectar}
-                    className="flex-1 py-3.5 rounded-xl bg-[#595959] text-white font-bold text-sm shadow-md hover:bg-black transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full sm:flex-1 py-3.5 rounded-xl bg-[#595959] text-white font-bold text-sm shadow-md hover:bg-black transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                     <LogOut className="w-5 h-5" />
                     Desconectar
@@ -219,7 +219,7 @@ function EditPageContent() {
             </div>
 
             {isDeleteModalOpen && (
-                <div className="fixed inset-0 z-[300] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
                     <div className="bg-white rounded-[30px] p-8 w-full max-w-sm shadow-2xl relative text-center">
 
                         <button

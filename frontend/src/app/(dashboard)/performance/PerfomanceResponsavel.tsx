@@ -47,15 +47,15 @@ export default function PerfomanceR() {
   return (
     <div className="w-full max-w-6xl mx-auto p-5 bg-transparent font-sans text-slate-600 overflow-hidden">
       <div className="mb-6 text-center">
-        <div className="fixed top-0 left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+        <div className="fixed top-0 left-0 md:left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
         <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">
           Desempenho do Jogador
         </h2>
         <p className="text-slate-400 text-xs font-medium">Selecione um planeta e veja o desempenho</p>
       </div>
 
-      <div className="flex flex-row gap-8 items-start justify-center">
-        <div className="w-[260px] flex flex-col gap-4 shrink-0">
+      <div className="flex flex-col md:flex-row gap-8 items-center md:items-start justify-center">
+        <div className="w-full max-w-[260px] md:w-[260px] flex flex-col gap-4 shrink-0">
           <div className="relative">
             <button
               onClick={() => setIsOpen(!isOpen)}
@@ -125,7 +125,7 @@ export default function PerfomanceR() {
           </div>
         </div>
 
-        <div className="min-w-[480px] bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm self-stretch">
+        <div className="w-full md:min-w-[480px] bg-white border border-slate-100 p-6 md:p-8 rounded-[2.5rem] shadow-sm self-stretch">
           {planetaAtivo ? (
             <div className="flex flex-col animate-in fade-in duration-500 h-full">
               <div className="flex items-center gap-5 mb-6 pb-4 border-b border-slate-50">
@@ -143,7 +143,7 @@ export default function PerfomanceR() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-x-10 gap-y-6 my-auto">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 sm:gap-x-10 gap-y-6 my-auto">
                 {Object.entries(planetaAtivo.stats).map(([key, value]) => {
                   const offset = circumference - (value / 100) * circumference;
                   return (

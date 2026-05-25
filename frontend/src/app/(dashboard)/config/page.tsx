@@ -20,10 +20,10 @@ export default function AjustesPage() {
     fonteDislexia: false,
     altoContraste: false,
     compartilharDados: false,
-
     velocidadeVoz: 'normal',
-    feedbackSonoro: true,
-    ignorarToqueDuplo: true,
+    // Corrigido: Agora vem tudo desligado por padrão
+    feedbackSonoro: false, 
+    ignorarToqueDuplo: false, 
   });
 
   useEffect(() => {
@@ -31,13 +31,18 @@ export default function AjustesPage() {
     const salvaContraste = localStorage.getItem('pref_contraste') === 'true';
     const salvaTamanho = localStorage.getItem('pref_tamanho') || 'normal';
     const salvaTema = localStorage.getItem('pref_tema') || 'sistema';
+    // Lê as novas configs do navegador (se não existir, fica falso)
+    const salvaSom = localStorage.getItem('pref_som') === 'true';
+    const salvaToqueDuplo = localStorage.getItem('pref_toqueDuplo') === 'true';
 
     setConfigs(prev => ({
       ...prev,
       fonteDislexia: salvaDislexia,
       altoContraste: salvaContraste,
       tamanhoFonte: salvaTamanho,
-      tema: salvaTema
+      tema: salvaTema,
+      feedbackSonoro: salvaSom,
+      ignorarToqueDuplo: salvaToqueDuplo
     }));
 
     aplicarClasses(salvaDislexia, salvaContraste, salvaTamanho);
@@ -91,6 +96,17 @@ export default function AjustesPage() {
     setConfigs({ ...configs, tema: novoTema });
     localStorage.setItem('pref_tema', novoTema);
     aplicarTema(novoTema);
+  };
+
+  // Funções novas para salvar o Som e Toque Duplo
+  const toggleSom = (checked: boolean) => {
+    setConfigs({ ...configs, feedbackSonoro: checked });
+    localStorage.setItem('pref_som', checked.toString());
+  };
+
+  const toggleToqueDuplo = (checked: boolean) => {
+    setConfigs({ ...configs, ignorarToqueDuplo: checked });
+    localStorage.setItem('pref_toqueDuplo', checked.toString());
   };
 
   const baixarDadosLGPD = () => {
@@ -154,7 +170,7 @@ export default function AjustesPage() {
 
   return (
     <div className="max-w-6xl mx-auto p-4 dark:bg-slate-900 transition-colors duration-300">
-      <div className="fixed top-0 left-0 md:left-64 right-0 h-1 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+      <div className="fixed top-0 left-0 md:left-0 md:left-64 right-0 h-1 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
 
       <header className="mb-8 pl-2">
         <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">
@@ -167,7 +183,7 @@ export default function AjustesPage() {
 
       <form onSubmit={handleSaveConfigs} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        {}
+        {/* Coluna 1: Interface & Acessibilidade */}
         <div className="space-y-6">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-[24px] border border-slate-100 dark:border-slate-700 shadow-sm transition-colors">
             <div className="flex items-center gap-2 mb-6">
@@ -250,7 +266,7 @@ export default function AjustesPage() {
           </div>
         </div>
 
-        {}
+        {/* Coluna 2: Integração Caixa CAA */}
         <div className="space-y-6">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-[24px] border border-slate-100 dark:border-slate-700 shadow-sm transition-colors">
             <div className="flex items-center gap-2 mb-6">
@@ -280,7 +296,7 @@ export default function AjustesPage() {
                     <Bell className="w-5 h-5 text-slate-400 dark:text-slate-300 mt-0.5"/>
                     <div>
                       <p className="text-sm font-bold text-slate-700 dark:text-slate-200">Feedback Sonoro (Beep)</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Sinalizar confirmação ao pressionar na caixa.</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Sinalizar confirmação ao pressionar botões.</p>
                     </div>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -288,7 +304,7 @@ export default function AjustesPage() {
                       type="checkbox" 
                       className="sr-only peer" 
                       checked={configs.feedbackSonoro}
-                      onChange={(e) => setConfigs({...configs, feedbackSonoro: e.target.checked})}
+                      onChange={(e) => toggleSom(e.target.checked)} // Conectado à nova função
                     />
                     <div className="w-11 h-6 bg-slate-200 dark:bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#4078A4]"></div>
                   </label>
@@ -307,7 +323,7 @@ export default function AjustesPage() {
                       type="checkbox" 
                       className="sr-only peer" 
                       checked={configs.ignorarToqueDuplo}
-                      onChange={(e) => setConfigs({...configs, ignorarToqueDuplo: e.target.checked})}
+                      onChange={(e) => toggleToqueDuplo(e.target.checked)} // Conectado à nova função
                     />
                     <div className="w-11 h-6 bg-slate-200 dark:bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#4078A4]"></div>
                   </label>
@@ -316,7 +332,7 @@ export default function AjustesPage() {
             </div>
           </div>
 
-          {}
+          {/* Privacidade e Dados */}
           <div className="bg-white dark:bg-slate-800 p-6 rounded-[24px] border border-slate-100 dark:border-slate-700 shadow-sm relative overflow-hidden transition-colors">
             <div className="absolute -top-4 -right-4 p-4 opacity-5 dark:opacity-10 pointer-events-none">
               <ShieldCheck className="w-32 h-32 text-slate-900 dark:text-white"/>
@@ -356,7 +372,7 @@ export default function AjustesPage() {
           </div>
         </div>
 
-        {}
+        {/* Central de Ajuda */}
         <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-[24px] border border-slate-100 dark:border-slate-700 shadow-sm mt-2 transition-colors">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100 dark:border-slate-700">
             <div className="flex items-center gap-2">
@@ -457,7 +473,7 @@ export default function AjustesPage() {
           </div>
         </div>
 
-        {}
+        {/* Botão Salvar */}
         <div className="lg:col-span-2 flex justify-center mt-2">
           <button 
             type="submit" 

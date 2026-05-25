@@ -158,6 +158,7 @@ export default function Home() {
   const [selenesIndex, setSelenesIndex] = useState(0);
   const [spectrumIndex, setSpectrumIndex] = useState(0);
   const [activeSection, setActiveSection] = useState("hero");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pageRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -353,42 +354,87 @@ export default function Home() {
           </div>
         ))}
 
-        {}
-        <header className="fixed top-0 left-0 w-full flex items-center justify-between px-12 py-5 z-50 bg-black/40 backdrop-blur-md border-b border-white/5">
-          <nav className="flex gap-9">
+        {/* Header */}
+        <header className="fixed top-0 left-0 w-full z-50 bg-[#0f0a1a]/80 backdrop-blur-lg border-b border-white/5 transition-all duration-300">
+          <div className="flex items-center justify-between px-5 md:px-12 py-3 md:py-5 relative z-[60]">
+            
+            {/* Desktop Nav */}
+            <nav className="hidden md:flex gap-9">
+              {menuItems.map((item) => {
+                const isActive = activeSection === item.id;
+                return (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className={`transition-all text-sm font-medium tracking-wide duration-300 relative py-1
+                      ${isActive 
+                        ? "text-cyan-400 font-semibold scale-105" 
+                        : "text-white/70 hover:text-cyan-300 hover:scale-105"
+                      }`}
+                    style={{ fontFamily: "'Raleway', sans-serif" }}
+                  >
+                    {item.label}
+                    {/* Active Indicator line */}
+                    <span className={`absolute bottom-0 left-0 h-[2px] bg-cyan-400 transition-all duration-300 ${isActive ? 'w-full' : 'w-0'}`}></span>
+                  </a>
+                );
+              })}
+            </nav>
+
+            {/* Mobile Hamburger Button */}
+            <button 
+              className="md:hidden text-white flex flex-col gap-1.5 p-1"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Menu"
+            >
+              <span className={`block w-6 h-0.5 bg-white transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
+              <span className={`block w-6 h-0.5 bg-white transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''}`}></span>
+              <span className={`block w-6 h-0.5 bg-white transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
+            </button>
+            
+            {/* Action Buttons */}
+            <div className="flex gap-2 md:gap-3">
+              <button 
+                onClick={() => router.push('/login')}
+                className="btn-login text-[11px] sm:text-xs md:text-sm px-3 sm:px-4 md:px-7 py-1.5 md:py-2 whitespace-nowrap"
+              >
+                Entrar
+              </button>
+              <button 
+                onClick={() => router.push('/register')}
+                className="btn-register text-[11px] sm:text-xs md:text-sm px-3 sm:px-4 md:px-6 py-1.5 md:py-2 whitespace-nowrap"
+              >
+                Cadastrar
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Nav Overlay */}
+          <div 
+            className={`md:hidden absolute top-full left-0 w-full bg-[#0f0a1a]/95 backdrop-blur-xl border-b border-white/10 flex flex-col items-center py-8 gap-6 transition-all duration-300 overflow-hidden ${
+              isMobileMenuOpen 
+                ? 'max-h-[400px] opacity-100 border-opacity-100 shadow-2xl' 
+                : 'max-h-0 opacity-0 border-opacity-0'
+            }`}
+          >
             {menuItems.map((item) => {
               const isActive = activeSection === item.id;
               return (
                 <a
                   key={item.label}
                   href={item.href}
-                  className={`transition-all text-sm font-medium tracking-wide duration-300 relative py-1
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`transition-all text-xl font-medium tracking-wide relative py-2
                     ${isActive 
-                      ? "text-cyan-400 font-semibold scale-105" 
-                      : "text-white/70 hover:text-cyan-300 hover:scale-105"
+                      ? "text-cyan-400 font-semibold" 
+                      : "text-white/70"
                     }`}
                   style={{ fontFamily: "'Raleway', sans-serif" }}
                 >
                   {item.label}
-                  {}
-                  <span className={`absolute bottom-0 left-0 h-[2px] bg-cyan-400 transition-all duration-300 ${isActive ? 'w-full' : 'w-0'}`}></span>
                 </a>
               );
             })}
-          </nav>
-          <div className="flex gap-3">
-            <button 
-              onClick={() => router.push('/login')}
-              className="btn-login"
-            >
-              Entrar
-            </button>
-            <button 
-              onClick={() => router.push('/register')}
-              className="btn-register"
-            >
-              Cadastrar-se
-            </button>
           </div>
         </header>
 
@@ -430,50 +476,48 @@ export default function Home() {
 
         {}
         <div className="animate-hero-3 flex justify-center gap-9 px-12 pb-16 flex-wrap relative z-10">
-          {}
-          <div
-            className="game-card flex items-center justify-center relative"
-            style={{ width: "clamp(260px, 34vw, 380px)", aspectRatio: "16/9" }}
-          >
-            <span
-              className="absolute"
-              style={{
-                bottom: "-18px",
-                left: "-14px",
-                fontSize: "2rem",
-                color: "rgba(130, 60, 220, 0.8)",
-                filter: "blur(1px)",
-                zIndex: 0,
-                pointerEvents: "none",
-              }}
-              aria-hidden="true"
-            >
-              ★
-            </span>
-            <span
-              className="font-bold text-base"
-              style={{ color: "rgba(30,20,50,0.85)", letterSpacing: "0.02em" }}
-            >
-              Imagem do jogo
-            </span>
-          </div>
+  {/* Caixa 1 */}
+  <div
+    className="game-card flex items-center justify-center relative overflow-hidden rounded-xl"
+    style={{ width: "clamp(260px, 34vw, 380px)", aspectRatio: "16/9" }}
+  >
+    <span
+      className="absolute"
+      style={{
+        bottom: "-18px",
+        left: "-14px",
+        fontSize: "2rem",
+        color: "rgba(130, 60, 220, 0.8)",
+        filter: "blur(1px)",
+        zIndex: 0,
+        pointerEvents: "none",
+      }}
+      aria-hidden="true"
+    >
+      ★
+    </span>
+    <img 
+      src="/game/game1.jpeg" 
+      alt="Screenshot do Jogo 1" 
+      className="w-full h-full object-cover relative z-10"
+    />
+  </div>
 
-          {}
-          <div
-            className="game-card flex items-center justify-center"
-            style={{ width: "clamp(260px, 34vw, 380px)", aspectRatio: "16/9" }}
-          >
-            <span
-              className="font-bold text-base"
-              style={{ color: "rgba(30,20,50,0.85)", letterSpacing: "0.02em" }}
-            >
-              Imagem do jogo
-            </span>
-          </div>
-        </div>
+  {/* Caixa 2 */}
+  <div
+    className="game-card flex items-center justify-center relative overflow-hidden rounded-xl"
+    style={{ width: "clamp(260px, 34vw, 380px)", aspectRatio: "16/9" }}
+  >
+    <img 
+      src="/game/game2.jpeg" 
+      alt="Screenshot do Jogo 2" 
+      className="w-full h-full object-cover"
+    />
+  </div>
+</div>
 
-        {}
-        <section id="download" className="flex flex-col items-center py-20 relative z-10">
+
+        <section id="download" className="flex flex-col items-center py-20 relative z-10 px-6">
           <div className="game-card p-10 flex flex-col items-center max-w-xl text-center">
             <h2 
               style={{ fontFamily: "'Orbitron', sans-serif" }} 
@@ -486,15 +530,29 @@ export default function Home() {
               o progresso cognitivo em tempo real.
             </p>
 
-            <a 
-              href="#" 
-              onClick={(e) => e.preventDefault()}
-              className="btn-register text-center no-underline inline-block scale-110 opacity-80 cursor-not-allowed"
-            >
-              Fazer download 
-            </a>
+            {/* Versão Mobile: Botão de Download */}
+            <div className="block md:hidden">
+              <a 
+                href="/download-link" 
+                className="btn-register text-center no-underline inline-block scale-110"
+              >
+                Fazer download 
+              </a>
+            </div>
 
-            <span className="text-white/40 text-xs mt-4">
+            {/* Versão Web: Espaço para QR Code */}
+            <div className="hidden md:flex flex-col items-center gap-4">
+              <div className="w-48 h-48 bg-white p-2 rounded-xl flex items-center justify-center overflow-hidden relative">
+                {/* Imagem do QR Code - Você pode substituir o src depois */}
+                <div className="text-black/50 text-sm font-bold flex flex-col items-center justify-center text-center">
+                  <span className="text-3xl mb-2">📱</span>
+                  Espaço para<br/>QR Code
+                </div>
+              </div>
+              <p className="text-white/50 text-sm">Escaneie o QR Code com seu celular para baixar o jogo</p>
+            </div>
+
+            <span className="text-white/40 text-xs mt-8">
                Desenvolvido em Unity 
             </span>
           </div>
