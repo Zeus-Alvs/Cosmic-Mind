@@ -363,7 +363,7 @@ def criar_jogador(id_usuario: str, dados: JogadorCadastro):
         "data_nascimento": dados.data_nascimento,
         "foto_perfil": dados.foto_perfil,
         "preferencias_jogo": {"volume_musica": 50, "daltonismo_modo": False},
-        "planetas_desbloqueados": [],
+        "planetas_desbloqueados": ["57b6d77617cbdc1499b06cab3d9f650e"],
         "melhores_pontuacoes": [],
         "pets_desbloqueados": [],
         "conquistas_obtidas": []
@@ -540,7 +540,7 @@ def salvar_partida(partida: PartidaParaPersistirModel, authorization: str = Head
         "score": pontuacao,
         "starsEarned": estrelas
     }
-
+    
     registro_retornado = novo_registro
 
     if not registro_atual:
@@ -566,6 +566,21 @@ def salvar_partida(partida: PartidaParaPersistirModel, authorization: str = Head
 
     # Retorna o melhor registro
     return MelhorPartidaModel(**registro_retornado)
+  
+@app.get("/api/planetas")
+def planetas_desbloqueados(authorization: str = Header(None)):
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Token de acesso ausente.")
+    token = authorization.replace('Bearer ', '')
+
+    sessao = db["sessao"].find_one({"token_acesso": token})
+    if not sessao:
+        raise HTTPException(status_code=401, detail="Token inválido ou expirado.")
+
+    id_jogador = ObjectId(sessao["id_jogador"])
+    jogador = db["jogador"].find_one({"_id": id_jogador})
+
+    return jogador["planetas_desbloqueados"]
     
 @app.put('/api/progresso/jogador/update')
 def atualizar_progresso(update_data: AtualizarProgressoRequest, authorization: str = Header(None)):
