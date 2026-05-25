@@ -509,10 +509,10 @@ def salvar_partida(partida: PartidaParaPersistirModel, authorization: str = Head
 
     id_jogador = ObjectId(sessao["id_jogador"])
 
-    # 1. Chamar o serviço que realiza o cálculo da performance do jogador
+
     pontuacao, estrelas, metricas_cognitivas = calculator.calcular_pontuacao(partida)
 
-    # 2. Cria o modelo para persistir e salva no banco
+
     partida_para_salvar = PartidaParaPersistirComPontuacaoModel(
         missionId=partida.missionId,
         planetId=partida.planetId,
@@ -525,10 +525,10 @@ def salvar_partida(partida: PartidaParaPersistirModel, authorization: str = Head
     partida_dict = partida_para_salvar.dict()
     partida_dict["id_jogador"] = id_jogador
 
-    # Inserir no banco
+
     colecao_partidas.insert_one(partida_dict)
 
-    # 3. Busca a lista de melhores partidas do jogador
+
     jogador = db["jogador"].find_one({"_id": id_jogador})
     melhores_pontuacoes = jogador.get("melhores_pontuacoes", [])
     
@@ -543,16 +543,16 @@ def salvar_partida(partida: PartidaParaPersistirModel, authorization: str = Head
     
     registro_retornado = novo_registro
 
-    if not registro_atual:
-        # Se não houver registro com esse missionId na lista, adiciona na lista
+if not registro_atual:
+
         db["jogador"].update_one(
             {"_id": id_jogador},
             {"$push": {"melhores_pontuacoes": novo_registro}}
         )
     else:
-        # Se houver, verifica se a nova pontuação é maior que a atual
+      
         if pontuacao > registro_atual.get("score", 0):
-            # Substitui na lista
+
             db["jogador"].update_one(
                 {"_id": id_jogador, "melhores_pontuacoes.missionId": partida.missionId},
                 {"$set": {
@@ -561,12 +561,11 @@ def salvar_partida(partida: PartidaParaPersistirModel, authorization: str = Head
                 }}
             )
         else:
-            # Mantém o antigo e retorna o antigo
             registro_retornado = registro_atual
 
-    # Retorna o melhor registro
     return MelhorPartidaModel(**registro_retornado)
-  
+
+
 @app.get("/api/planetas")
 def planetas_desbloqueados(authorization: str = Header(None)):
     if not authorization:
@@ -581,6 +580,21 @@ def planetas_desbloqueados(authorization: str = Header(None)):
     jogador = db["jogador"].find_one({"_id": id_jogador})
 
     return jogador["planetas_desbloqueados"]
+
+
+@app.get("/api/planetas/{planetId}/melhores-pontuacoes")
+def melhores_pontuacoes(planetId: str, authorization: str = Header(None)):
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Token de acesso ausente.")
+    token = authorization.replace('Bearer ', '')
+
+    sessao = db["sessao"].find_one({"token_acesso": token})
+    if not sessao:
+        raise HTTPException(status_code=401, detail="Token inválido ou expirado.")
+
+    jogador = db["jogador"].find_one({"_id": ObjectId(sessao["id_jogador"])})
+
+    return [item for item in jogador.get("melhores_pontuacoes", []) if item.get("planetId") == planetId]
     
 @app.put('/api/progresso/jogador/update')
 def atualizar_progresso(update_data: AtualizarProgressoRequest, authorization: str = Header(None)):
