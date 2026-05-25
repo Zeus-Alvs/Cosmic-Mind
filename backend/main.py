@@ -11,10 +11,12 @@ import secrets
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import random
-from datetime import datetime as dt_cls, timedelta, timezone
+from datetime import datetime as dt_cls, timedelta, timezone, datetime
 import jwt
+from match_performance_calculator.MatchPerformanceCalculator import MatchPerformanceCalculator
 import random
 import string
+
 
 load_dotenv()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -493,8 +495,10 @@ def game_login(dados: GameLoginRequest):
 
     return {"accessToken": token_jwt}
 
-@app.post("/api/partidas/salvar")
-def salvar_partida(partida: PartidaModel, authorization: str = Header(None)):
+calculator = MatchPerformanceCalculator()
+
+@app.post("/api/partidas/salvar", response_model=MelhorPartidaModel)
+def salvar_partida(partida: PartidaParaPersistirModel, authorization: str = Header(None)):
     if not authorization:
         raise HTTPException(status_code=401, detail="Token de acesso ausente.")
     token = authorization.replace('Bearer ', '')
@@ -503,15 +507,66 @@ def salvar_partida(partida: PartidaModel, authorization: str = Header(None)):
     if not sessao:
         raise HTTPException(status_code=401, detail="Token inválido ou expirado.")
 
-    partida_dict = partida.dict()
-    partida_dict["id_jogador"] = ObjectId(sessao["id_jogador"])
+    id_jogador = ObjectId(sessao["id_jogador"])
 
-    resultado = colecao_partidas.insert_one(partida_dict)
-    return {
-        "message": "Partida salva com sucesso!",
-        "id_partida": str(resultado.inserted_id)
+    # 1. Chamar o serviço que realiza o cálculo da performance do jogador
+    pontuacao, estrelas, metricas_cognitivas = calculator.calcular_pontuacao(partida)
+
+    # 2. Cria o modelo para persistir e salva no banco
+    partida_para_salvar = PartidaParaPersistirComPontuacaoModel(
+        missionId=partida.missionId,
+        planetId=partida.planetId,
+        iniciado_em=partida.start_time,
+        finalizado_em=partida.end_time,
+        pontuacao_final=pontuacao,
+        metricas_cognitivas=metricas_cognitivas
+    )
+
+    partida_dict = partida_para_salvar.dict()
+    partida_dict["id_jogador"] = id_jogador
+
+    # Inserir no banco
+    colecao_partidas.insert_one(partida_dict)
+
+    # 3. Busca a lista de melhores partidas do jogador
+    jogador = db["jogador"].find_one({"_id": id_jogador})
+    melhores_pontuacoes = jogador.get("melhores_pontuacoes", [])
+    
+    registro_atual = next((p for p in melhores_pontuacoes if p.get("missionId") == partida.missionId), None)
+    
+    novo_registro = {
+        "missionId": partida.missionId,
+        "planetId": partida.planetId,
+        "score": pontuacao,
+        "starsEarned": estrelas
     }
 
+    registro_retornado = novo_registro
+
+    if not registro_atual:
+        # Se não houver registro com esse missionId na lista, adiciona na lista
+        db["jogador"].update_one(
+            {"_id": id_jogador},
+            {"$push": {"melhores_pontuacoes": novo_registro}}
+        )
+    else:
+        # Se houver, verifica se a nova pontuação é maior que a atual
+        if pontuacao > registro_atual.get("score", 0):
+            # Substitui na lista
+            db["jogador"].update_one(
+                {"_id": id_jogador, "melhores_pontuacoes.missionId": partida.missionId},
+                {"$set": {
+                    "melhores_pontuacoes.$.score": pontuacao,
+                    "melhores_pontuacoes.$.starsEarned": estrelas
+                }}
+            )
+        else:
+            # Mantém o antigo e retorna o antigo
+            registro_retornado = registro_atual
+
+    # Retorna o melhor registro
+    return MelhorPartidaModel(**registro_retornado)
+    
 @app.put('/api/progresso/jogador/update')
 def atualizar_progresso(update_data: AtualizarProgressoRequest, authorization: str = Header(None)):
     if not authorization:
