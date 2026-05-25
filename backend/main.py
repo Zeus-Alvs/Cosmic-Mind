@@ -14,6 +14,10 @@ import random
 from datetime import datetime as dt_cls, timedelta, timezone, datetime
 import jwt
 from match_performance_calculator.MatchPerformanceCalculator import MatchPerformanceCalculator
+import random
+import string
+
+
 load_dotenv()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 app = FastAPI(title="Cosmic Mind API")
@@ -21,7 +25,7 @@ app = FastAPI(title="Cosmic Mind API")
 JWT_SECRET = os.getenv("JWT_SECRET", secrets.token_hex(32))
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 2
-# Opcional JWT_SECRET=sua_chave no .env depois
+
 def gerar_jwt(id_jogador: str):
     payload = {
         'id_jogador': id_jogador,
@@ -52,26 +56,37 @@ colecao_partidas = db["partidas"]
 def read_root():
     return {"status": "A API do Cosmic Mind está viva!"}
 
-
 @app.post("/api/cadastrar", response_model=UsuarioRetorno, status_code=status.HTTP_201_CREATED)
 def cadastrar_usuario(novo_usuario: UsuarioCadastro):
     usuario_existente = colecao_usuarios.find_one({"email": novo_usuario.email})
     if usuario_existente:
         raise HTTPException(status_code=400, detail="Este e-mail já está cadastrado.")
 
-    usuario_dict = novo_usuario.dict()
+    usuario_dict = novo_usuario.model_dump()
     usuario_dict["senha"] = pwd_context.hash(novo_usuario.senha)
     usuario_dict["criado_em"] = datetime.now(timezone.utc)
     usuario_dict["avatar"] = 1
     
-    resultado = colecao_usuarios.insert_one(usuario_dict)
+    if usuario_dict.get('tipo_perfil') == 'especialista':
+        crm_val = usuario_dict.get('crm')
+        if not crm_val:
+            raise HTTPException(status_code=400, detail="O campo CRM é obrigatório para especialistas.")
+        usuario_dict['crp_especialista'] = crm_val
+        usuario_dict['clinica'] = usuario_dict.get('clinica')
+        usuario_dict['ocupacao'] = usuario_dict.get('ocupacao')
+        usuario_dict.pop('crm', None)     
     
+    resultado = colecao_usuarios.insert_one(usuario_dict)
+
     return UsuarioRetorno(
-        id=str(resultado.inserted_id),
-        nome=usuario_dict["nome"],
-        email=usuario_dict["email"],
-        tipo_perfil=usuario_dict["tipo_perfil"],
-        avatar=usuario_dict.get("avatar", 1)
+        id = str(resultado.inserted_id),
+        nome = usuario_dict["nome"],
+        email = usuario_dict["email"],
+        tipo_perfil = usuario_dict["tipo_perfil"],
+        avatar = usuario_dict.get("avatar", 1),
+        crm = usuario_dict.get("crp_especialista") or usuario_dict.get('crm'),
+        clinica = usuario_dict.get("clinica"),
+        ocupacao = usuario_dict.get("ocupacao")
     )
 
 @app.post("/api/login", response_model=UsuarioRetorno, status_code=status.HTTP_200_OK)
@@ -113,7 +128,7 @@ def atualizar_perfil(email_usuario: str, dados: UsuarioUpdate):
 
     if "email" in campos_para_atualizar and campos_para_atualizar["email"] != email_usuario:
         novo_email = campos_para_atualizar["email"]
-        
+
         if colecao_usuarios.find_one({"email": novo_email}):
             raise HTTPException(status_code=400, detail="Este e-mail já está em uso.")
 
@@ -127,7 +142,7 @@ def atualizar_perfil(email_usuario: str, dados: UsuarioUpdate):
         enviar_email_troca_email(novo_email, token_confirmacao)
 
         del campos_para_atualizar["email"]
-        
+
         mensagem_retorno = "Dados salvos! Um link de verificação foi enviado para o seu novo e-mail."
 
     if campos_para_atualizar:
@@ -160,7 +175,7 @@ def trocar_senha(email_usuario: str, dados: TrocarSenha):
 def enviar_email_recuperacao(email_destino: str, token: str):
     remetente = os.getenv("EMAIL_REMETENTE")
     senha = os.getenv("EMAIL_SENHA")
-    
+
     link_recuperacao = f"http://localhost:3000/reset-password?token={token}"
 
     msg = MIMEMultipart()
@@ -170,19 +185,19 @@ def enviar_email_recuperacao(email_destino: str, token: str):
 
     corpo = f"""
     Olá!
-    
+
     Recebemos um pedido para redefinir a senha da sua conta no Cosmic Mind.
     Se foi você, clique no link abaixo para criar uma nova senha:
-    
+
     {link_recuperacao}
-    
+
     Este link é válido por apenas 1 hora.
     Se não foi você, apenas ignore este e-mail.
     """
     msg.attach(MIMEText(corpo, 'plain'))
 
     try:
-    
+
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login(remetente, senha)
@@ -195,7 +210,7 @@ def enviar_email_recuperacao(email_destino: str, token: str):
 def enviar_email_troca_email(email_novo: str, token: str):
     remetente = os.getenv("EMAIL_REMETENTE")
     senha = os.getenv("EMAIL_SENHA")
-    
+
     link_confirmacao = f"http://localhost:3000/confirmar-email?token={token}"
 
     msg = MIMEMultipart()
@@ -204,7 +219,7 @@ def enviar_email_troca_email(email_novo: str, token: str):
     msg['Subject'] = "Cosmic Mind - Confirmação de Novo E-mail"
 
     corpo = f"""Olá!
-    
+
     Você solicitou a alteração do seu e-mail de acesso no Cosmic Mind.
     Para confirmar este novo e-mail, clique no link abaixo:
 
@@ -227,12 +242,12 @@ def enviar_email_troca_email(email_novo: str, token: str):
 @app.post("/api/auth/esqueci-senha")
 def solicitar_recuperacao(dados: EsqueciSenha):
     usuario = colecao_usuarios.find_one({"email": dados.email})
-    
+
     if not usuario:
         return {"message": "Se o e-mail existir, um link de recuperação será enviado."}
 
     token_seguro = secrets.token_hex(20)
-    
+
     expiracao = datetime.utcnow() + timedelta(hours=1)
 
     colecao_usuarios.update_one(
@@ -243,7 +258,6 @@ def solicitar_recuperacao(dados: EsqueciSenha):
     enviar_email_recuperacao(dados.email, token_seguro)
 
     return {"message": "Se o e-mail existir, um link de recuperação será enviado."}
-
 
 @app.post("/api/auth/redefinir-senha")
 def redefinir_senha(dados: RedefinirSenha):
@@ -267,11 +281,10 @@ def redefinir_senha(dados: RedefinirSenha):
 
     return {"message": "Senha redefinida com sucesso! Você já pode fazer login."}
 
-
 @app.post("/api/conta/confirmar-email")
 def confirmar_novo_email(dados: ConfirmarEmail):
     usuario = colecao_usuarios.find_one({"token_troca_email": dados.token})
-    
+
     if not usuario or "email_pendente" not in usuario:
         raise HTTPException(status_code=400, detail="Token inválido ou expirado.")
 
@@ -305,17 +318,47 @@ def definir_crp(dados: DefinirCRP):
     usuario = colecao_usuarios.find_one({"email": dados.email})
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
-    
+
     colecao_usuarios.update_one(
         {"email": dados.email},
         {"$set": {"crp_especialista": dados.crp}}
     )
     return {"message": "CRP atualizado com sucesso"}
 
+@app.delete("/api/conta/deletar/{email_usuario}")
+def deletar_conta(email_usuario: str, payload: DeletarContaRequest):
+    usuario = colecao_usuarios.find_one({"email": email_usuario})
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+
+    senha_correta = pwd_context.verify(payload.senha, usuario["senha"])
+    if not senha_correta:
+        raise HTTPException(status_code=401, detail="Senha incorreta. A exclusão foi cancelada.")
+
+    if "jogadores_vinculados" in usuario and usuario["jogadores_vinculados"]:
+        db["jogador"].delete_many({"_id": {"$in": usuario["jogadores_vinculados"]}})
+
+    colecao_usuarios.delete_one({"email": email_usuario})
+
+    db["sessao"].delete_many({"id_usuario": str(usuario["_id"])})
+
+    return {"message": "Sua conta e todos os dados vinculados foram excluídos com sucesso."}
+
+def gerar_codigo_unico():
+    caracteres = string.ascii_uppercase + string.digits
+    while True:
+        codigo = ''.join(random.choices(caracteres, k=6))
+
+        if not db["jogador"].find_one({"codigo_vinculo": codigo}):
+            return codigo
 
 @app.post("/api/jogadores/{id_usuario}")
 def criar_jogador(id_usuario: str, dados: JogadorCadastro):
+
+    codigo_amigo = gerar_codigo_unico()
+
     novo_jogador = {
+        "codigo_vinculo": codigo_amigo,
         "apelido": dados.apelido,
         "data_nascimento": dados.data_nascimento,
         "foto_perfil": dados.foto_perfil,
@@ -329,14 +372,12 @@ def criar_jogador(id_usuario: str, dados: JogadorCadastro):
     resultado = db["jogador"].insert_one(novo_jogador)
     id_novo_jogador = resultado.inserted_id
 
-
     colecao_usuarios.update_one(
         {"_id": ObjectId(id_usuario)},
         {"$push": {"jogadores_vinculados": id_novo_jogador}}
     )
 
     return {"message": "Jogador criado!", "id_jogador": str(id_novo_jogador)}
-
 
 @app.get("/api/jogadores/{id_usuario}")
 def listar_jogadores(id_usuario: str):
@@ -352,6 +393,7 @@ def listar_jogadores(id_usuario: str):
     for jogador in jogadores_banco:
         resultado.append({
             "id": str(jogador["_id"]),
+            "codigo_vinculo": jogador.get("codigo_vinculo"),
             "nome": jogador.get("apelido", "Jogador"),
             "foto_perfil": jogador.get("foto_perfil", 1),
             "progresso": 0, 
@@ -367,7 +409,7 @@ def desconectar_jogador(id_jogador: str):
     sessao = db["sessao"].find_one({"id_jogador": id_jogador})
     if not sessao:
         raise HTTPException(status_code=404, detail="Sessão não encontrada.")
-    
+
     db["sessao"].update_one(
         {"id_jogador": id_jogador},
         {"$set": {"expira_em": datetime.now(timezone.utc)}}
@@ -379,7 +421,7 @@ def atualizar_jogador(id_jogador: str, dados: JogadorUpdate):
     campos_para_atualizar = {k: v for k, v in dados.dict(exclude_none=True).items()}
     if not campos_para_atualizar:
         return {"message": "Nenhum dado para atualizar."}
-    
+
     resultado = db["jogador"].update_one(
         {"_id": ObjectId(id_jogador)},
         {"$set": campos_para_atualizar}
@@ -393,27 +435,23 @@ def excluir_jogador(id_usuario: str, id_jogador: str, payload: ExcluirJogador):
     usuario = colecao_usuarios.find_one({"_id": ObjectId(id_usuario)})
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
-        
+
     senha_correta = pwd_context.verify(payload.senha, usuario["senha"])
     if not senha_correta:
         raise HTTPException(status_code=400, detail="Senha incorreta.")
-        
-   
+
     colecao_usuarios.update_one(
         {"_id": ObjectId(id_usuario)},
         {"$pull": {"jogadores_vinculados": ObjectId(id_jogador)}}
     )
-    
-  
+
     resultado = db["jogador"].delete_one({"_id": ObjectId(id_jogador)})
     if resultado.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Jogador não encontrado.")
-        
-  
-    db["sessao"].delete_many({"id_jogador": id_jogador})
-    
-    return {"message": "Jogador excluído permanentemente."}
 
+    db["sessao"].delete_many({"id_jogador": id_jogador})
+
+    return {"message": "Jogador excluído permanentemente."}
 
 @app.post("/api/jogo/gerar-pin/{id_jogador}")
 def gerar_pin_jogo(id_jogador: str):
@@ -442,10 +480,9 @@ def game_login(dados: GameLoginRequest):
     if not sessao:
         raise HTTPException(status_code=401, detail="Código inválido ou expirado.")
 
-
     if datetime.utcnow() > sessao["expira_em"]:
         raise HTTPException(status_code=401, detail="Código expirado.")
-    
+
     token_jwt = gerar_jwt(sessao["id_jogador"])
     nova_expiracao = datetime.now(timezone.utc) + timedelta(hours=2)
     db["sessao"].update_one(
@@ -534,13 +571,13 @@ def salvar_partida(partida: PartidaParaPersistirModel, authorization: str = Head
 def atualizar_progresso(update_data: AtualizarProgressoRequest, authorization: str = Header(None)):
     if not authorization:
         raise HTTPException(status_code=401, detail="Token de acesso ausente.")
-    
+
     token = authorization.replace('Bearer ', '')
     sessao = db["sessao"].find_one({"token_acesso": token})
     if not sessao:
         raise HTTPException(status_code=401, detail="Token inválido ou expirado.")
     id_jogador = ObjectId(sessao["id_jogador"])
-    
+
     if update_data.tipo == 'planeta':
         db["jogador"].update_one(
             {"_id": id_jogador},
@@ -618,13 +655,12 @@ def listar_todos_jogadores(_: dict = Depends(require_especialista)):
 
 @app.get("/api/estatisticas/{id_jogador}")
 def obter_estatisticas(id_jogador: str, current_user: dict = Depends(get_current_user)):
-    # permitir se especialista
+
     if current_user.get("tipo_perfil") == "responsavel":
         vinculos = current_user.get("jogadores_vinculados", [])
-        # vinculos podem ser ObjectId ou strings — adeque conforme o formato no DB
+
         if ObjectId(id_jogador) not in vinculos and id_jogador not in [str(v) for v in vinculos]:
             raise HTTPException(status_code=403, detail="Você não tem permissão para ver esse jogador.")
-    # segue a lógica existente para agregar e retornar estatísticas
 
     if not id_jogador:
         raise HTTPException(status_code=400, detail="ID de jogador inválido.")
@@ -708,6 +744,217 @@ def obter_estatisticas(id_jogador: str, current_user: dict = Depends(get_current
         "evolucao_por_missao": evolucao,
         "habilidades":         habilidades_final
     }
+
+@app.post("/api/vinculo/solicitar")
+def solicitar_vinculo(dados: SolicitarVinculo, current_user: dict = Depends(get_current_user)):
+    if current_user.get("tipo_perfil") != "especialista":
+        raise HTTPException(status_code=403, detail="Apenas especialistas podem solicitar vínculos.")
+
+    codigo_limpo = dados.codigo_vinculo.strip().upper()
+    jogador = db["jogador"].find_one({"codigo_vinculo": codigo_limpo})
+
+    if not jogador:
+        raise HTTPException(status_code=404, detail="Paciente não encontrado com este código.")
+
+    id_jogador_obj = jogador["_id"]
+
+    if id_jogador_obj in current_user.get("jogadores_vinculados", []):
+        raise HTTPException(status_code=400, detail="Você já acompanha este paciente.")
+
+    solicitacao_existente = db["solicitacoes_vinculo"].find_one({
+        "id_especialista": current_user["_id"],
+        "id_jogador": id_jogador_obj,
+        "status": "pendente"
+    })
+
+    if solicitacao_existente:
+        raise HTTPException(status_code=400, detail="Você já enviou uma solicitação para este paciente.")
+
+    db["solicitacoes_vinculo"].insert_one({
+        "id_especialista": current_user["_id"],
+        "id_jogador": id_jogador_obj,
+        "status": "pendente",
+        "criado_em": datetime.utcnow()
+    })
+
+    return {"message": "Solicitação enviada com sucesso ao responsável!"}
+
+@app.get("/api/vinculo/pendentes")
+def listar_solicitacoes_pendentes(current_user: dict = Depends(get_current_user)):
+    if current_user.get("tipo_perfil") != "responsavel":
+        raise HTTPException(status_code=403, detail="Apenas responsáveis podem gerenciar solicitações.")
+
+    jogadores_do_responsavel = current_user.get("jogadores_vinculados", [])
+    if not jogadores_do_responsavel:
+        return []
+
+    solicitacoes = list(db["solicitacoes_vinculo"].find({
+        "id_jogador": {"$in": jogadores_do_responsavel},
+        "status": "pendente"
+    }))
+
+    resultado = []
+    for sol in solicitacoes:
+        especialista = colecao_usuarios.find_one({"_id": sol["id_especialista"]})
+        jogador = db["jogador"].find_one({"_id": sol["id_jogador"]})
+
+        resultado.append({
+            "id_solicitacao": str(sol["_id"]),
+            "nome_especialista": especialista["nome"] if especialista else "Especialista Desconhecido",
+            "foto_especialista": especialista.get("avatar", 1) if especialista else 1,
+            "nome_jogador": jogador["apelido"] if jogador else "Criança Desconhecida",
+            "foto_jogador": jogador.get("foto_perfil", 1) if jogador else 1,
+            "id_jogador": str(sol["id_jogador"])
+        })
+
+    return resultado
+
+@app.post("/api/vinculo/responder")
+def responder_solicitacao(dados: ResponderVinculo, current_user: dict = Depends(get_current_user)):
+    if current_user.get("tipo_perfil") != "responsavel":
+        raise HTTPException(status_code=403, detail="Apenas responsáveis podem aprovar vínculos.")
+
+    try:
+        id_sol_obj = ObjectId(dados.id_solicitacao)
+    except:
+        raise HTTPException(status_code=400, detail="ID de solicitação inválido.")
+
+    solicitacao = db["solicitacoes_vinculo"].find_one({"_id": id_sol_obj, "status": "pendente"})
+    if not solicitacao:
+        raise HTTPException(status_code=404, detail="Solicitação não encontrada ou já respondida.")
+
+    if solicitacao["id_jogador"] not in current_user.get("jogadores_vinculados", []):
+        raise HTTPException(status_code=403, detail="Você não tem permissão sobre este jogador.")
+
+    if dados.acao == "aprovar":
+
+        db["solicitacoes_vinculo"].update_one({"_id": id_sol_obj}, {"$set": {"status": "aprovado"}})
+
+        colecao_usuarios.update_one(
+            {"_id": solicitacao["id_especialista"]},
+            {"$addToSet": {"jogadores_vinculados": solicitacao["id_jogador"]}}
+        )
+        return {"message": "Vínculo aprovado! O especialista agora pode acompanhar o desempenho."}
+
+    elif dados.acao == "rejeitar":
+        db["solicitacoes_vinculo"].update_one({"_id": id_sol_obj}, {"$set": {"status": "rejeitado"}})
+        return {"message": "Solicitação rejeitada."}
+
+    else:
+        raise HTTPException(status_code=400, detail="Ação inválida. Use 'aprovar' ou 'rejeitar'.")
+
+@app.get("/api/jogadores/buscar/{codigo}")
+def buscar_jogador_por_codigo(codigo: str, current_user: dict = Depends(get_current_user)):
+    if current_user.get("tipo_perfil") != "especialista":
+        raise HTTPException(status_code=403, detail="Acesso negado.")
+
+    jogador = db["jogador"].find_one({"codigo_vinculo": codigo.strip().upper()})
+    if not jogador:
+        raise HTTPException(status_code=404, detail="Jogador não encontrado.")
+
+    return {
+        "codigo_vinculo": jogador.get("codigo_vinculo"),
+        "apelido": jogador.get("apelido"),
+        "foto_perfil": jogador.get("foto_perfil", 1)
+    }
+
+@app.get("/api/vinculo/meus-vinculos")
+def meus_vinculos_especialista(current_user: dict = Depends(get_current_user)):
+    if current_user.get("tipo_perfil") != "especialista":
+        raise HTTPException(status_code=403, detail="Acesso negado.")
+
+    solicitacoes = list(db["solicitacoes_vinculo"].find({"id_especialista": current_user["_id"]}))
+
+    resultado = []
+    for sol in solicitacoes:
+        jogador = db["jogador"].find_one({"_id": sol["id_jogador"]})
+        if jogador:
+            resultado.append({
+                "id_solicitacao": str(sol["_id"]),
+                "nome_jogador": jogador.get("apelido", "Paciente"),
+                "foto_jogador": jogador.get("foto_perfil", 1),
+                "codigo_vinculo": jogador.get("codigo_vinculo", ""),
+                "status": sol["status"]
+            })
+    return resultado
+
+@app.get("/api/vinculo/meus-pacientes")
+def listar_pacientes_especialista(current_user: dict = Depends(get_current_user)):
+    if current_user.get("tipo_perfil") != "especialista":
+        raise HTTPException(status_code=403, detail="Acesso negado.")
+
+    ids_jogadores = current_user.get("jogadores_vinculados", [])
+    jogadores_banco = list(db["jogador"].find({"_id": {"$in": ids_jogadores}}))
+
+    resultado = []
+    for jogador in jogadores_banco:
+        resultado.append({
+            "id": str(jogador["_id"]),
+            "nome": jogador.get("apelido", "Paciente"),
+            "foto_perfil": jogador.get("foto_perfil", 1),
+            "codigo_vinculo": jogador.get("codigo_vinculo", ""),
+            "progresso": 0, 
+            "tempoUso": "0 horas",
+            "nivelFase": "1 - Mercúrio",
+            "pontuacao": 0
+        })
+    return resultado
+
+@app.get("/api/vinculo/aprovados")
+def listar_vinculos_aprovados(current_user: dict = Depends(get_current_user)):
+    if current_user.get("tipo_perfil") != "responsavel":
+        raise HTTPException(status_code=403, detail="Acesso negado.")
+
+    jogadores_do_responsavel = current_user.get("jogadores_vinculados", [])
+    if not jogadores_do_responsavel:
+        return []
+
+    solicitacoes = list(db["solicitacoes_vinculo"].find({
+        "id_jogador": {"$in": jogadores_do_responsavel},
+        "status": "aprovado"
+    }))
+
+    resultado = []
+    for sol in solicitacoes:
+        especialista = colecao_usuarios.find_one({"_id": sol["id_especialista"]})
+        jogador = db["jogador"].find_one({"_id": sol["id_jogador"]})
+
+        resultado.append({
+            "id_solicitacao": str(sol["_id"]),
+            "nome_especialista": especialista["nome"] if especialista else "Especialista",
+            "foto_especialista": especialista.get("avatar", 1) if especialista else 1,
+            "nome_jogador": jogador["apelido"] if jogador else "Criança",
+            "foto_jogador": jogador.get("foto_perfil", 1) if jogador else 1,
+            "id_jogador": str(sol["id_jogador"])
+        })
+    return resultado
+
+@app.delete("/api/vinculo/cancelar/{id_solicitacao}")
+def cancelar_vinculo(id_solicitacao: str, current_user: dict = Depends(get_current_user)):
+    try:
+        id_sol_obj = ObjectId(id_solicitacao)
+    except:
+        raise HTTPException(status_code=400, detail="ID inválido.")
+
+    solicitacao = db["solicitacoes_vinculo"].find_one({"_id": id_sol_obj})
+    if not solicitacao:
+        raise HTTPException(status_code=404, detail="Vínculo não encontrado.")
+
+    is_dono_especialista = solicitacao["id_especialista"] == current_user["_id"]
+    is_dono_responsavel = solicitacao["id_jogador"] in current_user.get("jogadores_vinculados", [])
+
+    if not (is_dono_especialista or is_dono_responsavel):
+        raise HTTPException(status_code=403, detail="Você não tem permissão para apagar este vínculo.")
+
+    if solicitacao["status"] == "aprovado":
+        colecao_usuarios.update_one(
+            {"_id": solicitacao["id_especialista"]},
+            {"$pull": {"jogadores_vinculados": solicitacao["id_jogador"]}}
+        )
+
+    db["solicitacoes_vinculo"].delete_one({"_id": id_sol_obj})
+
+    return {"message": "Vínculo removido com sucesso."}
 
 try:
     db["sessao"].create_index("expira_em", expireAfterSeconds=0)

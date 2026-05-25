@@ -157,17 +157,16 @@ function StarSVG({ size }: { size: number }) {
 export default function Home() {
   const [selenesIndex, setSelenesIndex] = useState(0);
   const [spectrumIndex, setSpectrumIndex] = useState(0);
-  const [activeSection, setActiveSection] = useState("hero"); // Estado para monitorar a seção ativa
+  const [activeSection, setActiveSection] = useState("hero");
   const pageRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Monitora qual seção está visível na tela
   useEffect(() => {
     const sections = ["hero", "download", "aboutus", "about", "contact"];
-    
+
     const observerOptions = {
       root: null,
-      rootMargin: "-30% 0px -60% 0px", // Dispara quando a seção ocupa a parte central da tela
+      rootMargin: "-30% 0px -60% 0px",
       threshold: 0,
     };
 
@@ -206,7 +205,7 @@ export default function Home() {
   };
 
   const menuItems = [
-    { label: "Início", href: "#hero", id: "hero" }, 
+    { label: "Início", href: "#", id: "hero" }, 
     { label: "Download", href: "#download", id: "download" },
     { label: "Quem Somos", href: "#aboutus", id: "aboutus" },
     { label: "Sobre", href: "#about", id: "about" },
@@ -330,7 +329,7 @@ export default function Home() {
         .animate-hero    { animation: fadeSlideDown 0.9s ease both; }
         .animate-hero-2  { animation: fadeSlideDown 1s ease 0.2s both; }
         .animate-hero-3  { animation: fadeSlideDown 1s ease 0.4s both; }
-        
+
         html {
           scroll-behavior: smooth;
         }
@@ -338,7 +337,7 @@ export default function Home() {
 
       <div className="page-wrapper" ref={pageRef} id="hero-wrapper">
 
-        {/* ── Stars ── */}
+        {}
         {starPositions.map((sp, i) => (
           <div
             key={i}
@@ -354,7 +353,7 @@ export default function Home() {
           </div>
         ))}
 
-        {/* ── Header Fixo ── */}
+        {}
         <header className="fixed top-0 left-0 w-full flex items-center justify-between px-12 py-5 z-50 bg-black/40 backdrop-blur-md border-b border-white/5">
           <nav className="flex gap-9">
             {menuItems.map((item) => {
@@ -371,7 +370,7 @@ export default function Home() {
                   style={{ fontFamily: "'Raleway', sans-serif" }}
                 >
                   {item.label}
-                  {/* Linha decorativa embaixo do link ativo */}
+                  {}
                   <span className={`absolute bottom-0 left-0 h-[2px] bg-cyan-400 transition-all duration-300 ${isActive ? 'w-full' : 'w-0'}`}></span>
                 </a>
               );
@@ -393,8 +392,8 @@ export default function Home() {
           </div>
         </header>
 
-        {/* ── Hero ── */}
-        <div className="flex flex-col items-center text-center px-6 pt-40 pb-20 relative z-10 min-h-[70vh] justify-center">
+        {}
+        <div id="hero" className="flex flex-col items-center text-center px-6 pt-40 pb-20 relative z-10 min-h-[70vh] justify-center">
           <h1
             className="animate-hero mb-10"
             style={{
@@ -429,9 +428,9 @@ export default function Home() {
           </button>
         </div>
 
-        {/* ── Cards ── */}
+        {}
         <div className="animate-hero-3 flex justify-center gap-9 px-12 pb-16 flex-wrap relative z-10">
-          {/* Card 1 */}
+          {}
           <div
             className="game-card flex items-center justify-center relative"
             style={{ width: "clamp(260px, 34vw, 380px)", aspectRatio: "16/9" }}
@@ -459,7 +458,7 @@ export default function Home() {
             </span>
           </div>
 
-          {/* Card 2 */}
+          {}
           <div
             className="game-card flex items-center justify-center"
             style={{ width: "clamp(260px, 34vw, 380px)", aspectRatio: "16/9" }}
@@ -473,7 +472,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── Download ── */}
+        {}
         <section id="download" className="flex flex-col items-center py-20 relative z-10">
           <div className="game-card p-10 flex flex-col items-center max-w-xl text-center">
             <h2 
@@ -486,7 +485,7 @@ export default function Home() {
               Baixe agora o Cosmic Mind e conecte-se ao nosso dashboard para monitorar 
               o progresso cognitivo em tempo real.
             </p>
-            
+
             <a 
               href="#" 
               onClick={(e) => e.preventDefault()}
@@ -494,14 +493,14 @@ export default function Home() {
             >
               Fazer download 
             </a>
-            
+
             <span className="text-white/40 text-xs mt-4">
                Desenvolvido em Unity 
             </span>
           </div>
         </section>
 
-        {/* ── Quem somos ── */}
+        {}
         <section id="aboutus" className="py-24 relative z-10 px-6 backdrop-blur-sm border-y border-white/5">
           <div className="max-w-5xl mx-auto text-center mb-16">
             <h2 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-3xl text-white mb-8 uppercase tracking-widest">
@@ -510,7 +509,7 @@ export default function Home() {
             <p style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg text-white/90 leading-relaxed max-w-4xl mx-auto italic mb-6">
               "Somos a equipe Selenes e, em parceria com a equipe Spectrum, desenvolvedora de um jogo lúdico voltado para crianças com TDAH, nos unimos para criar o Cosmic Mind Dashboard."
             </p>
-            
+
             <p style={{ fontFamily: "'Raleway', sans-serif" }} className="text-base text-white/70 leading-relaxed max-w-3xl mx-auto font-light">
               Nosso projeto consiste em uma platforma inteligente capaz de gerar métricas e análises sobre o desempenho das crianças dentro do jogo, auxiliando no acompanhamento de seu desenvolvimento de forma prática, acessível e intuitiva. 
               Buscamos unir tecnologia, inclusão e inovação para contribuir com uma experiência mais eficiente e acolhedora.
@@ -518,8 +517,8 @@ export default function Home() {
           </div>
 
           <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 pt-4">
-            
-            {/* ── CARROSSEL 1: SELENES ── */}
+
+            {}
             <div className="flex flex-col items-center">
               <h3 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-xl text-cyan-400 mb-6 uppercase tracking-wider font-semibold">
                 🌙 Equipe Selenes
@@ -534,8 +533,8 @@ export default function Home() {
                     {selenesTeam.map((member, idx) => (
                       <div key={idx} className="w-full flex-shrink-0 px-2">
                         <div className={`game-card ${member.bg} p-6 flex flex-col items-center text-center h-[340px] justify-between border border-white/10`}>
-                          
-                          {/* Avatar Modificado */}
+
+                          {}
                           <div className={`w-22 h-22 rounded-full bg-gradient-to-tr ${member.color} flex items-center justify-center shadow-lg shadow-black/45 ring-2 ring-white/15 relative`}>
                             <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
                               <img 
@@ -551,7 +550,7 @@ export default function Home() {
                               {member.icon}
                             </span>
                           </div>
-                          
+
                           <div className="mt-4 flex-grow flex flex-col justify-center">
                             <h4 className="text-white text-lg font-bold tracking-wide">{member.name}</h4>
                             <p className="text-cyan-400 text-xs uppercase tracking-widest font-semibold mt-1 mb-3">{member.role}</p>
@@ -590,7 +589,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* ── CARROSSEL 2: SPECTRUM ── */}
+            {}
             <div className="flex flex-col items-center">
               <h3 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-xl text-purple-400 mb-6 uppercase tracking-wider font-semibold">
                 👾 Equipe Spectrum
@@ -606,7 +605,7 @@ export default function Home() {
                       <div key={idx} className="w-full flex-shrink-0 px-2">
                         <div className={`game-card ${member.bg} p-6 flex flex-col items-center text-center h-[340px] justify-between border border-white/10`}>
 
-                          {/* Avatar Modificado */}
+                          {}
                           <div className={`w-22 h-22 rounded-full bg-gradient-to-tr ${member.color} flex items-center justify-center shadow-lg shadow-black/45 ring-2 ring-white/15 relative`}>
                             <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
                               <img 
@@ -622,7 +621,7 @@ export default function Home() {
                               {member.icon}
                             </span>
                           </div>
-                          
+
                           <div className="mt-4 flex-grow flex flex-col justify-center">
                             <h4 className="text-white text-lg font-bold tracking-wide">{member.name}</h4>
                             <p className="text-purple-400 text-xs uppercase tracking-widest font-semibold mt-1 mb-3">{member.role}</p>
@@ -664,11 +663,11 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── Seção Sobre o Projeto ── */}
+        {}
         <section id="about" className="pt-32 pb-20 relative z-10 px-6 bg-black/20 w-full">
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '32px', justifyContent: 'center', alignItems: 'center' }} className="max-w-5xl mx-auto w-full">
-            
-            {/* CAIXA DA ESQUERDA */}
+
+            {}
             <div style={{ flex: '1 1 320px', maxWidth: '380px' }} className="text-left animate-hero">
               <h2 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-3xl text-white mb-6 uppercase tracking-widest">
                 Sobre o Cosmic Mind
@@ -680,7 +679,7 @@ export default function Home() {
               </p>
             </div>
 
-            {/* CAIXA DA DIREITA */}
+            {}
             <div style={{ flex: '1 1 450px', maxWidth: '540px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
               <div className="game-card p-5 border-t-2 border-cyan-500/50">
                 <div className="text-cyan-400 mb-2 text-xl">🧠</div>
@@ -709,10 +708,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── Contato ── */}
+        {}
         <section id="contact" className="py-24 relative z-10 px-6 bg-gradient-to-b from-transparent to-purple-900/20">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
-            
+
             <div className="flex flex-col justify-center">
               <h2 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-4xl text-white mb-6 uppercase tracking-tighter">
                 Vamos Conversar?
@@ -745,10 +744,10 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Formulário */}
+            {}
             <div className="game-card p-8 bg-black/40 backdrop-blur-xl border border-white/10 relative overflow-hidden">
               <div className="absolute -top-10 -right-10 w-32 h-32 bg-cyan-500/10 blur-3xl rounded-full"></div>
-              
+
               <form className="space-y-4 relative z-10">
                 <div>
                   <label className="text-white/60 text-xs uppercase tracking-widest mb-2 block">Nome</label>

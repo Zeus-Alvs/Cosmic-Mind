@@ -14,7 +14,6 @@ import random
 
 app = FastAPI()
 
-# Mesmas configs do main.py
 JWT_SECRET = secrets.token_hex(32)
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 2
@@ -24,7 +23,6 @@ ID_JOGADOR_TESTE = "6749a1b2c3d4e5f678901234"
 class GameLoginRequest(BaseModel):
     code: str
 
-
 def gerar_jwt(id_jogador: str) -> str:
     payload = {
         "id_jogador": id_jogador,
@@ -33,13 +31,12 @@ def gerar_jwt(id_jogador: str) -> str:
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
-
 @app.get("/teste-jwt")
 def teste_jwt_completo():
     """
     Testa o fluxo completo: gerar PIN -> game login -> JWT
     """
-    # Simula gerar PIN (não acessa banco, só gera o que a rota retornaria)
+
     pin_gerado = str(random.randint(0, 999999)).zfill(6)
     tempo_expiracao = datetime.now(timezone.utc) + timedelta(minutes=10)
 
@@ -51,7 +48,6 @@ def teste_jwt_completo():
 
     return resultado
 
-
 @app.post("/teste-login")
 def teste_game_login(dados: GameLoginRequest):
     """
@@ -62,14 +58,12 @@ def teste_game_login(dados: GameLoginRequest):
     if len(pin_valido) != 6 or not pin_valido.isdigit():
         raise HTTPException(status_code=401, detail="Código inválido.")
 
-    # Gera JWT real
     token_jwt = gerar_jwt(ID_JOGADOR_TESTE)
 
     return {
         "accessToken": token_jwt,
-        "login": f"Login - SUCESSO - JWT - #{token_jwt}"
+        "login": f"Login - SUCESSO - JWT -
     }
-
 
 if __name__ == "__main__":
     import uvicorn

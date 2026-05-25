@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { Lock, ChevronDown } from 'lucide-react';
 import { getApiUrl } from '@/utils/api';
 
-// ----- Tipos -----
 interface Habilidades {
   Agilidade: number;
   Lógica: number;
@@ -30,7 +29,6 @@ interface JogadorItem {
   nome: string;
 }
 
-// ----- Mapa de cores por planeta (igual ao original) -----
 const PLANETA_CORES: Record<string, string> = {
   netuno:   'bg-[#4A59BD]',
   urano:    'bg-[#38BDF8]',
@@ -43,7 +41,6 @@ const PLANETA_CORES: Record<string, string> = {
   sol:      'bg-[#A3A3A3]',
 };
 
-// Planetas exibidos na grade (ordem do original)
 const PLANETAS_LISTA = [
   { id: 'netuno',   nome: 'Netuno'   },
   { id: 'urano',    nome: 'Urano'    },
@@ -57,7 +54,7 @@ const PLANETAS_LISTA = [
 ];
 
 export default function PerfomanceS() {
-  // ---- Estado do componente ----
+
   const [jogadores, setJogadores]       = useState<JogadorItem[]>([]);
   const [jogadorAtivo, setJogadorAtivo] = useState<JogadorItem | null>(null);
   const [isOpen, setIsOpen]             = useState(false);
@@ -67,8 +64,7 @@ export default function PerfomanceS() {
 
   const radius       = 28;
   const circumference = 2 * Math.PI * radius;
-    
-  // ---- Buscar lista de jogadores do responsável logado ----
+
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem('user_data') || '{}');
     const token   = localStorage.getItem('token_acesso') || '';
@@ -83,7 +79,6 @@ export default function PerfomanceS() {
       .catch(() => setErro('Não foi possível carregar os jogadores.'));
   }, []);
 
-  // ---- Buscar estatísticas sempre que o jogador selecionado mudar ----
   useEffect(() => {
     if (!jogadorAtivo) return;
 
@@ -106,22 +101,18 @@ export default function PerfomanceS() {
       .finally(() => setCarregando(false));
   }, [jogadorAtivo]);
 
-  // ---- Quais planetas estão desbloqueados (baseado nas partidas reais) ----
   const planetasDesbloqueados = stats && stats.total_partidas > 0
     ? PLANETAS_LISTA.slice(0, 3).map(p => p.id)
     : [];
 
-  // ---- Planetas com status calculated ----
   const planetas = PLANETAS_LISTA.map(p => ({
     ...p,
     cor:    PLANETA_CORES[p.id],
     status: planetasDesbloqueados.includes(p.id) ? 'Finalizado' : 'Bloqueado',
   }));
 
-  // ---- Planeta clicado (para exibir detalhe das habilidades) ----
   const [planetaAtivo, setPlanetaAtivo] = useState<string | null>(null);
 
-  // Habilidades a exibir no detalhe — sempre vêm da API
   const habilidades = stats?.habilidades ?? {
     Agilidade: 0, Lógica: 0, Memorização: 0,
     Leitura: 0, Interpretação: 0, Concentração: 0,
@@ -130,7 +121,7 @@ export default function PerfomanceS() {
   return (
     <div className="w-full max-w-6xl mx-auto p-5 bg-transparent font-sans text-slate-600 overflow-hidden">
 
-      {/* Cabeçalho */}
+      {}
       <div className="mb-6 text-center">
         <div className="fixed top-0 left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
         <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">
@@ -141,10 +132,10 @@ export default function PerfomanceS() {
 
       <div className="flex flex-row gap-8 items-start justify-center">
 
-        {/* Coluna esquerda */}
+        {}
         <div className="w-[260px] flex flex-col gap-4 shrink-0">
 
-          {/* Dropdown de jogadores */}
+          {}
           <div className="relative">
             <button
               onClick={() => setIsOpen(!isOpen)}
@@ -185,7 +176,7 @@ export default function PerfomanceS() {
             )}
           </div>
 
-          {/* Grade de planetas */}
+          {}
           <div className="bg-white border border-slate-100 p-5 rounded-[2.5rem] shadow-sm">
             <h2 className="text-center font-semibold text-[#9D82CE] text-[10px] tracking-widest mb-4 opacity-80 uppercase">
               Progresso - Fase
@@ -213,7 +204,7 @@ export default function PerfomanceS() {
             </div>
           </div>
 
-          {/* Cards de resumo */}
+          {}
           {stats && (
             <div className="bg-white border border-slate-100 p-4 rounded-2xl shadow-sm flex flex-col gap-2 text-xs text-slate-500">
               <div className="flex justify-between">
@@ -240,7 +231,7 @@ export default function PerfomanceS() {
           )}
         </div>
 
-        {/* Painel direito — gráficos de habilidades */}
+        {}
         <div className="min-w-[480px] bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm self-stretch">
           {carregando && (
             <div className="flex items-center justify-center h-[340px] text-slate-300">
@@ -256,7 +247,7 @@ export default function PerfomanceS() {
 
           {!carregando && !erro && planetaAtivo ? (
             <div className="flex flex-col animate-in fade-in duration-500 h-full">
-              {/* Cabeçalho do planeta */}
+              {}
               <div className="flex items-center gap-5 mb-6 pb-4 border-b border-slate-50">
                 <div className={`w-12 h-12 rounded-2xl ${PLANETA_CORES[planetaAtivo]} shadow-sm`} />
                 <div>
@@ -272,7 +263,7 @@ export default function PerfomanceS() {
                 </div>
               </div>
 
-              {/* Gráficos circulares por habilidade */}
+              {}
               <div className="grid grid-cols-3 gap-x-10 gap-y-6 my-auto">
                 {Object.entries(habilidades).map(([key, value]) => {
                   const offset = circumference - ((value as number) / 100) * circumference;

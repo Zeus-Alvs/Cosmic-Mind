@@ -138,7 +138,7 @@ function EditPageContent() {
         <div className="w-full max-w-4xl mx-auto p-8 relative -mt-5">
             <div className="fixed top-0 left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
 
-            {/* Header */}
+            {}
             <div className="flex items-center justify-center relative mb-6">
                 <button
                     onClick={voltar}

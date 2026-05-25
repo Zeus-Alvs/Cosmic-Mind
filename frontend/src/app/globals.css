@@ -1,1 +1,178 @@
+@import url('https://fonts.cdnfonts.com/css/opendyslexic');
 @import "tailwindcss";
+
+html.fonte-dislexia, 
+html.fonte-dislexia body, 
+html.fonte-dislexia #__next, 
+html.fonte-dislexia * {
+  font-family: 'OpenDyslexic', sans-serif !important;
+  letter-spacing: 0.03em !important; 
+  line-height: 1.6 !important; 
+}
+
+.alto-contraste {
+  filter: contrast(125%) saturate(120%) !important;
+}
+
+html.fonte-pequena { font-size: 10px !important; } 
+html.fonte-grande { font-size: 18px !important; }
+html.fonte-extra { font-size: 20px !important; }
+
+html.tema-escuro, 
+html.tema-escuro body {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+}
+html.tema-escuro aside p,
+html.tema-escuro aside span,
+html.tema-escuro aside a {
+  color: inherit !important; 
+}
+
+html.tema-escuro .bg-white,
+html.tema-escuro div.bg-white,
+html.tema-escuro form.bg-white,
+html.tema-escuro .bg-slate-100,
+html.tema-escuro .bg-slate-200,
+html.tema-escuro .bg-slate-300,
+html.tema-escuro .bg-slate-50\/50 {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+html.tema-escuro .bg-slate-50,
+html.tema-escuro div.bg-slate-50,
+html.tema-escuro .bg-purple-50 {
+  background-color: #334155 !important; 
+  border-color: #475569 !important;
+}
+
+html.tema-escuro h1,
+html.tema-escuro h2 {
+  color: #ffffff !important;
+}
+html.tema-escuro p,
+html.tema-escuro span,
+html.tema-escuro h3,
+html.tema-escuro h4,
+html.tema-escuro label,
+html.tema-escuro .text-slate-500,
+html.tema-escuro .text-slate-700,
+html.tema-escuro .text-slate-800 {
+  color: #e2e8f0 !important;
+}
+html.tema-escuro .bg-slate-50\/50 * {
+  color: #94a3b8 !important; 
+}
+
+html.tema-escuro select, 
+html.tema-escuro input,
+html.tema-escuro button.bg-slate-50,
+html.tema-escuro form input[type="text"],
+html.tema-escuro form input[type="email"],
+html.tema-escuro form input[type="password"] {
+  background-color: #0f172a !important; 
+  color: #ffffff !important;
+  border-color: #475569 !important;
+}
+html.tema-escuro input::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.tema-escuro input.peer + div {
+  background-color: #475569 !important; 
+  border-color: #475569 !important;
+}
+
+html.tema-escuro input.peer:checked + div.peer-checked\:bg-emerald-500 {
+  background-color: #10b981 !important; 
+}
+html.tema-escuro input.peer:checked + div.peer-checked\:bg-\[\#AC57EB\] {
+  background-color: #a855f7 !important; 
+}
+html.tema-escuro input.peer:checked + div.peer-checked\:bg-\[\#4078A4\] {
+  background-color: #3b82f6 !important; 
+}
+
+html.tema-escuro .bg-yellow-50, 
+html.tema-escuro .bg-yellow-100,
+html.tema-escuro .bg-amber-50,
+html.tema-escuro .bg-orange-50 {
+  background-color: rgba(133, 77, 14, 0.2) !important;
+  border: 1px solid rgba(202, 138, 4, 0.3) !important;
+}
+html.tema-escuro .text-yellow-600,
+html.tema-escuro .text-yellow-700,
+html.tema-escuro .text-yellow-800,
+html.tema-escuro .text-amber-600,
+html.tema-escuro .text-amber-700,
+html.tema-escuro .text-amber-900,
+html.tema-escuro .bg-amber-50 *,
+html.tema-escuro .bg-orange-50 * {
+  color: #fde047 !important;
+}
+
+html.tema-escuro .bg-red-50, 
+html.tema-escuro .bg-red-100,
+html.tema-escuro .bg-red-50\/50 {
+  background-color: rgba(153, 27, 27, 0.2) !important;
+  border: 1px solid rgba(220, 38, 38, 0.3) !important;
+}
+html.tema-escuro .text-red-500,
+html.tema-escuro .text-red-600,
+html.tema-escuro .text-red-700,
+html.tema-escuro .text-red-800 {
+  color: #fca5a5 !important;
+}
+
+html.tema-escuro .bg-purple-100\/60,
+html.tema-escuro [class*="bg-purple-100/"] {
+  background-color: rgba(88, 28, 135, 0.2) !important;
+  border-color: rgba(147, 51, 234, 0.3) !important;
+}
+html.tema-escuro .bg-purple-100\/60 *,
+html.tema-escuro [class*="bg-purple-100/"] * {
+  color: #e2e8f0 !important;
+}
+
+html.tema-escuro .text-purple-600,
+html.tema-escuro .text-purple-700 {
+  color: #c084fc !important; 
+}
+
+html.tema-escuro .ring-blue-500 {
+  --tw-ring-color: #60a5fa !important;
+}
+
+html.tema-escuro .bg-\[\#4A59BD\] {
+  background-color: #818cf8 !important; 
+}
+
+html.tema-escuro [class*="F2ECEF"],
+html.tema-escuro [class*="f2ecef"],
+html.tema-escuro [style*="F2ECEF"],
+html.tema-escuro [style*="f2ecef"] {
+  background-color: #1e293b !important; 
+  border-color: #334155 !important;
+}
+
+html.tema-escuro [class*="F2ECEF"] .bg-white,
+html.tema-escuro [class*="f2ecef"] .bg-white {
+  background-color: #334155 !important;
+  color: #e8b5ff !important; 
+  border-color: #475569 !important;
+}
+
+html.tema-escuro button[class*="bg-slate-100"],
+html.tema-escuro button[class*="bg-slate-200"],
+html.tema-escuro button.bg-slate-100,
+html.tema-escuro button.bg-slate-200 {
+  background-color: #334155 !important; 
+  color: #f8fafc !important; 
+  border: 1px solid #475569 !important;
+}
+
+html.tema-escuro button[class*="bg-slate-100"]:hover,
+html.tema-escuro button[class*="bg-slate-200"]:hover {
+  background-color: #475569 !important;
+}

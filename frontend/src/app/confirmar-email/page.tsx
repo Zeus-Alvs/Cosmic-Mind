@@ -22,7 +22,6 @@ function ConfirmarEmailContent() {
       return;
     }
 
-
     const confirmarNoBackend = async () => {
       try {
         const response = await fetch(`${getApiUrl()}/conta/confirmar-email`, {
@@ -36,7 +35,6 @@ function ConfirmarEmailContent() {
         if (response.ok) {
           setStatus('sucesso');
           setMensagem('Seu e-mail foi atualizado com sucesso no Cosmic Mind!');
-
 
           localStorage.removeItem('user_data');
         } else {
@@ -106,7 +104,6 @@ export default function ConfirmarEmailPage() {
         <div className="flex justify-center mb-8 pb-6 border-b border-slate-100">
           <Image src="/icons/logo.png" alt="Cosmic Mind" width={150} height={40} />
         </div>
-
 
         <Suspense fallback={<p className="text-center text-slate-400 py-10 font-bold">Iniciando verificação...</p>}>
           <ConfirmarEmailContent />
