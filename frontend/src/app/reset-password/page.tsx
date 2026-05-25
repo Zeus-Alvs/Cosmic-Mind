@@ -13,15 +13,13 @@ function RedefinirSenhaForm() {
 
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
-  
-  // IHC: Estados independentes para visibilidade de cada campo de senha
+
   const [showNovaSenha, setShowNovaSenha] = useState(false);
   const [showConfirmarSenha, setShowConfirmarSenha] = useState(false);
-  
+
   const [loading, setLoading] = useState(false);
   const [sucesso, setSucesso] = useState(false);
 
-  // Estado das regras atualizado para incluir maiúsculas e especiais
   const [senhaRegras, setSenhaRegras] = useState({
     minCaracteres: false,
     temMaiuscula: false,
@@ -29,13 +27,12 @@ function RedefinirSenhaForm() {
     temEspecial: false,
   });
 
-  // Validação em tempo real conforme digitação com as novas regras
   useEffect(() => {
     setSenhaRegras({
       minCaracteres: novaSenha.length >= 8,
       temMaiuscula: /[A-Z]/.test(novaSenha),
       temNumero: /\d/.test(novaSenha),
-      temEspecial: /[^a-zA-Z0-9]/.test(novaSenha), // Qualquer caractere que não seja letra ou número
+      temEspecial: /[^a-zA-Z0-9]/.test(novaSenha),
     });
   }, [novaSenha]);
 
@@ -52,7 +49,6 @@ function RedefinirSenhaForm() {
       return;
     }
 
-    // Trava de segurança atualizada com as 4 regras obrigatórias
     if (
       !senhaRegras.minCaracteres || 
       !senhaRegras.temMaiuscula || 
@@ -112,8 +108,8 @@ function RedefinirSenhaForm() {
       <p className="text-sm text-slate-500 mb-8">Digite sua nova senha abaixo.</p>
 
       <form onSubmit={handleSubmit} className="space-y-4 text-left">
-        
-        {/* Campo: Nova Senha */}
+
+        {}
         <div className="space-y-1 relative">
           <label htmlFor="novaSenha" className="text-xs font-bold text-slate-500 ml-1">NOVA SENHA</label>
           <div className="relative flex items-center mt-1">
@@ -137,13 +133,13 @@ function RedefinirSenhaForm() {
             </button>
           </div>
 
-          {/* Quadro Amarelo de Alerta Atualizado com as 4 Regras */}
+          {}
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mt-2 text-xs text-amber-900 space-y-1.5 shadow-sm">
             <div className="flex items-center font-bold text-amber-800 gap-1.5 mb-1">
               <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
               Regras para uma senha segura:
             </div>
-            
+
             <div className="flex items-center gap-2">
               <div className={`w-4 h-4 rounded-full flex items-center justify-center border ${senhaRegras.minCaracteres ? 'bg-green-500 border-green-600 text-white' : 'bg-amber-100 border-amber-300'}`}>
                 {senhaRegras.minCaracteres && <Check className="w-2.5 h-2.5" />}
@@ -174,7 +170,7 @@ function RedefinirSenhaForm() {
           </div>
         </div>
 
-        {/* Campo: Confirmar Senha */}
+        {}
         <div className="space-y-1 relative">
           <label htmlFor="confirmarSenha" className="text-xs font-bold text-slate-500 ml-1">CONFIRMAR SENHA</label>
           <div className="relative flex items-center mt-1">
@@ -197,8 +193,8 @@ function RedefinirSenhaForm() {
               {showConfirmarSenha ? <Eye className="w-5 h-5 text-[#AC57EB]" /> : <EyeOff className="w-5 h-5" />}
             </button>
           </div>
-          
-          {/* Feedback dinâmico se as duas senhas estão iguais */}
+
+          {}
           {confirmarSenha && (
             <p className={`text-xs pl-1 mt-1 font-semibold ${novaSenha === confirmarSenha ? 'text-green-600' : 'text-red-500'}`}>
               {novaSenha === confirmarSenha ? '✓ As senhas coincidem' : '✕ As senhas ainda não coincidem'}
@@ -206,7 +202,7 @@ function RedefinirSenhaForm() {
           )}
         </div>
 
-        {/* Botão Submeter */}
+        {}
         <button
           type="submit"
           disabled={loading}

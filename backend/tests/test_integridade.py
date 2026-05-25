@@ -17,12 +17,10 @@ import random
 
 app = FastAPI()
 
-# Configs (espelha o main.py)
 JWT_SECRET = secrets.token_hex(32)
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 2
 ID_JOGADOR_TESTE = "6749a1b2c3d4e5f678901234"
-
 
 def gerar_jwt(id_jogador: str) -> str:
     payload = {
@@ -31,7 +29,6 @@ def gerar_jwt(id_jogador: str) -> str:
         "iat": datetime.now(timezone.utc)
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
-
 
 def validar_jwt(token: str) -> bool:
     """Valida se o JWT é válido (mesma lógica do main.py)"""
@@ -43,29 +40,20 @@ def validar_jwt(token: str) -> bool:
     except jwt.InvalidTokenError:
         return False
 
-
 class GameLoginRequest(BaseModel):
     code: str
-
 
 class PartidaRequest(BaseModel):
     missionId: str
     pontuacao_final: int
 
-
 class ProgressoRequest(BaseModel):
     tipo: str
     valor: Optional[str] = None
 
-
-# ───────────────────────────────────────────────
-# ROTAS DE TESTE (espelham o main.py)
-# ───────────────────────────────────────────────
-
 @app.get("/")
 def read_root():
     return {"status": "A API do Cosmic Mind está viva!"}
-
 
 @app.post("/api/jogo/gerar-pin/{id_jogador}")
 def gerar_pin(id_jogador: str):
@@ -76,7 +64,6 @@ def gerar_pin(id_jogador: str):
         "id_jogador": id_jogador
     }
 
-
 @app.post("/game-login")
 def game_login(dados: GameLoginRequest):
     """Espelha /game-login do main.py"""
@@ -84,7 +71,6 @@ def game_login(dados: GameLoginRequest):
         raise HTTPException(status_code=401, detail="Código inválido.")
     token_jwt = gerar_jwt(ID_JOGADOR_TESTE)
     return {"accessToken": token_jwt}
-
 
 @app.post("/api/partidas/salvar")
 def salvar_partida(
@@ -101,7 +87,6 @@ def salvar_partida(
 
     return {"message": "Partida salva com sucesso!", "missionId": partida.missionId}
 
-
 @app.put("/api/progresso/jogador/update")
 def atualizar_progresso(
     progresso: ProgressoRequest,
@@ -117,11 +102,6 @@ def atualizar_progresso(
 
     return {"message": "Progresso atualizado com sucesso!"}
 
-
-# ───────────────────────────────────────────────
-# ROTA DE TESTE DE INTEGRIDADE
-# ───────────────────────────────────────────────
-
 @app.get("/teste-integridade")
 def rodar_testes():
     """Roda todos os testes de integridade e retorna relatório."""
@@ -129,7 +109,6 @@ def rodar_testes():
     resultados = []
     token_jwt = gerar_jwt(ID_JOGADOR_TESTE)
 
-    # ── Teste 1: Health check ──
     try:
         resp = read_root()
         status_1 = "✅ OK" if any("viva" in str(v) for v in resp.values()) else "❌ FALHA"
@@ -137,7 +116,6 @@ def rodar_testes():
         status_1 = f"❌ ERRO: {e}"
     resultados.append(("Health check (GET /)", status_1))
 
-    # ── Teste 2: Gerar PIN ──
     try:
         resp = gerar_pin(ID_JOGADOR_TESTE)
         tem_pin = "pin" in resp and len(resp["pin"]) == 6
@@ -147,7 +125,6 @@ def rodar_testes():
         status_2 = f"❌ ERRO: {e}"
     resultados.append(("Gerar PIN sem JWT (/api/jogo/gerar-pin)", status_2))
 
-    # ── Teste 3: Game login ──
     try:
         resp = game_login(GameLoginRequest(code="123456"))
         tem_jwt = "accessToken" in resp and resp["accessToken"].startswith("eyJ")
@@ -156,7 +133,6 @@ def rodar_testes():
         status_3 = f"❌ ERRO: {e}"
     resultados.append(("Game login (/game-login)", status_3))
 
-    # ── Teste 4: Salvar partida SEM token ──
     try:
         salvar_partida(PartidaRequest(missionId="teste", pontuacao_final=100), None)
         status_4 = "❌ FALHA (aceitou sem token)"
@@ -164,7 +140,6 @@ def rodar_testes():
         status_4 = "✅ OK (rejeitou sem token)" if e.status_code == 401 else f"❌ ERRO: {e}"
     resultados.append(("Salvar sem token (deve falhar)", status_4))
 
-    # ── Teste 5: Salvar partida COM token ──
     try:
         resp = salvar_partida(
             PartidaRequest(missionId="teste", pontuacao_final=100),
@@ -175,7 +150,6 @@ def rodar_testes():
         status_5 = f"❌ ERRO: {e}"
     resultados.append(("Salvar com token (deve funcionar)", status_5))
 
-    # ── Teste 6: Atualizar progresso SEM token ──
     try:
         atualizar_progresso(ProgressoRequest(tipo="planeta", valor="marte"), None)
         status_6 = "❌ FALHA (aceitou sem token)"
@@ -183,7 +157,6 @@ def rodar_testes():
         status_6 = "✅ OK (rejeitou sem token)" if e.status_code == 401 else f"❌ ERRO: {e}"
     resultados.append(("Progresso sem token (deve falhar)", status_6))
 
-    # ── Teste 7: Atualizar progresso COM token ──
     try:
         resp = atualizar_progresso(
             ProgressoRequest(tipo="planeta", valor="marte"),
@@ -194,17 +167,14 @@ def rodar_testes():
         status_7 = f"❌ ERRO: {e}"
     resultados.append(("Progresso com token (deve funcionar)", status_7))
 
-    # ── Teste 8: JWT válido aceito ──
     resultado_8a = validar_jwt(token_jwt)
     status_8a = "✅ OK" if resultado_8a is True else "❌ FALHA"
     resultados.append(("JWT válido aceito", status_8a))
 
-    # ── Teste 9: JWT inválido rejeitado ──
     resultado_8b = validar_jwt("token_invalido")
     status_8b = "✅ OK" if resultado_8b is False else "❌ FALHA"
     resultados.append(("JWT inválido rejeitado", status_8b))
 
-    # ── Monta output ──
     total = len(resultados)
     ok_count = sum(1 for _, s in resultados if "✅" in s)
     output_lines = [
@@ -229,7 +199,6 @@ def rodar_testes():
         "resumo": f"{ok_count}/{total}",
         "relatorio": "\n".join(output_lines)
     }
-
 
 if __name__ == "__main__":
     import uvicorn

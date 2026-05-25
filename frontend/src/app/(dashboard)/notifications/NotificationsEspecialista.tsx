@@ -104,7 +104,7 @@ export default function NotificationsS() {
         <p className="text-slate-400 text-xs font-medium">Gestão de vínculos e acompanhamento clínico</p>
       </header>
 
-      {/* Abas Filtro */}
+      {}
       <div className="flex justify-end mb-6">
         <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200/50 shadow-inner">
           {['recentes', 'antigas', '30dias'].map((t) => (
