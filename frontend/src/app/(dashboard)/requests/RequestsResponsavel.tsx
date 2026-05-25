@@ -1,63 +1,124 @@
 'use client';
 
-import { useState } from 'react';
-import { Check, X, Building2, Inbox, ShieldAlert, MoreVertical, Trash2, Eye } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Check, X, Inbox, ShieldAlert, MoreVertical, Trash2, Eye } from 'lucide-react';
+import { getApiUrl } from '@/utils/api';
 
 interface Solicitacao {
-  id: string;
+  id_solicitacao: string;
   profissional: string;
   fotoProfissional: string;
-  clinica: string;
-  cargo: string;
   paciente: string;
   fotoPaciente: string;
   status: 'pendente' | 'aprovado';
   permissoes: string[];
 }
 
-const initialData: Solicitacao[] = [
-  {
-    id: "21342",
-    profissional: "Regina Ribeiro",
-    fotoProfissional: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=150&h=150",
-    clinica: "Clínica Mente Brilhante",
-    cargo: "Psicopedagoga",
-    paciente: "Ana Silva",
-    fotoPaciente: "https://api.dicebear.com/7.x/pixel-art/svg?seed=Ana",
-    status: "pendente",
-    permissoes: ["Visualizar dados de desempenho", "Informações do perfil", "Insights de diagnósticos"]
-  },
-  {
-    id: "21345",
-    profissional: "Dr. Ricardo Lemos",
-    fotoProfissional: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=150&h=150",
-    clinica: "Centro de Apoio Kids",
-    cargo: "Psicólogo Infantil",
-    paciente: "Davi Souza",
-    fotoPaciente: "https://api.dicebear.com/7.x/pixel-art/svg?seed=Davi",
-    status: "aprovado",
-    permissoes: ["Visualizar dados de desempenho", "Informações do perfil", "Insights de diagnósticos"]
-  }
-];
-
 export default function RequestsR() {
-  const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>(initialData);
+  const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>([]);
   const [modalConfira, setModalConfira] = useState<Solicitacao | null>(null);
   const [modalExcluir, setModalExcluir] = useState<Solicitacao | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleAprovar = (id: string) => {
-    setSolicitacoes(prev => prev.map(s => s.id === id ? { ...s, status: 'aprovado' } : s));
-    setModalConfira(null);
+  useEffect(() => {
+    const carregarDados = async () => {
+      try {
+        const dadosSalvos = JSON.parse(localStorage.getItem('user_data') || '{}');
+        const token = dadosSalvos.token_acesso;
+
+        if (!token) return;
+
+        const resPendentes = await fetch(`${getApiUrl()}/vinculo/pendentes`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const resAprovados = await fetch(`${getApiUrl()}/vinculo/aprovados`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (resPendentes.ok && resAprovados.ok) {
+          const pendentesData = await resPendentes.json();
+          const aprovadosData = await resAprovados.json();
+
+          const formatarSolicitacao = (s: any, status: 'pendente' | 'aprovado'): Solicitacao => ({
+            id_solicitacao: s.id_solicitacao,
+            profissional: s.nome_especialista || "Especialista",
+            fotoProfissional: `/usuarios/foto${s.foto_especialista || 1}.png`,
+            paciente: s.nome_jogador,
+            fotoPaciente: `/jogadores/foto${s.foto_jogador || 1}.png`,
+            status: status,
+            permissoes: ["Visualizar dados de desempenho", "Informações do perfil", "Insights de diagnósticos"]
+          });
+
+          const todasSolicitacoes = [
+            ...pendentesData.map((s: any) => formatarSolicitacao(s, 'pendente')),
+            ...aprovadosData.map((s: any) => formatarSolicitacao(s, 'aprovado'))
+          ];
+
+          setSolicitacoes(todasSolicitacoes);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar solicitações:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    carregarDados();
+  }, []);
+
+  const handleAprovar = async (id: string) => {
+    try {
+      const dadosSalvos = JSON.parse(localStorage.getItem('user_data') || '{}');
+      const token = dadosSalvos.token_acesso;
+
+      const res = await fetch(`${getApiUrl()}/vinculo/responder`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ id_solicitacao: id, acao: 'aprovar' })
+      });
+
+      if (res.ok) {
+        setSolicitacoes(prev => prev.map(s => s.id_solicitacao === id ? { ...s, status: 'aprovado' } : s));
+        setModalConfira(null);
+      } else {
+        alert("Erro ao aprovar solicitação.");
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleRemover = (id: string) => {
-    setSolicitacoes(prev => prev.filter(s => s.id !== id));
-    setModalExcluir(null);
-    setModalConfira(null);
-  };
+  const handleRemover = async (id: string) => {
+  try {
+    const dadosSalvos = JSON.parse(localStorage.getItem('user_data') || '{}');
+    const token = dadosSalvos.token_acesso;
+
+    const res = await fetch(`${getApiUrl()}/vinculo/cancelar/${id}`, {
+      method: 'DELETE', 
+      headers: { 
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (res.ok) {
+      setSolicitacoes(prev => prev.filter(s => s.id_solicitacao !== id));
+      setModalExcluir(null);
+      setModalConfira(null);
+    } else {
+      alert("Erro ao remover vínculo.");
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   const pendentes = solicitacoes.filter(s => s.status === 'pendente');
   const aprovadas = solicitacoes.filter(s => s.status === 'aprovado');
+
+  if (isLoading) return <div className="p-10 text-center font-bold text-slate-400">Carregando permissões...</div>;
 
   return (
     <div className="max-w-5xl mx-auto p-6 font-sans">
@@ -69,23 +130,22 @@ export default function RequestsR() {
         </h2>
       </div>
 
-      {/* Seção Pendentes */}
       <section className="mb-12">
         {pendentes.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {pendentes.map((item) => (
-              <div key={item.id} className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+              <div key={item.id_solicitacao} className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                 <div className="flex items-center gap-3 mb-4">
-                  <img src={item.fotoProfissional} className="w-10 h-10 rounded-full object-cover border border-slate-200" alt="" />
+                  <img src={item.fotoPaciente} className="w-10 h-10 rounded-full object-cover border border-slate-200" alt="" />
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm font-bold text-slate-800 truncate">{item.profissional}</h3>
-                    <p className="text-[10px] text-slate-400 font-semibold uppercase">{item.cargo}</p>
+                    <p className="text-[10px] text-slate-400 font-semibold uppercase">Especialista</p>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-100">
                   <div className="flex items-center gap-2">
-                    <img src={item.fotoPaciente} className="w-7 h-7 rounded-lg bg-white p-0.5 border border-slate-200" alt="" />
+                    <img src={item.fotoProfissional} className="w-7 h-7 rounded-lg bg-white p-0.5 border border-slate-200" alt="" />
                     <span className="text-xs font-bold text-slate-600">{item.paciente}</span>
                   </div>
                   <button
@@ -106,7 +166,6 @@ export default function RequestsR() {
         )}
       </section>
 
-      {/* Seção Aprovados */}
       <section>
         <div className="mb-6">
           <h3 className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] bg-clip-text text-transparent">
@@ -117,7 +176,7 @@ export default function RequestsR() {
         {aprovadas.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {aprovadas.map((item) => (
-              <div key={item.id} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-xs flex flex-col gap-3 group relative">
+              <div key={item.id_solicitacao} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-xs flex flex-col gap-3 group relative">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <img src={item.fotoProfissional} className="w-9 h-9 rounded-full object-cover border border-slate-200" alt="" />
@@ -149,13 +208,10 @@ export default function RequestsR() {
         )}
       </section>
 
-      {/* Modal CONFIRA */}
       {modalConfira && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          {/* Adicionado 'relative' para o X do topo se posicionar corretamente */}
           <div className="bg-white w-full max-w-xs rounded-[40px] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200 p-7 relative">
-            
-            {/* Botão X lateral/superior para fechar sem responder */}
+
             <button 
               onClick={() => setModalConfira(null)}
               className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-50 transition-colors cursor-pointer"
@@ -190,17 +246,15 @@ export default function RequestsR() {
             </div>
 
             <div className="flex gap-3">
-              {/* Botão de Confirmar (Verde) */}
               <button 
-                onClick={() => handleAprovar(modalConfira.id)} 
+                onClick={() => handleAprovar(modalConfira.id_solicitacao)} 
                 className="flex-1 bg-green-500 hover:bg-green-600 text-white py-3.5 rounded-2xl shadow-lg shadow-green-100 flex justify-center items-center transition-transform active:scale-95 cursor-pointer"
               >
                 <Check className="w-5 h-5" />
               </button>
-              
-              {/* Botão de Recusar (Vermelho com X Branco) */}
+
               <button 
-                onClick={() => handleRemover(modalConfira.id)} 
+                onClick={() => handleRemover(modalConfira.id_solicitacao)} 
                 className="flex-1 bg-red-500 hover:bg-red-600 text-white py-3.5 rounded-2xl shadow-lg shadow-red-100 flex justify-center items-center transition-transform active:scale-95 cursor-pointer"
                 title="Recusar solicitação"
               >
@@ -211,7 +265,6 @@ export default function RequestsR() {
         </div>
       )}
 
-      {/* Modal EXCLUIR */}
       {modalExcluir && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-xs rounded-[40px] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200 p-7">
@@ -234,7 +287,7 @@ export default function RequestsR() {
             </p>
 
             <div className="flex gap-3">
-              <button onClick={() => handleRemover(modalExcluir.id)} className="flex-1 bg-red-500 hover:bg-red-600 text-white py-3.5 rounded-2xl shadow-lg shadow-red-100 flex justify-center transition-transform active:scale-95 cursor-pointer">
+              <button onClick={() => handleRemover(modalExcluir.id_solicitacao)} className="flex-1 bg-red-500 hover:bg-red-600 text-white py-3.5 rounded-2xl shadow-lg shadow-red-100 flex justify-center transition-transform active:scale-95 cursor-pointer">
                 <Trash2 className="w-5 h-5" />
               </button>
               <button onClick={() => setModalExcluir(null)} className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-400 py-3.5 rounded-2xl flex justify-center transition-transform active:scale-95 cursor-pointer">

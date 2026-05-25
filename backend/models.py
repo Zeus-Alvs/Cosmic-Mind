@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 class MetricasCognitivas(BaseModel):
@@ -20,11 +20,9 @@ class UsuarioCadastro(BaseModel):
     senha: str
     tipo_perfil: str 
 
-
 class UsuarioLogin(BaseModel):
     email: EmailStr
     senha: str
-
 
 class UsuarioRetorno(BaseModel):
     id: str
@@ -33,6 +31,7 @@ class UsuarioRetorno(BaseModel):
     tipo_perfil: str
     email_pendente: Optional[str] = None
     avatar: Optional[int] = 1
+    token_acesso: str
 
 class UsuarioUpdate(BaseModel):
     nome: Optional[str] = None
@@ -73,21 +72,17 @@ class JogadorUpdate(BaseModel):
 class GameLoginRequest(BaseModel):
     code: str
 
-
 class DesbloquearPlaneta(BaseModel):
     planeta: str 
-
 
 class AtualizarPontuacao(BaseModel):
     fase_id: str
     pontuacao: int
     estrelas: int 
 
-
 class AtualizarPreferencias(BaseModel):
     volume_musica: Optional[int] = None
     daltonismo_modo: Optional[bool] = None
-
 
 class DesbloquearItem(BaseModel):
     item_type: str  
@@ -102,3 +97,13 @@ class AtualizarProgressoRequest(BaseModel):
     volumeMusica: Optional[int] = None
     daltonismoModo: Optional[bool] = None
     item_id: Optional[str] = None
+
+class DeletarContaRequest(BaseModel):
+    senha: str
+
+class SolicitarVinculo(BaseModel):
+    codigo_vinculo: str
+
+class ResponderVinculo(BaseModel):
+    id_solicitacao: str
+    acao: str

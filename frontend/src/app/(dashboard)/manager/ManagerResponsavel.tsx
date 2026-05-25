@@ -13,9 +13,10 @@ interface PlayerPerformanceDTO {
   nivelFase: string;
   pontuacao: number;
   foto_perfil?: number;
+  codigo_vinculo?: string;
 }
 
-export default function ManagerS() {
+export default function ManagerR() {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [players, setPlayers] = useState<PlayerPerformanceDTO[]>([]);
@@ -181,7 +182,16 @@ export default function ManagerS() {
                         </div>
                         <div>
                           <h3 className="text-md font-bold text-slate-800 leading-tight">{card.nome}</h3>
-                          <p className="text-[10px] text-slate-400 font-bold">ID: 0001</p>
+                          {}
+                          <div className="mt-1.5 flex items-center gap-1.5">
+                            <span className="text-[9px] font-black uppercase text-slate-400">Cód:</span>
+                            <span 
+                              className="text-xs font-mono font-bold bg-white text-[#AC57EB] px-2 py-0.5 rounded-md tracking-widest border border-[#AC57EB]/20 shadow-sm"
+                              title="Compartilhe este código com o especialista"
+                            >
+                              {card.codigo_vinculo || 'GERANDO...'}
+                            </span>
+                          </div>
                         </div>
                       </div>
 

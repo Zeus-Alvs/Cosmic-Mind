@@ -24,7 +24,6 @@ export default function Home() {
   return (
     <div className="h-full overflow-hidden relative">
 
-
       <div
         className="
           fixed top-0 h-3 z-50
@@ -34,12 +33,11 @@ export default function Home() {
         "
       />
 
-
       <div className="h-screen flex items-start justify-center pt-20 px-4 md:px-0">
 
         <div className="w-full max-w-3xl px-4 md:px-10">
 
-          {/* título */}
+          {}
           <h2 className="mb-10 flex items-center gap-3 flex-wrap">
 
             <span className="text-2xl md:text-3xl">👋</span>
@@ -53,7 +51,7 @@ export default function Home() {
 
           </h2>
 
-          {/* cards */}
+          {}
           <div className="flex flex-col gap-6 max-w-xl ml-auto w-full">
 
             <div className="bg-purple-100/60 backdrop-blur p-5 md:p-6 rounded-2xl border border-purple-200 shadow-sm">

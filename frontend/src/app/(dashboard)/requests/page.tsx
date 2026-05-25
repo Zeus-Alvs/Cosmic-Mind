@@ -11,7 +11,7 @@ export default function RequestsMaestro() {
 
   useEffect(() => {
     const dadosSalvos = localStorage.getItem("user_data");
-    
+
     if (!dadosSalvos) {
       router.push("/login");
       return;

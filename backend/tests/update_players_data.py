@@ -101,15 +101,12 @@ for p in players:
     jid = jogador['_id']
     print(f"Atualizando jogador {p['apelido']} (id={jid})")
 
-    # Atualiza planetas desbloqueados
     db['jogador'].update_one({'_id': jid}, {'$set': {'planetas_desbloqueados': p['planetas']}})
     print(f" - planetas setados: {p['planetas']}")
 
-    # Remove partidas antigas desse jogador
     rem = db['partidas'].delete_many({'id_jogador': jid})
     print(f" - partidas removidas: {rem.deleted_count}")
 
-    # Insere novas partidas com tempos distintos
     inserted = []
     for i, partida in enumerate(p['partidas']):
         partida_doc = {

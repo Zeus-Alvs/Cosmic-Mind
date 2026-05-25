@@ -14,10 +14,13 @@ export default function AccountPage() {
   const [formData, setFormData] = useState({ nome: '', email: '', crp_especialista: '' });
   const [passData, setPassData] = useState({ atual: '', nova: '', confirmar: '' });
 
-  // Estados individuais para visibilidade de cada senha
   const [showAtual, setShowAtual] = useState(false);
   const [showNova, setShowNova] = useState(false);
   const [showConfirmar, setShowConfirmar] = useState(false);
+
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [showDeletePassword, setShowDeletePassword] = useState(false);
 
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
@@ -131,13 +134,11 @@ export default function AccountPage() {
       return;
     }
 
-    // Validação do tamanho mínimo (8 caracteres)
     if (passData.nova.length < 8) {
       alert('A nova senha deve conter no mínimo 8 caracteres.');
       return;
     }
 
-    // Regex para validar: pelo menos uma letra maiúscula, pelo menos um número e pelo menos um caractere especial
     const regexLetraMaiuscula = /[A-Z]/;
     const regexNumero = /[0-9]/;
     const regexCaractereEspecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
@@ -185,14 +186,18 @@ export default function AccountPage() {
   };
 
   const handleDeleteAccount = async () => {
-    const confirmacao = window.confirm("Tem certeza absoluta que deseja excluir permanentemente sua conta? Esta ação não pode ser desfeita.");
-    if (!confirmacao) return;
+    if (!deletePassword) {
+      alert('Por favor, informe sua senha para excluir a conta.');
+      return;
+    }
 
     setIsDeleting(true);
     try {
       const response = await fetch(`${getApiUrl()}/conta/deletar/${usuario.email}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+
+        body: JSON.stringify({ senha: deletePassword })
       });
 
       if (response.ok) {
@@ -201,12 +206,14 @@ export default function AccountPage() {
         router.push('/login');
       } else {
         const data = await response.json();
-        alert(`Erro ao excluir conta: ${data.detail || 'Ocorreu um erro.'}`);
+        alert(`Erro ao excluir conta: ${data.detail || 'Senha incorreta.'}`);
       }
     } catch (error) {
       alert('Erro de conexão com o servidor ao tentar excluir a conta.');
     } finally {
       setIsDeleting(false);
+      setShowDeleteConfirm(false);
+      setDeletePassword('');
     }
   };
 
@@ -225,7 +232,7 @@ export default function AccountPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* Coluna Esquerda: Avatar e Exclusão */}
+        {}
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex flex-col items-center text-center">
             <div className="w-28 h-28 rounded-full shadow-lg mb-5 transition-all duration-300 overflow-hidden ring-4 ring-slate-100">
@@ -252,26 +259,69 @@ export default function AccountPage() {
             </div>
           </div>
 
-          {/* Seção Excluir Conta */}
+          {}
           <div className="bg-red-50/50 p-6 rounded-[24px] border border-red-100 shadow-sm text-center">
             <h4 className="text-sm font-bold text-red-800 mb-1">Zona de Perigo</h4>
             <p className="text-xs text-slate-500 mb-4">A exclusão da conta apagará todos os seus dados permanentemente do sistema.</p>
-            <button
-              type="button"
-              onClick={handleDeleteAccount}
-              disabled={isDeleting}
-              className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
-            >
-              <Trash2 className="w-4 h-4" />
-              {isDeleting ? 'Excluindo...' : 'Excluir Minha Conta'}
-            </button>
+
+            {!showDeleteConfirm ? (
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition-colors shadow-sm cursor-pointer"
+              >
+                <Trash2 className="w-4 h-4" />
+                Excluir Minha Conta
+              </button>
+            ) : (
+              <div className="space-y-3 text-left animate-in fade-in slide-in-from-top-2">
+                <label className="text-[10px] font-bold text-red-800 ml-1 tracking-wider">CONFIRME SUA SENHA</label>
+                <div className="relative">
+                  <input
+                    type={showDeletePassword ? "text" : "password"}
+                    value={deletePassword}
+                    onChange={(e) => setDeletePassword(e.target.value)}
+                    placeholder="Sua senha atual"
+                    className="w-full bg-white border border-red-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowDeletePassword(!showDeletePassword)}
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-red-600 cursor-pointer"
+                  >
+                    {showDeletePassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                  </button>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowDeleteConfirm(false);
+                      setDeletePassword('');
+                    }}
+                    className="flex-1 bg-white border border-red-200 hover:bg-red-50 text-red-600 font-bold py-2 px-4 rounded-xl text-xs transition-colors cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDeleteAccount}
+                    disabled={isDeleting || !deletePassword}
+                    className="flex-1 flex items-center justify-center gap-1.5 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl text-xs transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    {isDeleting ? 'Excluindo...' : 'Confirmar'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Coluna Direita: Formulários */}
+        {}
         <div className="lg:col-span-2 space-y-6">
 
-          {/* Form Dados Pessoais */}
+          {}
           <form onSubmit={handleSaveProfile} className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm">
             <div className="flex items-center gap-2 mb-6">
               <User className="w-5 h-5 text-[#4078A4]" />
@@ -375,7 +425,7 @@ export default function AccountPage() {
             </div>
           </form>
 
-          {/* Form Segurança */}
+          {}
           <form onSubmit={handleSavePassword} className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm">
             <div className="flex items-center gap-2 mb-6">
               <Lock className="w-5 h-5 text-[#AC57EB]" />
@@ -383,7 +433,7 @@ export default function AccountPage() {
             </div>
 
             <div className="space-y-4 max-w-md">
-              {/* Campo: Senha Atual */}
+              {}
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-500 ml-1">SENHA ATUAL</label>
                 <div className="relative">
@@ -403,7 +453,7 @@ export default function AccountPage() {
                     {showAtual ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                   </button>
                 </div>
-                {/* Regras da Senha Atual */}
+                {}
                 {!showAtual && (
                   <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-left mt-1.5">
                     <p className="text-[10px] font-black text-amber-600 uppercase tracking-wider mb-1">Validação Obrigatória:</p>
@@ -415,7 +465,7 @@ export default function AccountPage() {
                 )}
               </div>
 
-              {/* Campo: Nova Senha */}
+              {}
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-500 ml-1">NOVA SENHA</label>
                 <div className="relative">
@@ -435,7 +485,7 @@ export default function AccountPage() {
                     {showNova ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                   </button>
                 </div>
-                {/* Regras da Nova Senha */}
+                {}
                 {!showNova && (
                   <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-left mt-1.5">
                     <p className="text-[10px] font-black text-amber-600 uppercase tracking-wider mb-1.5">⚠️ Regras para uma senha segura:</p>
@@ -457,7 +507,7 @@ export default function AccountPage() {
                 )}
               </div>
 
-              {/* Campo: Confirmar Nova Senha */}
+              {}
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-500 ml-1">CONFIRMAR NOVA SENHA</label>
                 <div className="relative">
@@ -477,7 +527,7 @@ export default function AccountPage() {
                     {showConfirmar ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                   </button>
                 </div>
-                {/* Regras da Confirmação */}
+                {}
                 {!showConfirmar && (
                   <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-left mt-1.5">
                     <p className="text-[10px] font-black text-amber-600 uppercase tracking-wider mb-1">Confirmação de segurança:</p>

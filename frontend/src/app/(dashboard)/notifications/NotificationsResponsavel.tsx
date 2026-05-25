@@ -121,7 +121,7 @@ export default function NotificationsR() {
         <p className="text-slate-400 text-xs font-medium">Acompanhe os jogadores em tempo real</p>
       </header>
 
-      {/* Abas Filtro */}
+      {}
       <div className="flex justify-end mb-6">
         <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200/50 shadow-inner">
           {[
