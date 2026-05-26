@@ -6,7 +6,7 @@ export const getApiUrl = () => {
             return 'http://localhost:8000/api';
         }
 
-        return `http://${hostname}:5847/api`;
+        return `http://85.31.63.53:5847/api`;
     }
 
     return 'http://backend:8000/api';
