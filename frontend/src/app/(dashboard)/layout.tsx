@@ -1,261 +1,258 @@
-'use client';
+  'use client';
 
-import Link from "next/link";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { ChevronRight } from "lucide-react";
+  import Link from "next/link";
+  import Image from "next/image";
+  import { useEffect, useState } from "react";
+  import { useRouter, usePathname } from "next/navigation";
+  import { ChevronRight } from "lucide-react";
+  import { NotificationProvider } from './contexts/NotificationContext';
 
-type Usuario = {
-  nome: string;
-  tipo_perfil: string;
-  avatar?: number;
-};
+  type Usuario = {
+    nome: string;
+    tipo_perfil: string;
+    avatar?: number;
+  };
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const router = useRouter();
-  const pathname = usePathname();
+  export default function DashboardLayout({
+    children,
+  }: {
+    children: React.ReactNode;
+  }) {
+    const router = useRouter();
+    const pathname = usePathname();
 
-  const [usuario, setUsuario] = useState<Usuario>({
-    nome: "",
-    tipo_perfil: "",
-  });
+    const [usuario, setUsuario] = useState<Usuario>({
+      nome: "",
+      tipo_perfil: "",
+    });
 
-  const [autorizado, setAutorizado] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+    const [autorizado, setAutorizado] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
 
-  // --- EFEITO 1: AUTENTICAÇÃO ---
-  useEffect(() => {
-    const dadosSalvos = localStorage.getItem("user_data");
+    // --- EFEITO 1: AUTENTICAÇÃO ---
+    useEffect(() => {
+      const dadosSalvos = localStorage.getItem("user_data");
 
-    if (!dadosSalvos) {
-      router.push("../");
-      return;
+      if (!dadosSalvos) {
+        router.push("../");
+        return;
+      }
+
+      setUsuario(JSON.parse(dadosSalvos));
+      setAutorizado(true);
+    }, [router]);
+
+    // --- EFEITO 2: FEEDBACK SONORO (Clique UI) ---
+    useEffect(() => {
+      const tocarBeep = () => {
+        try {
+          const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+          const osc = audioCtx.createOscillator();
+          const gainNode = audioCtx.createGain();
+          
+          osc.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          
+          osc.type = 'sine'; 
+          osc.frequency.value = 600; 
+          gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); 
+          
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.1); 
+        } catch (e) {
+          console.log("Áudio não suportado ou bloqueado");
+        }
+      };
+
+      const handleGlobalClick = (e: MouseEvent) => {
+        const somAtivado = localStorage.getItem('pref_som') === 'true';
+        if (!somAtivado) return;
+
+        const target = e.target as HTMLElement;
+        if (target.closest('button') || target.closest('a')) {
+          tocarBeep();
+        }
+      };
+
+      document.addEventListener('click', handleGlobalClick);
+      return () => document.removeEventListener('click', handleGlobalClick);
+    }, []);
+
+    const links = [
+      { 
+        href: "/menu", 
+        label: "Início", 
+        icon: "/icons/home.png", 
+        activeIcon: "/icons/home-active.png",
+        roles: ["responsavel", "especialista"]
+      },
+      { 
+        href: `/performance`, 
+        label: "Desempenho", 
+        icon: "/icons/dashboard.png", 
+        activeIcon: "/icons/dashboard-active.png",
+        roles: ["responsavel", "especialista"]
+      },
+      { 
+        href: `/notifications`, 
+        label: "Notificações", 
+        icon: "/icons/bell.png", 
+        activeIcon: "/icons/bell-active.png",
+        roles: ["responsavel", "especialista"]
+      },
+      { 
+        href: `/manager`, 
+        label: "Gerenciar Contas", 
+        icon: "/icons/users.png", 
+        activeIcon: "/icons/users-active.png",
+        roles: ["responsavel", "especialista"]
+      },
+      {
+        href: `/requests`,
+        label: "Solicitações",
+        icon: "/icons/request.png",
+        activeIcon: "/icons/request-active.png",
+        roles: ["responsavel", "especialista"]
+      },
+      { 
+        href: "/config", 
+        label: "Ajustes", 
+        icon: "/icons/config.png", 
+        activeIcon: "/icons/config-active.png",
+        roles: ["responsavel", "especialista"]
+      },
+    ];
+
+    if (!autorizado) {
+      return (
+        <div className="flex h-screen w-full items-center justify-center bg-slate-50">
+          <p className="text-slate-500 font-medium">Verificando segurança...</p>
+        </div>
+      );
     }
 
-    setUsuario(JSON.parse(dadosSalvos));
-    setAutorizado(true);
-  }, [router]);
-
-
-  // --- EFEITO 2: FEEDBACK SONORO (O VIGIA) ---
-  useEffect(() => {
-    // Função que toca o bip
-    const tocarBeep = () => {
-      try {
-        const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        
-        osc.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-        
-        osc.type = 'sine'; // Som suave
-        osc.frequency.value = 600; // Frequência do bip
-        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // Volume baixo
-        
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.1); // Duração curtinha (100ms)
-      } catch (e) {
-        console.log("Áudio não suportado ou bloqueado");
-      }
-    };
-
-    // O "Vigia" que escuta todos os cliques do site
-    const handleGlobalClick = (e: MouseEvent) => {
-      // Verifica se a chavinha tá ligada no navegador
-      const somAtivado = localStorage.getItem('pref_som') === 'true';
-      if (!somAtivado) return;
-
-      // Verifica se o cara clicou num botão ou link
-      const target = e.target as HTMLElement;
-      if (target.closest('button') || target.closest('a')) {
-        tocarBeep();
-      }
-    };
-
-    document.addEventListener('click', handleGlobalClick);
-    return () => document.removeEventListener('click', handleGlobalClick);
-  }, []); // <--- O VIGIA VAI FICAR AQUI DENTRO BONITINHO
-
-
-  const links = [
-    { 
-      href: "/menu", 
-      label: "Início", 
-      icon: "/icons/home.png", 
-      activeIcon: "/icons/home-active.png",
-      roles: ["responsavel", "especialista"]
-    },
-    { 
-      href: `/performance`, 
-      label: "Desempenho", 
-      icon: "/icons/dashboard.png", 
-      activeIcon: "/icons/dashboard-active.png",
-      roles: ["responsavel", "especialista"]
-    },
-    { 
-      href: `/notifications`, 
-      label: "Notificações", 
-      icon: "/icons/bell.png", 
-      activeIcon: "/icons/bell-active.png",
-      roles: ["responsavel", "especialista"]
-    },
-    { 
-      href: `/manager`, 
-      label: "Gerenciar Contas", 
-      icon: "/icons/users.png", 
-      activeIcon: "/icons/users-active.png",
-      roles: ["responsavel", "especialista"]
-    },
-    {
-      href: `/requests`,
-      label: "Solicitações",
-      icon: "/icons/request.png",
-      activeIcon: "/icons/request-active.png",
-      roles: ["responsavel", "especialista"]
-    },
-    { 
-      href: "/config", 
-      label: "Ajustes", 
-      icon: "/icons/config.png", 
-      activeIcon: "/icons/config-active.png",
-      roles: ["responsavel", "especialista"]
-    },
-  ];
-
-  if (!autorizado) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-50">
-        <p className="text-slate-500 font-medium">Verificando segurança...</p>
-      </div>
-    );
-  }
+      <NotificationProvider>
+        <div className="flex h-screen w-full bg-slate-50 text-slate-900">
 
-  return (
-    <div className="flex h-screen w-full bg-slate-50 text-slate-900">
-
-      {/* Botão Hambúrguer Mobile */}
-      <button
-        className="md:hidden fixed top-4 left-4 z-[100] bg-slate-800 text-white p-2 rounded-lg shadow-md cursor-pointer"
-        onClick={() => setMenuOpen(!menuOpen)}
-      >
-        ☰
-      </button>
-
-      {/* Overlay Mobile */}
-      {menuOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-[90] md:hidden backdrop-blur-sm transition-opacity"
-          onClick={() => setMenuOpen(false)}
-        />
-      )}
-
-      {/* Sidebar - Desktop (fixa) | Mobile (off-canvas) */}
-      <aside
-        className={`
-          fixed md:static z-[95] w-64 bg-[#1E293B] text-white flex flex-col shadow-2xl h-full
-          transform transition-transform duration-300 ease-in-out
-          ${menuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-        `}
-      >
-        {/* Logo */}
-        <div className="pt-10 pb-6 px-6 flex items-center justify-center border-b border-slate-700/50">
-          <Image
-            src="/icons/logo.png"
-            alt="Cosmic Mind"
-            width={150}
-            height={40}
-            priority
-            className="hover:scale-105 transition-transform"
-          />
-        </div>
-
-        {/* Navigation Links */}
-        <nav className="flex-1 px-4 space-y-1 mt-6 overflow-y-auto">
-          {links
-            .filter((link) => link.roles.includes(usuario.tipo_perfil))
-            .map((link) => {
-              const isActive = pathname === link.href;
-
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group cursor-pointer
-                    ${
-                      isActive
-                        ? "bg-gradient-to-r from-[#4078A4] to-[#3E89AE] shadow-lg font-bold"
-                        : "hover:bg-slate-800 text-slate-300 hover:text-white"
-                    }
-                  `}
-                >
-                  <Image
-                    src={isActive ? link.activeIcon : link.icon}
-                    alt={link.label}
-                    width={20}
-                    height={20}
-                    className={`transition-transform duration-200 ${!isActive && "opacity-70 group-hover:opacity-100 group-hover:scale-110"}`}
-                  />
-                  <span className="text-sm tracking-wide">{link.label}</span>
-                </Link>
-              );
-            })}
-        </nav>
-
-        {/* Profile / Logout */}
-        <div className="p-4 mt-auto border-t border-slate-700/50 bg-slate-900/20">
-
-          {/* User Info Link */}
-          <Link 
-            href="/account"
-            className="flex items-center gap-3 mb-4 p-2 rounded-xl hover:bg-slate-700 transition-colors cursor-pointer group w-full"
+          {/* Botão Hambúrguer Mobile */}
+          <button
+            className="md:hidden fixed top-4 left-4 z-[100] bg-slate-800 text-white p-2 rounded-lg shadow-md cursor-pointer"
+            onClick={() => setMenuOpen(!menuOpen)}
           >
-            <div className="w-10 h-10 rounded-full border-2 border-slate-600 shadow-inner overflow-hidden flex items-center justify-center shrink-0 bg-slate-800 group-hover:scale-105 transition-transform">
-              <img 
-                src={usuario.avatar ? `/usuarios/foto${usuario.avatar}.png` : "/usuarios/foto1.png"} 
-                alt="Avatar" 
-                className="w-full h-full object-cover" 
+            ☰
+          </button>
+
+          {/* Overlay Mobile */}
+          {menuOpen && (
+            <div
+              className="fixed inset-0 bg-black/40 z-[90] md:hidden backdrop-blur-sm transition-opacity"
+              onClick={() => setMenuOpen(false)}
+            />
+          )}
+
+          {/* Sidebar - Desktop (fixa) | Mobile (off-canvas) */}
+          <aside
+            className={`
+              fixed md:static z-[95] w-64 bg-[#1E293B] text-white flex flex-col shadow-2xl h-full
+              transform transition-transform duration-300 ease-in-out
+              ${menuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+            `}
+          >
+            {/* Logo */}
+            <div className="pt-10 pb-6 px-6 flex items-center justify-center border-b border-slate-700/50">
+              <Image
+                src="/icons/logo.png"
+                alt="Cosmic Mind"
+                width={150}
+                height={40}
+                priority
+                className="hover:scale-105 transition-transform"
               />
             </div>
-            <div className="flex-1 min-w-0 text-left">
-              <p className="text-sm font-bold truncate text-slate-100 group-hover:text-blue-300 transition-colors">
-                {usuario.nome}
-              </p>
-              <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
-                {usuario.tipo_perfil}
-              </p>
+
+            {/* Navigation Links */}
+            <nav className="flex-1 px-4 space-y-1 mt-6 overflow-y-auto">
+              {links
+                .filter((link) => link.roles.includes(usuario.tipo_perfil))
+                .map((link) => {
+                  const isActive = pathname === link.href;
+
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMenuOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group cursor-pointer
+                        ${
+                          isActive
+                            ? "bg-gradient-to-r from-[#4078A4] to-[#3E89AE] shadow-lg font-bold"
+                            : "hover:bg-slate-800 text-slate-300 hover:text-white"
+                        }
+                      `}
+                    >
+                      <Image
+                        src={isActive ? link.activeIcon : link.icon}
+                        alt={link.label}
+                        width={20}
+                        height={20}
+                        className={`transition-transform duration-200 ${!isActive && "opacity-70 group-hover:opacity-100 group-hover:scale-110"}`}
+                      />
+                      <span className="text-sm tracking-wide">{link.label}</span>
+                    </Link>
+                  );
+                })}
+            </nav>
+
+            {/* Profile / Logout */}
+            <div className="p-4 mt-auto border-t border-slate-700/50 bg-slate-900/20">
+
+              {/* User Info Link */}
+              <Link 
+                href="/account"
+                className="flex items-center gap-3 mb-4 p-2 rounded-xl hover:bg-slate-700 transition-colors cursor-pointer group w-full"
+              >
+                <div className="w-10 h-10 rounded-full border-2 border-slate-600 shadow-inner overflow-hidden flex items-center justify-center shrink-0 bg-slate-800 group-hover:scale-105 transition-transform">
+                  <img 
+                    src={usuario.avatar ? `/usuarios/foto${usuario.avatar}.png` : "/usuarios/foto1.png"} 
+                    alt="Avatar" 
+                    className="w-full h-full object-cover" 
+                  />
+                </div>
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-bold truncate text-slate-100 group-hover:text-blue-300 transition-colors">
+                    {usuario.nome}
+                  </p>
+                  <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
+                    {usuario.tipo_perfil}
+                  </p>
+                </div>
+                <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-white transition-colors shrink-0" />
+              </Link>
+
+              <div className="space-y-1">
+                {/* Botão Sair */}
+                <button
+                  onClick={() => {
+                    localStorage.removeItem("user_data");
+                    localStorage.removeItem("token_acesso");
+                    router.push("../");
+                  }}
+                  className="flex items-center justify-center gap-2 w-full p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 border border-slate-600/50 hover:border-red-500/50 transition-all text-sm font-medium group cursor-pointer"
+                >
+                  <Image src="/icons/logout.png" alt="Sair" width={18} height={18} className="group-hover:scale-110 transition-transform" />
+                  Sair
+                </button>
+              </div>
             </div>
-            <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-white transition-colors shrink-0" />
-          </Link>
+          </aside>
 
-          <div className="space-y-1">
-            {/* Botão Sair */}
-            <button
-              onClick={() => {
-                localStorage.removeItem("user_data");
-                localStorage.removeItem("token_acesso");
-                router.push("../");
-              }}
-              className="flex items-center justify-center gap-2 w-full p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 border border-slate-600/50 hover:border-red-500/50 transition-all text-sm font-medium group cursor-pointer"
-            >
-              <Image src="/icons/logout.png" alt="Sair" width={18} height={18} className="group-hover:scale-110 transition-transform" />
-              Sair
-            </button>
-          </div>
+          {/* CONTEÚDO PRINCIPAL */}
+          <main className="flex-1 p-4 md:p-10 overflow-y-auto w-full relative">
+            {children}
+          </main>
+
         </div>
-      </aside>
-
-      {/* CONTEÚDO PRINCIPAL (ONDE AS OUTRAS PÁGINAS SÃO RENDERIZADAS) */}
-      <main className="flex-1 p-4 md:p-10 overflow-y-auto w-full relative">
-        {children}
-      </main>
-
-    </div>
-  );
-}
+      </NotificationProvider>
+    );
+  }

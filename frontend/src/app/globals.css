@@ -176,3 +176,29 @@ html.tema-escuro button[class*="bg-slate-100"]:hover,
 html.tema-escuro button[class*="bg-slate-200"]:hover {
   background-color: #475569 !important;
 }
+
+
+
+html.tema-escuro .bg-green-50 {
+  background-color: rgba(22, 163, 74, 0.2) !important;
+  border-color: rgba(34, 197, 94, 0.3) !important;
+}
+html.tema-escuro .text-green-600 {
+  color: #86efac !important;
+}
+
+
+html.tema-escuro .border-amber-100 {
+  border-color: rgba(202, 138, 4, 0.3) !important;
+}
+
+
+html.tema-escuro .bg-blue-50\/50 {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+}
+
+html.tema-escuro .border-slate-50,
+html.tema-escuro .border-slate-100,
+html.tema-escuro .border-slate-200 {
+  border-color: #334155 !important;
+}

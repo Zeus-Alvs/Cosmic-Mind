@@ -52,10 +52,31 @@ db = client["cosmic_mind_db"]
 colecao_usuarios = db["usuario"]
 colecao_partidas = db["partidas"]
 
+
 # rota não utilizada --- Nenhuma página do frontend
 @app.get("/")
 def read_root():
     return {"status": "A API do Cosmic Mind está viva!"}
+
+def criar_notificacao(id_destino: ObjectId, tipo: str, titulo: str, descricao: str, link_to: str = None):
+    """Insere uma notificação individual no banco de dados."""
+    db["notificacao"].insert_one({
+        "id_usuario_destino": ObjectId(id_destino),
+        "type": tipo,
+        "title": titulo,
+        "description": descricao,
+        "isLink": bool(link_to),
+        "linkTo": link_to,
+        "lida": False,
+        "criado_em": datetime.utcnow()
+    })
+
+def notificar_rede_do_jogador(id_jogador: ObjectId, tipo: str, titulo: str, descricao: str, link_to: str = None):
+    """Encontra responsáveis e especialistas vinculados ao jogador e notifica todos."""
+    usuarios_interessados = colecao_usuarios.find({"jogadores_vinculados": id_jogador})
+    for usuario in usuarios_interessados:
+        criar_notificacao(usuario["_id"], tipo, titulo, descricao, link_to)
+
 
 # rota em uso --- /register
 @app.post("/api/cadastrar", response_model=UsuarioRetorno, status_code=status.HTTP_201_CREATED)
@@ -389,6 +410,15 @@ def criar_jogador(id_usuario: str, dados: JogadorCadastro):
         {"$push": {"jogadores_vinculados": id_novo_jogador}}
     )
 
+    # GATILHO DE NOTIFICAÇÃO
+    criar_notificacao(
+        id_destino=ObjectId(id_usuario),
+        tipo="info",
+        titulo="Novo Perfil Criado",
+        descricao=f"O perfil do jogador {dados.apelido} foi criado e vinculado à sua conta com sucesso.",
+        link_to="/performance"
+    )
+
     return {"message": "Jogador criado!", "id_jogador": str(id_novo_jogador)}
 
 # rota em uso --- /edit, /manager, /performance
@@ -428,6 +458,23 @@ def desconectar_jogador(id_jogador: str):
         {"id_jogador": id_jogador},
         {"$set": {"expira_em": datetime.now(timezone.utc)}}
     )
+
+    #GATILHO DE NOTIFICAÇÃO: SESSÃO ENCERRADA
+    try:
+        id_jogador_obj = ObjectId(id_jogador)
+        jogador = db["jogador"].find_one({"_id": id_jogador_obj})
+        nome_jogador = jogador.get("apelido", "O paciente") if jogador else "O paciente"
+
+        notificar_rede_do_jogador(
+            id_jogador=id_jogador_obj,
+            tipo="pausa", # Usa o ícone de raio laranja do frontend
+            titulo="Sessão Encerrada",
+            descricao=f"A conexão do jogo de {nome_jogador} foi encerrada pelo painel.",
+            link_to=None
+        )
+    except Exception as e:
+        print(f"Erro ao enviar notificação de desconexão: {e}")
+
     return {"message": "Dispositivos desconectados com sucesso."}
 
 # rota em uso --- /edit
@@ -491,7 +538,7 @@ def gerar_pin_jogo(id_jogador: str):
     }
 
 # rota não utilizada no frontend --- Usada pelo jogo
-@app.post("/game-login")
+@app.post("/api/game-login")
 def game_login(dados: GameLoginRequest):
     sessao = db["sessao"].find_one({"codigo_pin": dados.code})
 
@@ -510,6 +557,22 @@ def game_login(dados: GameLoginRequest):
             "expira_em": nova_expiracao
         }}
     )
+    
+    #GATILHO DE NOTIFICAÇÃO: JOGADOR ONLINE
+    try:
+        id_jogador_obj = ObjectId(sessao["id_jogador"])
+        jogador = db["jogador"].find_one({"_id": id_jogador_obj})
+        nome_jogador = jogador.get("apelido", "O paciente") if jogador else "O paciente"
+
+        notificar_rede_do_jogador(
+            id_jogador=id_jogador_obj,
+            tipo="novidade", # Usa o ícone de estrelinha roxa do frontend
+            titulo="Jogador Conectado!",
+            descricao=f"{nome_jogador} acabou de entrar no Cosmic Mind e iniciou uma sessão de jogo.",
+            link_to="/performance"
+        )
+    except Exception as e:
+        print(f"Erro ao enviar notificação de login: {e}")
 
     return {"accessToken": token_jwt}
 
@@ -582,6 +645,15 @@ def salvar_partida(partida: PartidaParaPersistirModel, authorization: str = Head
         else:
             registro_retornado = registro_atual
 
+    # GATILHO DE NOTIFICAÇÃO
+    notificar_rede_do_jogador(
+        id_jogador=id_jogador,
+        tipo="conquista" if pontuacao > 1000 else "info", # Muda o tipo/ícone baseado no desempenho
+        titulo="Desempenho Brilhante!" if pontuacao > 1000 else "Partida Finalizada",
+        descricao=f"A partida no planeta {partida.planetId} foi concluída com {pontuacao} pontos e {estrelas} estrelas.",
+        link_to="/performance"
+    )
+
     return MelhorPartidaModel(**registro_retornado)
 
 
@@ -635,6 +707,16 @@ def atualizar_progresso(update_data: AtualizarProgressoRequest, authorization: s
             {"_id": id_jogador},
             {"$push": {"planetasDesbloqueados": update_data.valor}}
         )
+
+        #GATILHO DE NOTIFICAÇÃO
+        notificar_rede_do_jogador(
+            id_jogador=id_jogador,
+            tipo="novidade",
+            titulo="Nova Fase Desbloqueada!",
+            descricao="O jogador avançou de nível e desbloqueou um novo planeta para explorar.",
+            link_to="/performance"
+        )
+
     elif update_data.tipo == 'pontuacao':
         existente = db["jogador"].find_one({
             "_id": id_jogador,
@@ -706,8 +788,8 @@ def listar_todos_jogadores(_: dict = Depends(require_especialista)):
     jogadores = list(db["jogador"].find())
     return [{'id': str(j['_id']), 'nome': j.get('apelido', 'Jogador')} for j in jogadores]
 
-# rota em uso --- /performance (ia q disse, eu n vejo funcionar)
-# Adicionamos o "planetId: str = None" ali nos parâmetros!
+# rota em uso --- /performance
+
 @app.get("/api/estatisticas/{id_jogador}")
 def obter_estatisticas(id_jogador: str, planetId: str = None, current_user: dict = Depends(get_current_user)):
 
@@ -836,6 +918,21 @@ def solicitar_vinculo(dados: SolicitarVinculo, current_user: dict = Depends(get_
         "criado_em": datetime.utcnow()
     })
 
+    #GATILHO DE NOTIFICAÇÃO
+    responsavel = colecao_usuarios.find_one({
+        "jogadores_vinculados": id_jogador_obj,
+        "tipo_perfil": "responsavel"
+    })
+    
+    if responsavel:
+        criar_notificacao(
+            id_destino=responsavel["_id"],
+            tipo="solicitacao",
+            titulo="Nova Solicitação de Acompanhamento",
+            descricao=f"O especialista {current_user['nome']} deseja visualizar o desempenho de {jogador['apelido']}.",
+            link_to="/requests"
+        )
+    
     return {"message": "Solicitação enviada com sucesso ao responsável!"}
 
 # rota em uso --- /requests
@@ -895,6 +992,19 @@ def responder_solicitacao(dados: ResponderVinculo, current_user: dict = Depends(
             {"_id": solicitacao["id_especialista"]},
             {"$addToSet": {"jogadores_vinculados": solicitacao["id_jogador"]}}
         )
+
+        #GATILHO DE NOTIFICAÇÃO
+        jogador_alvo = db["jogador"].find_one({"_id": solicitacao["id_jogador"]})
+        nome_jogador = jogador_alvo.get("apelido", "o paciente") if jogador_alvo else "o paciente"
+        
+        criar_notificacao(
+            id_destino=solicitacao["id_especialista"],
+            tipo="solicitacao",
+            titulo="Vínculo Aprovado!",
+            descricao=f"Seu pedido para acompanhar {nome_jogador} foi aprovado. Você já pode visualizar o relatório de desempenho.",
+            link_to="/performance"
+        )
+
         return {"message": "Vínculo aprovado! O especialista agora pode acompanhar o desempenho."}
 
     elif dados.acao == "rejeitar":
@@ -1021,6 +1131,29 @@ def cancelar_vinculo(id_solicitacao: str, current_user: dict = Depends(get_curre
     db["solicitacoes_vinculo"].delete_one({"_id": id_sol_obj})
 
     return {"message": "Vínculo removido com sucesso."}
+
+# rota em uso --- /notificacoes
+@app.get("/api/notificacoes")
+def listar_notificacoes(current_user: dict = Depends(get_current_user)):
+    # Busca notificações direcionadas ao usuário logado, do mais recente para o mais antigo (limite de 50)
+    notificacoes = list(db["notificacao"].find(
+        {"id_usuario_destino": current_user["_id"]}
+    ).sort("criado_em", -1).limit(50))
+    
+    resultado = []
+    for notif in notificacoes:
+        criado_em = notif.get("criado_em")
+        resultado.append({
+            "id": str(notif["_id"]),
+            "type": notif.get("type", "info"),
+            "title": notif.get("title", ""),
+            "description": notif.get("description", ""),
+            "createdAt": criado_em.isoformat() if hasattr(criado_em, 'isoformat') else str(criado_em),
+            "isLink": notif.get("isLink", False),
+            "linkTo": notif.get("linkTo", "")
+        })
+        
+    return resultado
 
 try:
     db["sessao"].create_index("expira_em", expireAfterSeconds=0)

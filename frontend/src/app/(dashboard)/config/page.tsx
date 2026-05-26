@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { 
-  Bell, Save, Monitor, ShieldCheck, Type, Eye, Globe, 
+  Bell, Save, Monitor, ShieldCheck, Type, Eye, 
   HelpCircle, ChevronDown, ChevronUp, MessageSquare, 
-  BookOpen, Compass, Download, Volume2, MousePointerClick, 
-  Activity
+  BookOpen, Compass, Download, Volume2
 } from 'lucide-react';
 
 export default function AjustesPage() {
@@ -20,10 +19,8 @@ export default function AjustesPage() {
     fonteDislexia: false,
     altoContraste: false,
     compartilharDados: false,
-    velocidadeVoz: 'normal',
-    // Corrigido: Agora vem tudo desligado por padrão
-    feedbackSonoro: false, 
-    ignorarToqueDuplo: false, 
+    feedbackSonoro: false,
+    notificacoesAtivas: true, // Padrão ligado
   });
 
   useEffect(() => {
@@ -31,9 +28,8 @@ export default function AjustesPage() {
     const salvaContraste = localStorage.getItem('pref_contraste') === 'true';
     const salvaTamanho = localStorage.getItem('pref_tamanho') || 'normal';
     const salvaTema = localStorage.getItem('pref_tema') || 'sistema';
-    // Lê as novas configs do navegador (se não existir, fica falso)
     const salvaSom = localStorage.getItem('pref_som') === 'true';
-    const salvaToqueDuplo = localStorage.getItem('pref_toqueDuplo') === 'true';
+    const salvaNotificacoes = localStorage.getItem('pref_notif') !== 'false';
 
     setConfigs(prev => ({
       ...prev,
@@ -42,7 +38,7 @@ export default function AjustesPage() {
       tamanhoFonte: salvaTamanho,
       tema: salvaTema,
       feedbackSonoro: salvaSom,
-      ignorarToqueDuplo: salvaToqueDuplo
+      notificacoesAtivas: salvaNotificacoes
     }));
 
     aplicarClasses(salvaDislexia, salvaContraste, salvaTamanho);
@@ -98,15 +94,14 @@ export default function AjustesPage() {
     aplicarTema(novoTema);
   };
 
-  // Funções novas para salvar o Som e Toque Duplo
   const toggleSom = (checked: boolean) => {
     setConfigs({ ...configs, feedbackSonoro: checked });
     localStorage.setItem('pref_som', checked.toString());
   };
 
-  const toggleToqueDuplo = (checked: boolean) => {
-    setConfigs({ ...configs, ignorarToqueDuplo: checked });
-    localStorage.setItem('pref_toqueDuplo', checked.toString());
+  const toggleNotificacoes = (checked: boolean) => {
+    setConfigs({ ...configs, notificacoesAtivas: checked });
+    localStorage.setItem('pref_notif', checked.toString());
   };
 
   const baixarDadosLGPD = () => {
@@ -160,24 +155,20 @@ export default function AjustesPage() {
     },
     {
       pergunta: "Essas alterações afetam o funcionamento do hardware?",
-      resposta: "Apenas as configurações da seção 'Integração Caixa CAA'. O tamanho da fonte e alto contraste afetam apenas o visual deste painel web."
-    },
-    {
-      pergunta: "O que é 'Ignorar toques duplos'?",
-      resposta: "É um filtro para o hardware físico. Evita que comandos sejam lidos duas vezes caso a criança aperte um botão acidentalmente em um curto período de tempo."
+      resposta: "Apenas as configurações da seção 'Áudio e Notificações'. O tamanho da fonte e alto contraste afetam apenas o visual deste painel web."
     }
   ];
 
   return (
     <div className="max-w-6xl mx-auto p-4 dark:bg-slate-900 transition-colors duration-300">
-      <div className="fixed top-0 left-0 md:left-0 md:left-64 right-0 h-1 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+      <div className="fixed top-0 left-0 md:left-64 right-0 h-1 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
 
       <header className="mb-8 pl-2">
         <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">
           Ajustes
         </h2>
         <p className="text-slate-400 text-sm font-medium">
-          Personalize sua experiência na plataforma, acesse ferramentas de acessibilidade e ajuste o dispositivo.
+          Personalize sua experiência na plataforma, acesse ferramentas de acessibilidade e ajuste o sistema.
         </p>
       </header>
 
@@ -266,68 +257,52 @@ export default function AjustesPage() {
           </div>
         </div>
 
-        {/* Coluna 2: Integração Caixa CAA */}
+        {/* Coluna 2: Áudio e Notificações */}
         <div className="space-y-6">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-[24px] border border-slate-100 dark:border-slate-700 shadow-sm transition-colors">
             <div className="flex items-center gap-2 mb-6">
-              <Activity className="w-5 h-5 text-[#4078A4]"/>
-              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Integração Caixa CAA</h3>
+              <Volume2 className="w-5 h-5 text-[#4078A4]"/>
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Áudio e Notificações</h3>
             </div>
 
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 ml-1 flex items-center gap-1">
-                  <Volume2 className="w-3.5 h-3.5"/> VELOCIDADE DA VOZ (TTS)
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-600">
+                <div className="flex items-start gap-3">
+                  <Volume2 className="w-5 h-5 text-slate-400 dark:text-slate-300 mt-0.5"/>
+                  <div>
+                    <p className="text-sm font-bold text-slate-700 dark:text-slate-200">Feedback Sonoro (Beep)</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Sinalizar confirmação ao pressionar botões.</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    className="sr-only peer" 
+                    checked={configs.feedbackSonoro}
+                    onChange={(e) => toggleSom(e.target.checked)} 
+                  />
+                  <div className="w-11 h-6 bg-slate-200 dark:bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#4078A4]"></div>
                 </label>
-                <select 
-                  value={configs.velocidadeVoz}
-                  onChange={(e) => setConfigs({...configs, velocidadeVoz: e.target.value})}
-                  className="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#4078A4] focus:ring-1 focus:ring-[#4078A4] transition-all text-slate-700 dark:text-slate-200 cursor-pointer"
-                >
-                  <option value="lenta">Mais lenta</option>
-                  <option value="normal">Normal (Recomendado)</option>
-                  <option value="rapida">Rápida</option>
-                </select>
               </div>
 
-              <div className="pt-2 space-y-4">
-                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-600">
-                  <div className="flex items-start gap-3">
-                    <Bell className="w-5 h-5 text-slate-400 dark:text-slate-300 mt-0.5"/>
-                    <div>
-                      <p className="text-sm font-bold text-slate-700 dark:text-slate-200">Feedback Sonoro (Beep)</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Sinalizar confirmação ao pressionar botões.</p>
-                    </div>
+              {/* Notificações no Painel */}
+              <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-600">
+                <div className="flex items-start gap-3">
+                  <Bell className="w-5 h-5 text-slate-400 dark:text-slate-300 mt-0.5"/>
+                  <div>
+                    <p className="text-sm font-bold text-slate-700 dark:text-slate-200">Notificações no Painel</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Receber alertas de progresso e vínculos.</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input 
-                      type="checkbox" 
-                      className="sr-only peer" 
-                      checked={configs.feedbackSonoro}
-                      onChange={(e) => toggleSom(e.target.checked)} // Conectado à nova função
-                    />
-                    <div className="w-11 h-6 bg-slate-200 dark:bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#4078A4]"></div>
-                  </label>
                 </div>
-
-                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-600">
-                  <div className="flex items-start gap-3">
-                    <MousePointerClick className="w-5 h-5 text-slate-400 dark:text-slate-300 mt-0.5"/>
-                    <div>
-                      <p className="text-sm font-bold text-slate-700 dark:text-slate-200">Ignorar Toques Duplos</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Delay anti-acidentes de 500ms no botão.</p>
-                    </div>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input 
-                      type="checkbox" 
-                      className="sr-only peer" 
-                      checked={configs.ignorarToqueDuplo}
-                      onChange={(e) => toggleToqueDuplo(e.target.checked)} // Conectado à nova função
-                    />
-                    <div className="w-11 h-6 bg-slate-200 dark:bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#4078A4]"></div>
-                  </label>
-                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    className="sr-only peer" 
+                    checked={configs.notificacoesAtivas}
+                    onChange={(e) => toggleNotificacoes(e.target.checked)}
+                  />
+                  <div className="w-11 h-6 bg-slate-200 dark:bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#4078A4]"></div>
+                </label>
               </div>
             </div>
           </div>
