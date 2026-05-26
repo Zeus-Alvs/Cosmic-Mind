@@ -39,7 +39,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "http://85.31.63.53:7485"
+        "http://85.31.63.53:7485",
+        "https://cosmic-mind-fatec.vercel.app/"
     ],
     allow_credentials=True,
     allow_methods=["*"],
