@@ -11,6 +11,7 @@ interface Planeta {
   nome: string;
   desafio: string;
   cor: string;
+  imagem: string; // Adicionado para suportar as imagens
 }
 
 export default function PerfomanceS() {
@@ -25,16 +26,17 @@ export default function PerfomanceS() {
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
+  // Lista atualizada com os arquivos .png
   const planetasBase: Planeta[] = [
-    { id: '57b6d77617cbdc1499b06cab3d9f650e', nome: 'Netuno', desafio: 'Resgate Crítico', cor: 'bg-[#4A59BD]' },
-    { id: 'urano', nome: 'Urano', desafio: 'Órbita Complexa', cor: 'bg-[#38BDF8]' }, 
-    { id: 'saturno', nome: 'Saturno', desafio: 'Anéis de Poeira', cor: 'bg-[#C5A059]' }, 
-    { id: 'jupiter', nome: 'Júpiter', desafio: '---', cor: 'bg-[#A3A3A3]' },
-    { id: 'marte', nome: 'Marte', desafio: '---', cor: 'bg-[#A3A3A3]' },
-    { id: 'terra', nome: 'Terra', desafio: '---', cor: 'bg-[#A3A3A3]' },
-    { id: 'venus', nome: 'Vênus', desafio: '---', cor: 'bg-[#A3A3A3]' },
-    { id: 'mercurio', nome: 'Mercúrio', desafio: '---', cor: 'bg-[#A3A3A3]' },
-    { id: 'sol', nome: 'Pentas', desafio: '---', cor: 'bg-[#A3A3A3]' },
+    { id: '57b6d77617cbdc1499b06cab3d9f650e', nome: 'Netuno', desafio: 'Resgate Crítico', cor: 'bg-[#4A59BD]', imagem: 'netuno.png' },
+    { id: 'urano', nome: 'Urano', desafio: 'Órbita Complexa', cor: 'bg-[#38BDF8]', imagem: 'urano.png' },
+    { id: 'saturno', nome: 'Saturno', desafio: 'Anéis de Poeira', cor: 'bg-[#C5A059]', imagem: 'saturno.png' },
+    { id: 'jupiter', nome: 'Júpiter', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'jupiter.png' },
+    { id: 'marte', nome: 'Marte', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'marte.png' },
+    { id: 'terra', nome: 'Terra', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'terra.png' },
+    { id: 'venus', nome: 'Vênus', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'venus.png' },
+    { id: 'mercurio', nome: 'Mercúrio', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'mercurio.png' },
+    { id: 'sol', nome: 'Pentas', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'pentas.png' },
   ];
 
   useEffect(() => {
@@ -248,15 +250,30 @@ export default function PerfomanceS() {
                     key={p.id}
                     disabled={isBloqueado}
                     onClick={() => setPlanetaAtivo(p)}
-                    className={`flex flex-col items-center gap-1.5 transition-all ${isBloqueado ? 'opacity-30 grayscale cursor-not-allowed' : 'hover:scale-105 cursor-pointer'}`}
+                    className={`flex flex-col items-center gap-1.5 transition-all ${isBloqueado ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 cursor-pointer'}`}
                   >
-                    <div className={`w-10 h-10 rounded-full ${p.cor} flex items-center justify-center relative shadow-inner`}>
-                      {isBloqueado && <Lock className="w-3.5 h-3.5 text-white" />}
+                    {/* Container da imagem com overlay integrado */}
+                    <div className="relative w-10 h-10">
+                      <div className="w-full h-full rounded-full overflow-hidden relative shadow-inner">
+                        <img 
+                          src={`/game/${p.imagem}`} 
+                          alt={p.nome} 
+                          className="w-full h-full object-cover"
+                        />
+                        {isBloqueado && (
+                          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                            <Lock className="w-3.5 h-3.5 text-white/90" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Borda de seleção */}
                       {planetaAtivo?.id === p.id && !isBloqueado && (
-                        <div className="absolute -inset-1.5 border-2 border-[#4A59BD] rounded-full opacity-30" />
+                        <div className="absolute -inset-1.5 border-2 border-[#4A59BD] rounded-full opacity-40 pointer-events-none" />
                       )}
                     </div>
-                    <span className="text-[9px] font-medium text-slate-400 truncate w-full text-center">{p.nome}</span>
+
+                    <span className="text-[9px] font-medium text-slate-400 truncate w-full text-center mt-1">{p.nome}</span>
                   </button>
                 );
               })}
@@ -268,13 +285,21 @@ export default function PerfomanceS() {
         <div className="w-full md:min-w-[480px] bg-white border border-slate-100 p-6 md:p-8 rounded-[2.5rem] shadow-sm self-stretch flex flex-col">
           {isLoading ? (
              <div className="flex-1 flex items-center justify-center text-slate-300 animate-pulse">
-                Calculando métricas cognitivas...
+               Calculando métricas cognitivas...
              </div>
           ) : estatisticasPlaneta && planetaAtivo ? (
             <div className="flex flex-col animate-in fade-in duration-500 h-full">
               
               <div className="flex items-center gap-5 mb-6 pb-4 border-b border-slate-50">
-                <div className={`w-12 h-12 rounded-2xl ${planetaAtivo.cor} shadow-sm flex items-center justify-center`} />
+                {/* Avatar do planeta substituindo a cor chapada */}
+                <div className="w-12 h-12 rounded-2xl shadow-sm overflow-hidden flex items-center justify-center bg-slate-100 shrink-0">
+                  <img 
+                    src={`/game/${planetaAtivo.imagem}`} 
+                    alt={planetaAtivo.nome} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
                 <div>
                   <h2 className="text-2xl font-semibold text-slate-700 leading-none">Análise - {planetaAtivo.nome}</h2>
                   <div className="flex gap-2 mt-2">

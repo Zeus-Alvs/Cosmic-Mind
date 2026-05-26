@@ -530,24 +530,18 @@ export default function Home() {
               o progresso cognitivo em tempo real.
             </p>
 
-            {/* Versão Mobile: Botão de Download */}
             <div className="block md:hidden">
               <a 
-                href="/download-link" 
+                href="https://dl.dropbox.com/scl/fi/1laoedeh2iyx7b6v2o9qo/CosmicMind.apk?rlkey=qhdx8isyjxcnklb1wawvknmuq&st=9cv5u5li&dl=0" 
                 className="btn-register text-center no-underline inline-block scale-110"
               >
                 Fazer download 
               </a>
             </div>
 
-            {/* Versão Web: Espaço para QR Code */}
             <div className="hidden md:flex flex-col items-center gap-4">
               <div className="w-48 h-48 bg-white p-2 rounded-xl flex items-center justify-center overflow-hidden relative">
-                {/* Imagem do QR Code - Você pode substituir o src depois */}
-                <div className="text-black/50 text-sm font-bold flex flex-col items-center justify-center text-center">
-                  <span className="text-3xl mb-2">📱</span>
-                  Espaço para<br/>QR Code
-                </div>
+                <img src="/game/qrcode.png" alt="QR Code para baixar o jogo" className="w-full h-full object-contain"/>
               </div>
               <p className="text-white/50 text-sm">Escaneie o QR Code com seu celular para baixar o jogo</p>
             </div>
