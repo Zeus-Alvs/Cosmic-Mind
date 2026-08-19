@@ -1,3 +1,6 @@
+---
+etiqueta: "Next.js • FastAPI"
+---
 SaaS de monitoramento cognitivo para crianças com TDAH. A plataforma recebe métricas do jogo e fornece análises médicas detalhadas.
 
 **Engenharia & Arquitetura:**
