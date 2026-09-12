@@ -63,10 +63,17 @@ export default function AjustesPage() {
   const aplicarTema = (novoTema: string) => {
     const html = document.documentElement;
     if (novoTema === 'escuro') {
-      html.classList.add('tema-escuro');
-      html.classList.remove('dark');
+      html.classList.add('dark', 'tema-escuro');
+    } else if (novoTema === 'claro') {
+      html.classList.remove('dark', 'tema-escuro');
     } else {
+      // sistema
       html.classList.remove('tema-escuro');
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        html.classList.add('dark');
+      } else {
+        html.classList.remove('dark');
+      }
     }
   };
 

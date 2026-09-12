@@ -140,13 +140,13 @@ export default function NotificationsR() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-0.5 gap-1 sm:gap-0">
-                      <h4 className="font-bold text-slate-700 text-sm truncate">{notif.title}</h4>
+                      <h4 className="font-bold text-slate-700 text-sm truncate">{notif.title.replace('57b6d77617cbdc1499b06cab3d9f650e', 'Terra')}</h4>
                       <span className="text-[9px] font-black text-[#AC57EB] uppercase shrink-0">
                         {new Date(notif.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 line-clamp-2 sm:truncate pr-0 sm:pr-4">
-                      {notif.description}
+                      {notif.description.replace('57b6d77617cbdc1499b06cab3d9f650e', 'Terra')}
                     </p>
                   </div>
                 </div>

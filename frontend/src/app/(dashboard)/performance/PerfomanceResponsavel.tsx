@@ -5,7 +5,7 @@ import { Lock, ChevronDown } from 'lucide-react';
 import { getApiUrl } from '@/utils/api';
 
 interface Planeta {
-  id: string; 
+  id: string;
   nome: string;
   desafio: string;
   cor: string;
@@ -15,24 +15,24 @@ interface Planeta {
 export default function PerfomanceR() {
   const [jogadores, setJogadores] = useState<any[]>([]);
   const [jogadorAtivo, setJogadorAtivo] = useState<any>(null);
-  
+
   const [estatisticasGlobais, setEstatisticasGlobais] = useState<any>(null);
   const [estatisticasPlaneta, setEstatisticasPlaneta] = useState<any>(null);
-  
+
   const [planetaAtivo, setPlanetaAtivo] = useState<Planeta | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   // 👇 Adicionei os nomes dos arquivos png na propriedade "imagem" 👇
   const planetasBase: Planeta[] = [
-    { id: '57b6d77617cbdc1499b06cab3d9f650e', nome: 'Netuno', desafio: 'Resgate Crítico', cor: 'bg-[#4A59BD]', imagem: 'netuno.png' },
-    { id: 'urano', nome: 'Urano', desafio: 'Órbita Complexa', cor: 'bg-[#38BDF8]', imagem: 'urano.png' },
-    { id: 'saturno', nome: 'Saturno', desafio: 'Anéis de Poeira', cor: 'bg-[#C5A059]', imagem: 'saturno.png' },
-    { id: 'jupiter', nome: 'Júpiter', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'jupiter.png' },
-    { id: 'marte', nome: 'Marte', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'marte.png' },
-    { id: 'terra', nome: 'Terra', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'terra.png' },
-    { id: 'venus', nome: 'Vênus', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'venus.png' },
     { id: 'mercurio', nome: 'Mercúrio', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'mercurio.png' },
+    { id: 'venus', nome: 'Vênus', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'venus.png' },
+    { id: '57b6d77617cbdc1499b06cab3d9f650e', nome: 'Terra', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'terra.png' },
+    { id: 'marte', nome: 'Marte', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'marte.png' },
+    { id: 'jupiter', nome: 'Júpiter', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'jupiter.png' },
+    { id: 'saturno', nome: 'Saturno', desafio: 'Anéis de Poeira', cor: 'bg-[#C5A059]', imagem: 'saturno.png' },
+    { id: 'urano', nome: 'Urano', desafio: 'Órbita Complexa', cor: 'bg-[#38BDF8]', imagem: 'urano.png' },
+    { id: 'netuno', nome: 'Netuno', desafio: 'Resgate Crítico', cor: 'bg-[#4A59BD]', imagem: 'netuno.png' },
     { id: 'sol', nome: 'Pentas', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'pentas.png' }, // Ajuste se o nome do arquivo for sol.png
   ];
 
@@ -51,7 +51,7 @@ export default function PerfomanceR() {
         if (res.ok) {
           const data = await res.json();
           setJogadores(data);
-          if (data.length > 0) setJogadorAtivo(data[0]); 
+          if (data.length > 0) setJogadorAtivo(data[0]);
         }
       } catch (error) {
         console.error("Erro ao buscar jogadores", error);
@@ -76,7 +76,9 @@ export default function PerfomanceR() {
         if (res.ok) {
           const data = await res.json();
           setEstatisticasGlobais(data);
-          setPlanetaAtivo(planetasBase[0]); // Começa com o Netuno selecionado
+          const liberados = data?.planetas_liberados || [];
+          const planetaInicial = planetasBase.find(p => liberados.includes(p.id)) || planetasBase[0];
+          setPlanetaAtivo(planetaInicial);
         }
       } catch (error) {
         console.error("Erro ao buscar estatísticas globais", error);
@@ -136,7 +138,7 @@ export default function PerfomanceR() {
       </div>
 
       <div className="flex flex-col md:flex-row gap-8 items-center md:items-start justify-center">
-        
+
         {/* COLUNA ESQUERDA: JOGADOR E PLANETAS */}
         <div className="w-full max-w-[260px] md:w-[260px] flex flex-col gap-4 shrink-0">
           <div className="relative">
@@ -145,7 +147,7 @@ export default function PerfomanceR() {
               className="w-full bg-white border border-slate-100 p-2.5 rounded-2xl shadow-sm flex items-center gap-3 hover:border-[#4A59BD]/40 transition-all duration-300 group cursor-pointer"
             >
               <div className="w-11 h-11 rounded-xl bg-slate-100 overflow-hidden flex items-center justify-center shrink-0 shadow-md border border-slate-200 group-hover:scale-105 transition-transform">
-                 <img src={`/jogadores/foto${estatisticasGlobais?.foto_perfil || 1}.png`} alt="Avatar" className="w-full h-full object-cover" />
+                <img src={`/jogadores/foto${estatisticasGlobais?.foto_perfil || 1}.png`} alt="Avatar" className="w-full h-full object-cover" />
               </div>
 
               <div className="flex-1 text-left min-w-0">
@@ -184,8 +186,9 @@ export default function PerfomanceR() {
           <div className="bg-white border border-slate-100 p-5 rounded-[2.5rem] shadow-sm">
             <h2 className="text-center font-semibold text-[#9D82CE] text-[10px] tracking-widest mb-4 opacity-80 uppercase">Mapa de Fases</h2>
             <div className="grid grid-cols-3 gap-4">
-              {planetasBase.map((p, index) => {
-                const isBloqueado = index > 0 && !estatisticasGlobais?.planetas_liberados?.includes(p.id);
+              {planetasBase.map((p) => {
+                // Se o backend enviar uma lista vazia, todos ficam bloqueados. Só libera quem tá na lista.
+                const isBloqueado = !estatisticasGlobais?.planetas_liberados?.includes(p.id);
 
                 return (
                   <button
@@ -197,9 +200,9 @@ export default function PerfomanceR() {
                     {/* Alterado aqui: Container da imagem com overlay */}
                     <div className="relative w-10 h-10">
                       <div className="w-full h-full rounded-full overflow-hidden relative shadow-inner">
-                        <img 
-                          src={`/game/${p.imagem}`} 
-                          alt={p.nome} 
+                        <img
+                          src={`/game/${p.imagem}`}
+                          alt={p.nome}
                           className="w-full h-full object-cover"
                         />
                         {/* Overlay escuro se estiver bloqueado */}
@@ -227,18 +230,18 @@ export default function PerfomanceR() {
         {/* COLUNA DIREITA: ESTATÍSTICAS REAIS DO BACKEND */}
         <div className="w-full md:min-w-[480px] bg-white border border-slate-100 p-6 md:p-8 rounded-[2.5rem] shadow-sm self-stretch flex flex-col">
           {isLoading ? (
-             <div className="flex-1 flex items-center justify-center text-slate-300 animate-pulse">
-               Calculando métricas cognitivas...
-             </div>
+            <div className="flex-1 flex items-center justify-center text-slate-300 animate-pulse">
+              Calculando métricas cognitivas...
+            </div>
           ) : estatisticasPlaneta && planetaAtivo ? (
             <div className="flex flex-col animate-in fade-in duration-500 h-full">
               <div className="flex items-center gap-5 mb-6 pb-4 border-b border-slate-50">
-                
+
                 {/* Alterado aqui: Avatar do planeta no cabeçalho das stats */}
                 <div className="w-12 h-12 rounded-2xl shadow-sm overflow-hidden flex items-center justify-center bg-slate-100">
-                  <img 
-                    src={`/game/${planetaAtivo.imagem}`} 
-                    alt={planetaAtivo.nome} 
+                  <img
+                    src={`/game/${planetaAtivo.imagem}`}
+                    alt={planetaAtivo.nome}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -258,9 +261,9 @@ export default function PerfomanceR() {
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 sm:gap-x-10 gap-y-6 my-auto">
                 {Object.entries(estatisticasPlaneta.habilidades).map(([key, value]) => {
-                  const valorReal = Number(value) || 0; 
+                  const valorReal = Number(value) || 0;
                   const offset = circumference - (valorReal / 100) * circumference;
-                  
+
                   return (
                     <div key={key} className="flex flex-col items-center group">
                       <div className="relative w-20 h-20 flex items-center justify-center">
@@ -270,7 +273,7 @@ export default function PerfomanceR() {
                             cx="40"
                             cy="40"
                             r={radius}
-                            stroke={valorReal > 0 ? "#4A59BD" : "#E2E8F0"} 
+                            stroke={valorReal > 0 ? "#4A59BD" : "#E2E8F0"}
                             strokeWidth="5" fill="transparent"
                             strokeDasharray={circumference}
                             strokeDashoffset={offset}
