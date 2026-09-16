@@ -29,17 +29,35 @@
     const [autorizado, setAutorizado] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
 
-    // --- EFEITO 1: AUTENTICAÇÃO ---
+    // --- EFEITO 1: AUTENTICAÇÃO E SEGURANÇA (INTERCEPTOR) ---
     useEffect(() => {
       const dadosSalvos = localStorage.getItem("user_data");
 
       if (!dadosSalvos) {
-        router.push("../");
+        router.push("/");
         return;
       }
 
       setUsuario(JSON.parse(dadosSalvos));
       setAutorizado(true);
+
+      // Intercepta todas as chamadas 'fetch' para verificar erro 401 globalmente
+      const originalFetch = window.fetch;
+      window.fetch = async (...args) => {
+        const response = await originalFetch(...args);
+        if (response.status === 401) {
+          // Token expirou ou é inválido
+          localStorage.removeItem("user_data");
+          localStorage.removeItem("token_acesso");
+          router.push("/"); // Redireciona para a tela de login
+        }
+        return response;
+      };
+
+      // Limpa o interceptor caso o componente seja desmontado
+      return () => {
+        window.fetch = originalFetch;
+      };
     }, [router]);
 
     // --- EFEITO 2: FEEDBACK SONORO (Clique UI) ---

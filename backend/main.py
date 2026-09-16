@@ -53,6 +53,26 @@ db = client["cosmic_mind_db"]
 colecao_usuarios = db["usuario"]
 colecao_partidas = db["partidas"]
 
+def get_current_user(authorization: str = Header(None)):
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Token ausente.")
+    token = authorization.replace("Bearer ", "")
+    sessao = db["sessao"].find_one({"token_acesso": token})
+    if not sessao:
+        raise HTTPException(status_code=401, detail="Sessão inválida ou expirada.")
+    exp = sessao.get("expira_em")
+    if exp and datetime.utcnow() > exp:
+        raise HTTPException(status_code=401, detail="Sessão expirada.")
+    usuario = colecao_usuarios.find_one({"_id": ObjectId(sessao.get("id_usuario"))})
+    if not usuario:
+        raise HTTPException(status_code=401, detail="Usuário não encontrado.")
+    return usuario
+
+def require_especialista(usuario = Depends(get_current_user)):
+    if usuario.get("tipo_perfil") != "especialista":
+        raise HTTPException(status_code=403, detail="Acesso restrito a especialistas.")
+    return usuario
+
 
 # rota não utilizada --- Nenhuma página do frontend
 @app.get("/")
@@ -141,7 +161,9 @@ def login_usuario(credenciais: UsuarioLogin):
 
 # rota em uso --- /account
 @app.put("/api/conta/atualizar/{email_usuario}")
-def atualizar_perfil(email_usuario: str, dados: UsuarioUpdate):
+def atualizar_perfil(email_usuario: str, dados: UsuarioUpdate, current_user: dict = Depends(get_current_user)):
+    if current_user["email"] != email_usuario:
+        raise HTTPException(status_code=403, detail="Você não tem permissão para alterar esta conta.")
     usuario = colecao_usuarios.find_one({"email": email_usuario})
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
@@ -181,7 +203,9 @@ def atualizar_perfil(email_usuario: str, dados: UsuarioUpdate):
 
 # rota em uso --- /account
 @app.put("/api/conta/senha/{email_usuario}")
-def trocar_senha(email_usuario: str, dados: TrocarSenha):
+def trocar_senha(email_usuario: str, dados: TrocarSenha, current_user: dict = Depends(get_current_user)):
+    if current_user["email"] != email_usuario:
+        raise HTTPException(status_code=403, detail="Você não tem permissão para alterar a senha desta conta.")
     usuario = colecao_usuarios.find_one({"email": email_usuario})
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
@@ -346,7 +370,9 @@ def cancelar_troca_email(dados: EsqueciSenha):
 
 # rota em uso --- /account
 @app.post("/api/conta/crp")
-def definir_crp(dados: DefinirCRP):
+def definir_crp(dados: DefinirCRP, current_user: dict = Depends(get_current_user)):
+    if current_user["email"] != dados.email:
+        raise HTTPException(status_code=403, detail="Você não tem permissão para alterar o CRP desta conta.")
     usuario = colecao_usuarios.find_one({"email": dados.email})
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
@@ -359,7 +385,9 @@ def definir_crp(dados: DefinirCRP):
 
 # rota em uso --- /account
 @app.delete("/api/conta/deletar/{email_usuario}")
-def deletar_conta(email_usuario: str, payload: DeletarContaRequest):
+def deletar_conta(email_usuario: str, payload: DeletarContaRequest, current_user: dict = Depends(get_current_user)):
+    if current_user["email"] != email_usuario:
+        raise HTTPException(status_code=403, detail="Você não tem permissão para deletar esta conta.")
     usuario = colecao_usuarios.find_one({"email": email_usuario})
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
@@ -387,7 +415,9 @@ def gerar_codigo_unico():
 
 # rota em uso --- /manager (Responsável)
 @app.post("/api/jogadores/{id_usuario}")
-def criar_jogador(id_usuario: str, dados: JogadorCadastro):
+def criar_jogador(id_usuario: str, dados: JogadorCadastro, current_user: dict = Depends(get_current_user)):
+    if str(current_user["_id"]) != id_usuario:
+        raise HTTPException(status_code=403, detail="Você não tem permissão para adicionar jogadores a este usuário.")
 
     codigo_amigo = gerar_codigo_unico()
 
@@ -424,7 +454,9 @@ def criar_jogador(id_usuario: str, dados: JogadorCadastro):
 
 # rota em uso --- /edit, /manager, /performance
 @app.get("/api/jogadores/{id_usuario}")
-def listar_jogadores(id_usuario: str):
+def listar_jogadores(id_usuario: str, current_user: dict = Depends(get_current_user)):
+    if str(current_user["_id"]) != id_usuario:
+        raise HTTPException(status_code=403, detail="Você não tem permissão para listar jogadores deste usuário.")
     usuario = colecao_usuarios.find_one({"_id": ObjectId(id_usuario)})
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
@@ -450,7 +482,9 @@ def listar_jogadores(id_usuario: str):
 
 # rota em uso --- /edit
 @app.post("/api/jogadores/{id_jogador}/desconectar")
-def desconectar_jogador(id_jogador: str):
+def desconectar_jogador(id_jogador: str, current_user: dict = Depends(get_current_user)):
+    if ObjectId(id_jogador) not in current_user.get("jogadores_vinculados", []):
+        raise HTTPException(status_code=403, detail="Você não tem permissão sobre este jogador.")
     sessao = db["sessao"].find_one({"id_jogador": id_jogador})
     if not sessao:
         raise HTTPException(status_code=404, detail="Sessão não encontrada.")
@@ -480,7 +514,9 @@ def desconectar_jogador(id_jogador: str):
 
 # rota em uso --- /edit
 @app.put("/api/jogadores/{id_jogador}")
-def atualizar_jogador(id_jogador: str, dados: JogadorUpdate):
+def atualizar_jogador(id_jogador: str, dados: JogadorUpdate, current_user: dict = Depends(get_current_user)):
+    if ObjectId(id_jogador) not in current_user.get("jogadores_vinculados", []):
+        raise HTTPException(status_code=403, detail="Você não tem permissão para alterar este jogador.")
     campos_para_atualizar = {k: v for k, v in dados.dict(exclude_none=True).items()}
     if not campos_para_atualizar:
         return {"message": "Nenhum dado para atualizar."}
@@ -495,7 +531,9 @@ def atualizar_jogador(id_jogador: str, dados: JogadorUpdate):
 
 # rota em uso --- /edit
 @app.delete("/api/jogadores/{id_usuario}/{id_jogador}")
-def excluir_jogador(id_usuario: str, id_jogador: str, payload: ExcluirJogador):
+def excluir_jogador(id_usuario: str, id_jogador: str, payload: ExcluirJogador, current_user: dict = Depends(get_current_user)):
+    if str(current_user["_id"]) != id_usuario:
+        raise HTTPException(status_code=403, detail="Você não tem permissão para deletar jogadores deste usuário.")
     usuario = colecao_usuarios.find_one({"_id": ObjectId(id_usuario)})
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
@@ -519,7 +557,9 @@ def excluir_jogador(id_usuario: str, id_jogador: str, payload: ExcluirJogador):
 
 # rota em uso --- /manager (Responsável)
 @app.post("/api/jogo/gerar-pin/{id_jogador}")
-def gerar_pin_jogo(id_jogador: str):
+def gerar_pin_jogo(id_jogador: str, current_user: dict = Depends(get_current_user)):
+    if ObjectId(id_jogador) not in current_user.get("jogadores_vinculados", []):
+        raise HTTPException(status_code=403, detail="Você não tem permissão para gerar PIN para este jogador.")
     pin_gerado = str(random.randint(0, 999999)).zfill(6)
     tempo_expiracao = datetime.now(timezone.utc) + timedelta(minutes=10)
 
@@ -762,26 +802,6 @@ def atualizar_progresso(update_data: AtualizarProgressoRequest, authorization: s
                 {"$set": prefs}
             )
     return {"message": "Progresso atualizado com sucesso!"}
-
-def get_current_user(authorization: str = Header(None)):
-    if not authorization:
-        raise HTTPException(status_code=401, detail="Token ausente.")
-    token = authorization.replace("Bearer ", "")
-    sessao = db["sessao"].find_one({"token_acesso": token})
-    if not sessao:
-        raise HTTPException(status_code=401, detail="Sessão inválida ou expirada.")
-    exp = sessao.get("expira_em")
-    if exp and datetime.utcnow() > exp:
-        raise HTTPException(status_code=401, detail="Sessão expirada.")
-    usuario = colecao_usuarios.find_one({"_id": ObjectId(sessao.get("id_usuario"))})
-    if not usuario:
-        raise HTTPException(status_code=401, detail="Usuário não encontrado.")
-    return usuario
-
-def require_especialista(usuario = Depends(get_current_user)):
-    if usuario.get("tipo_perfil") != "especialista":
-        raise HTTPException(status_code=403, detail="Acesso restrito a especialistas.")
-    return usuario
 
 # rota não utilizada --- Nenhuma
 @app.get("/api/jogadores")
