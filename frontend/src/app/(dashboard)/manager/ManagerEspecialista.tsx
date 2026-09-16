@@ -16,6 +16,18 @@ interface PlayerPerformanceDTO {
   codigo_vinculo?: string;
 }
 
+const planetMap: Record<string, string> = {
+  'mercurio': 'Mercúrio',
+  'venus': 'Vênus',
+  '57b6d77617cbdc1499b06cab3d9f650e': 'Terra',
+  'marte': 'Marte',
+  'jupiter': 'Júpiter',
+  'saturno': 'Saturno',
+  'urano': 'Urano',
+  'netuno': 'Netuno',
+  'sol': 'Pentas'
+};
+
 export default function ManagerS() {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -56,6 +68,12 @@ export default function ManagerS() {
                 const qtdPlanetas = stats.planetas_liberados?.length || 0;
                 let progressoCalc = Math.round((qtdPlanetas / 9) * 100);
                 if (progressoCalc > 100) progressoCalc = 100;
+                
+                let nomeFaseAtual = 'Iniciante';
+                if (qtdPlanetas > 0) {
+                  const lastId = stats.planetas_liberados[qtdPlanetas - 1];
+                  nomeFaseAtual = planetMap[lastId] || `Planeta ${qtdPlanetas}`;
+                }
 
                 return {
                   id: paciente.id || paciente._id,
@@ -64,7 +82,7 @@ export default function ManagerS() {
                   codigo_vinculo: paciente.codigo_vinculo || stats.codigo_vinculo,
                   progresso: progressoCalc,
                   tempoUso: `${stats.total_partidas} partidas`,
-                  nivelFase: qtdPlanetas > 0 ? `Planeta ${qtdPlanetas}` : 'Iniciante',
+                  nivelFase: nomeFaseAtual,
                   pontuacao: stats.pontuacao_maxima || 0
                 };
               }

@@ -28,14 +28,14 @@ export default function PerfomanceS() {
 
   // Lista atualizada com os arquivos .png
   const planetasBase: Planeta[] = [
-    { id: '57b6d77617cbdc1499b06cab3d9f650e', nome: 'Netuno', desafio: 'Resgate Crítico', cor: 'bg-[#4A59BD]', imagem: 'netuno.png' },
-    { id: 'urano', nome: 'Urano', desafio: 'Órbita Complexa', cor: 'bg-[#38BDF8]', imagem: 'urano.png' },
-    { id: 'saturno', nome: 'Saturno', desafio: 'Anéis de Poeira', cor: 'bg-[#C5A059]', imagem: 'saturno.png' },
-    { id: 'jupiter', nome: 'Júpiter', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'jupiter.png' },
-    { id: 'marte', nome: 'Marte', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'marte.png' },
-    { id: 'terra', nome: 'Terra', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'terra.png' },
-    { id: 'venus', nome: 'Vênus', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'venus.png' },
     { id: 'mercurio', nome: 'Mercúrio', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'mercurio.png' },
+    { id: 'venus', nome: 'Vênus', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'venus.png' },
+    { id: '57b6d77617cbdc1499b06cab3d9f650e', nome: 'Terra', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'terra.png' },
+    { id: 'marte', nome: 'Marte', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'marte.png' },
+    { id: 'jupiter', nome: 'Júpiter', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'jupiter.png' },
+    { id: 'saturno', nome: 'Saturno', desafio: 'Anéis de Poeira', cor: 'bg-[#C5A059]', imagem: 'saturno.png' },
+    { id: 'urano', nome: 'Urano', desafio: 'Órbita Complexa', cor: 'bg-[#38BDF8]', imagem: 'urano.png' },
+    { id: 'netuno', nome: 'Netuno', desafio: 'Resgate Crítico', cor: 'bg-[#4A59BD]', imagem: 'netuno.png' },
     { id: 'sol', nome: 'Pentas', desafio: '---', cor: 'bg-[#A3A3A3]', imagem: 'pentas.png' },
   ];
 
@@ -76,7 +76,9 @@ export default function PerfomanceS() {
         if (res.ok) {
           const data = await res.json();
           setEstatisticasGlobais(data);
-          setPlanetaAtivo(planetasBase[0]); 
+          const liberados = data?.planetas_liberados || [];
+          const planetaInicial = planetasBase.find(p => liberados.includes(p.id)) || planetasBase[0];
+          setPlanetaAtivo(planetaInicial);
         }
       } catch (error) {
         console.error("Erro", error);
@@ -242,8 +244,9 @@ export default function PerfomanceS() {
           <div className="bg-white border border-slate-100 p-5 rounded-[2.5rem] shadow-sm">
             <h2 className="text-center font-semibold text-[#9D82CE] text-[10px] tracking-widest mb-4 opacity-80 uppercase">Mapa de Fases</h2>
             <div className="grid grid-cols-3 gap-4">
-              {planetasBase.map((p, index) => {
-                const isBloqueado = index > 0 && !estatisticasGlobais?.planetas_liberados?.includes(p.id);
+              {planetasBase.map((p) => {
+                // Se o backend enviar uma lista vazia, todos ficam bloqueados. Só libera quem tá na lista.
+                const isBloqueado = !estatisticasGlobais?.planetas_liberados?.includes(p.id);
 
                 return (
                   <button
