@@ -18,7 +18,9 @@ import random
 import string
 from app.auth.router import router as auth_router
 from app.usuarios.router import router as usuarios_router
+from app.partidas.router import router as partidas_router
 from app.jogadores.router import router as jogadores_router
+from app.sessao.router import router as sessao_router
 
 
 load_dotenv()
@@ -1126,7 +1128,9 @@ def listar_notificacoes(current_user: dict = Depends(get_current_user)):
 app.include_router(auth_router, prefix="/api")
 app.include_router(auth_router)
 app.include_router(usuarios_router)
+app.include_router(partidas_router)
 app.include_router(jogadores_router)
+app.include_router(sessao_router)
 
 try:
     db["sessao"].create_index("expira_em", expireAfterSeconds=0)
