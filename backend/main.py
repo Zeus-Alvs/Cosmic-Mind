@@ -16,6 +16,7 @@ import jwt
 from match_performance_calculator.MatchPerformanceCalculator import MatchPerformanceCalculator
 import random
 import string
+from app.auth.router import router as auth_router
 
 
 load_dotenv()
@@ -99,65 +100,6 @@ def notificar_rede_do_jogador(id_jogador: ObjectId, tipo: str, titulo: str, desc
         criar_notificacao(usuario["_id"], tipo, titulo, descricao, link_to)
 
 
-# rota em uso --- /register
-@app.post("/api/cadastrar", response_model=UsuarioRetorno, status_code=status.HTTP_201_CREATED)
-def cadastrar_usuario(novo_usuario: UsuarioCadastro):
-    usuario_existente = colecao_usuarios.find_one({"email": novo_usuario.email})
-    if usuario_existente:
-        raise HTTPException(status_code=400, detail="Este e-mail já está cadastrado.")
-
-    usuario_dict = novo_usuario.model_dump()
-    usuario_dict["senha"] = pwd_context.hash(novo_usuario.senha)
-    usuario_dict["criado_em"] = datetime.now(timezone.utc)
-    usuario_dict["avatar"] = 1
-    
-    if usuario_dict.get('tipo_perfil') == 'especialista':
-        crm_val = usuario_dict.get('crm')
-        if not crm_val:
-            raise HTTPException(status_code=400, detail="O campo CRM é obrigatório para especialistas.")
-        usuario_dict['crp_especialista'] = crm_val
-        usuario_dict['clinica'] = usuario_dict.get('clinica')
-        usuario_dict['ocupacao'] = usuario_dict.get('ocupacao')
-        usuario_dict.pop('crm', None)     
-    
-    resultado = colecao_usuarios.insert_one(usuario_dict)
-
-    return UsuarioRetorno(
-        id = str(resultado.inserted_id),
-        nome = usuario_dict["nome"],
-        email = usuario_dict["email"],
-        tipo_perfil = usuario_dict["tipo_perfil"],
-        avatar = usuario_dict.get("avatar", 1),
-        crm = usuario_dict.get("crp_especialista") or usuario_dict.get('crm'),
-        clinica = usuario_dict.get("clinica"),
-        ocupacao = usuario_dict.get("ocupacao")
-    )
-
-# rota em uso --- /login
-@app.post("/api/login", response_model=UsuarioRetorno, status_code=status.HTTP_200_OK)
-def login_usuario(credenciais: UsuarioLogin):
-    usuario_banco = colecao_usuarios.find_one({"email": credenciais.email})
-    if not usuario_banco or not pwd_context.verify(credenciais.senha, usuario_banco["senha"]):
-        raise HTTPException(status_code=401, detail="E-mail ou senha incorretos.")
-
-    token_jwt = gerar_jwt(str(usuario_banco["_id"]))
-    expira = datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS)
-
-    db["sessao"].insert_one({
-        "token_acesso": token_jwt,
-        "id_usuario": str(usuario_banco["_id"]),
-        "expira_em": expira
-    })
-
-    return {
-        "id": str(usuario_banco["_id"]),
-        "nome": usuario_banco["nome"],
-        "email": usuario_banco["email"],
-        "tipo_perfil": usuario_banco["tipo_perfil"],
-        "email_pendente": usuario_banco.get("email_pendente"),
-        "avatar": usuario_banco.get("avatar", 1),
-        "token_acesso": token_jwt
-    }
 
 # rota em uso --- /account
 @app.put("/api/conta/atualizar/{email_usuario}")
@@ -1175,6 +1117,11 @@ def listar_notificacoes(current_user: dict = Depends(get_current_user)):
         })
         
     return resultado
+
+
+
+# rota em uso --- /login
+app.include_router(auth_router, prefix="/api")
 
 try:
     db["sessao"].create_index("expira_em", expireAfterSeconds=0)
