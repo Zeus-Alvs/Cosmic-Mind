@@ -1,55 +1,17 @@
-import importlib
-import sys
-from pathlib import Path
-from types import SimpleNamespace
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
+import pytest
 
-BACKEND_DIR = Path(__file__).resolve().parents[1]
-if str(BACKEND_DIR) not in sys.path:
-    sys.path.insert(0, str(BACKEND_DIR))
-
-class FakeUsuariosCollection:
-    def __init__(self):
-        self.inserted_doc = None
-        self.user_to_find = None
-        self.last_find_query = None
-        self.last_update_query = None
-        self.last_update_payload = None
-
-    def find_one(self, query):
-        self.last_find_query = query
-        return self.user_to_find
-
-    def insert_one(self, document):
-        self.inserted_doc = document.copy()
-        return SimpleNamespace(inserted_id="usuario-teste")
-
-    def update_one(self, query, payload):
-        self.last_update_query = query
-        self.last_update_payload = payload
-        return SimpleNamespace(modified_count=1)
-
-
-class FakeDatabase:
-    def __getitem__(self, name):
-        return FakeUsuariosCollection()
-
-
-class FakeMongoClient:
-    def __getitem__(self, name):
-        return FakeDatabase()
-
-
-with patch("pymongo.MongoClient", return_value=FakeMongoClient()):
-    main = importlib.import_module("main")
+from app.auth import service as auth_service
+from app.core.dependencies import get_current_user
+from models import DefinirCRP, UsuarioCadastro
 
 
 class CadastroEspecialistaTestCase(unittest.TestCase):
     def test_cadastro_especialista_mapeia_crm_para_crp_especialista(self):
-        fake_collection = FakeUsuariosCollection()
-        novo_usuario = main.UsuarioCadastro(
+        novo_usuario = UsuarioCadastro(
             nome="Dra. Ana",
             email="ana@example.com",
             senha="Senha@123",
@@ -59,8 +21,10 @@ class CadastroEspecialistaTestCase(unittest.TestCase):
             ocupacao="Psicologa",
         )
 
-        with patch.object(main, "colecao_usuarios", fake_collection):
-            response = main.cadastrar_usuario(novo_usuario)
+        with patch.object(auth_service.repository, "find_user_by_email", return_value=None), \
+             patch.object(auth_service, "hash_password", return_value="hash_fake"), \
+             patch.object(auth_service.repository, "create_user", return_value=SimpleNamespace(inserted_id="usuario-teste")) as create_user_mock:
+            response = auth_service.register(novo_usuario)
 
         self.assertEqual(response.id, "usuario-teste")
         self.assertEqual(response.tipo_perfil, "especialista")
@@ -68,30 +32,34 @@ class CadastroEspecialistaTestCase(unittest.TestCase):
         self.assertEqual(response.clinica, "Clinica Horizonte")
         self.assertEqual(response.ocupacao, "Psicologa")
 
-        self.assertIsNotNone(fake_collection.inserted_doc)
-        self.assertEqual(fake_collection.inserted_doc["crp_especialista"], "CRP-12345")
-        self.assertNotIn("crm_especialista", fake_collection.inserted_doc)
-        self.assertNotIn("crm", fake_collection.inserted_doc)
+        payload = create_user_mock.call_args.args[0]
+        self.assertEqual(payload["crp_especialista"], "CRP-12345")
+        self.assertEqual(payload["senha"], "hash_fake")
+        self.assertNotIn("crm", payload)
 
     def test_definir_crp_atualiza_campo_crp_especialista(self):
-        fake_collection = FakeUsuariosCollection()
-        fake_collection.user_to_find = {
+        dados = DefinirCRP(email="ana@example.com", crp="CRP-99999")
+        usuario = {
             "_id": "usuario-teste",
             "email": "ana@example.com",
             "tipo_perfil": "especialista",
         }
-        dados = main.DefinirCRP(email="ana@example.com", crp="CRP-99999")
 
-        with patch.object(main, "colecao_usuarios", fake_collection):
-            response = main.definir_crp(dados)
+        with patch.object(auth_service.repository, "find_user_by_email", return_value=usuario), \
+             patch.object(auth_service.usuarios, "update_one") as update_one_mock:
+            response = auth_service.definir_crp(dados)
 
         self.assertEqual(response["message"], "CRP atualizado com sucesso")
-        self.assertEqual(fake_collection.last_find_query, {"email": "ana@example.com"})
-        self.assertEqual(fake_collection.last_update_query, {"email": "ana@example.com"})
-        self.assertEqual(
-            fake_collection.last_update_payload,
+        update_one_mock.assert_called_once_with(
+            {"email": "ana@example.com"},
             {"$set": {"crp_especialista": "CRP-99999"}},
         )
+
+    def test_get_current_user_rejeita_token_jwt_invalido(self):
+        with patch("app.core.dependencies.sessoes.find_one", return_value={"token_acesso": "token-falso", "id_usuario": "user-1"}), \
+             patch("app.core.dependencies.usuarios.find_one", return_value={"_id": "user-1", "email": "ana@example.com"}):
+            with pytest.raises(Exception):
+                get_current_user(authorization="Bearer token-falso")
 
 
 if __name__ == "__main__":

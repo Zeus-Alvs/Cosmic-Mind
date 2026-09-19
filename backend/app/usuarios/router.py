@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 
+from app.auth.service import definir_crp
 from app.core.dependencies import get_current_user
 from app.usuarios.service import (
     atualizar_perfil,
@@ -12,6 +13,7 @@ from app.usuarios.service import (
 )
 from models import (
     ConfirmarEmail,
+    DefinirCRP,
     DeletarContaRequest,
     EsqueciSenha,
     RedefinirSenha,
@@ -60,3 +62,7 @@ def confirmar_novo_email_route(dados: ConfirmarEmail):
 @router.post("/api/conta/cancelar-troca-email")
 def cancelar_troca_email_route(dados: EsqueciSenha):
     return cancelar_troca_email(dados)
+
+@router.post("/api/conta/crp")
+def definir_crp_route(dados: DefinirCRP, current_user: dict = Depends(get_current_user)):
+    return definir_crp(dados, current_user)

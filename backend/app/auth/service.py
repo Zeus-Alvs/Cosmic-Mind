@@ -8,7 +8,8 @@ from app.core.security import (
     hash_password,
     verify_password
 )
-from models import UsuarioCadastro, UsuarioRetorno
+from app.core.database import usuarios
+from models import DefinirCRP, UsuarioCadastro, UsuarioRetorno
 
 def register(new_user: UsuarioCadastro) -> UsuarioRetorno:
     if repository.find_user_by_email(new_user.email):
@@ -46,7 +47,30 @@ def register(new_user: UsuarioCadastro) -> UsuarioRetorno:
         clinica=user_data.get("clinica"),
         ocupacao=user_data.get("ocupacao")
     )
-    
+
+
+def definir_crp(dados: DefinirCRP, current_user: dict | None = None):
+    if current_user is not None and current_user.get("email") != dados.email:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Você não tem permissão para alterar o CRP desta conta.",
+        )
+
+    usuario = repository.find_user_by_email(dados.email)
+    if not usuario:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado.",
+        )
+
+    usuarios.update_one(
+        {"email": dados.email},
+        {"$set": {"crp_especialista": dados.crp}},
+    )
+
+    return {"message": "CRP atualizado com sucesso"}
+
+
 def login(email: str, password: str):
     usuario = repository.find_user_by_email(email)
 

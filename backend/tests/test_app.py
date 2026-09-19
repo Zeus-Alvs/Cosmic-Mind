@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 app = FastAPI()
+__test__ = False
 
 class TestRequest(BaseModel):
     tipo: str

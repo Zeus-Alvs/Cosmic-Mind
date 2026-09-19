@@ -27,12 +27,32 @@ def get_current_user(
 ):
     token = get_bearer_token(authorization)
 
+    try:
+        payload = decode_token(token)
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido ou expirado.",
+        ) from None
+
+    if payload.get("type") != "user":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token de usuário inválido.",
+        )
+
     sessao = sessoes.find_one({"token_acesso": token})
 
     if not sessao or not sessao.get("id_usuario"):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Sessão inválida ou expirada.",
+        )
+
+    if str(payload.get("sub")) != str(sessao["id_usuario"]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token incompatível com a sessão atual.",
         )
 
     usuario = usuarios.find_one({"_id": sessao["id_usuario"]})

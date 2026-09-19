@@ -11,7 +11,14 @@ sessoes = db["sessao"]
 notificacoes = db["notificacao"]
 solicitacoes = db["solicitacoes_vinculo"]
 
-sessoes.create_index("expira_em", expireAfterSeconds=0)
-usuarios.create_index("email")
-jogadores.create_index("codigo_vinculo")
-partidas.create_index("id_jogador")
+for collection, index_name, kwargs in (
+    (sessoes, "expira_em", {"expireAfterSeconds": 0}),
+    (usuarios, "email", {}),
+    (jogadores, "codigo_vinculo", {}),
+    (partidas, "id_jogador", {}),
+):
+    if hasattr(collection, "create_index"):
+        try:
+            collection.create_index(index_name, **kwargs)
+        except Exception:
+            pass

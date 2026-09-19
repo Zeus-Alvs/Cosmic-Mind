@@ -13,6 +13,7 @@ import secrets
 import random
 
 app = FastAPI()
+__test__ = False
 
 JWT_SECRET = secrets.token_hex(32)
 JWT_ALGORITHM = "HS256"
@@ -62,7 +63,7 @@ def teste_game_login(dados: GameLoginRequest):
 
     return {
         "accessToken": token_jwt,
-        "login": f"Login - SUCESSO - JWT -
+        "login": "Login - SUCESSO - JWT - válido",
     }
 
 if __name__ == "__main__":
