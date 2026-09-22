@@ -1,20 +1,20 @@
 export const getApiUrl = () => {
+    const envUrl = process.env.NEXT_PUBLIC_API_URL;
+    const localDevApi = 'http://localhost:8000/api';
 
-    if (process.env.NEXT_PUBLIC_API_URL) {
-        return process.env.NEXT_PUBLIC_API_URL; 
+    if (envUrl) {
+        return envUrl;
     }
 
     if (typeof window !== 'undefined') {
         const hostname = window.location.hostname;
 
         if (hostname === 'localhost' || hostname === '127.0.0.1') {
-            return 'http://localhost:8000/api';
+            return localDevApi;
         }
-        
-        // Fallback caso acesse via IP na rede local, por exemplo
+
         return `http://${hostname}:8000/api`;
     }
 
-    // 3. Fallback para Server-Side Rendering (SSR) ou Docker no ambiente local
-    return 'http://localhost:8000/api';
+    return localDevApi;
 };

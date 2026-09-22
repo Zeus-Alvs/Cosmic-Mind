@@ -55,6 +55,7 @@ def criar_jogador(id_usuario: str, dados: JogadorCadastro, current_user: dict):
 
     return {
         "message": "Jogador criado com sucesso.",
+        "id": str(id_novo_jogador),
         "id_jogador": str(id_novo_jogador),
     }
 
@@ -72,8 +73,10 @@ def listar_jogadores(id_usuario: str, current_user: dict):
 
     resultado = []
     for jogador in jogadores_banco:
+        id_jogador = str(jogador["_id"])
         resultado.append({
-            "id_jogador": str(jogador["_id"]),
+            "id": id_jogador,
+            "id_jogador": id_jogador,
             "codigo_vinculo": jogador.get("codigo_vinculo"),
             "nome": jogador.get("apelido", "Jogador"),
             "foto_perfil": jogador.get("foto_perfil", 1),

@@ -44,14 +44,20 @@
       // Intercepta todas as chamadas 'fetch' para verificar erro 401 globalmente
       const originalFetch = window.fetch;
       window.fetch = async (...args) => {
-        const response = await originalFetch(...args);
-        if (response.status === 401) {
-          // Token expirou ou é inválido
-          localStorage.removeItem("user_data");
-          localStorage.removeItem("token_acesso");
-          router.push("/"); // Redireciona para a tela de login
+        try {
+          const response = await originalFetch(...args);
+          if (response.status === 401) {
+            // Token expirou ou é inválido
+            localStorage.removeItem("user_data");
+            localStorage.removeItem("token_acesso");
+            router.push("/");
+          }
+          return response;
+        } catch (error) {
+          // Não faz redirect em falhas de rede/transientes; permite a página tentar novamente.
+          console.warn("Fetch interrompido sem resposta do backend:", error);
+          throw error;
         }
-        return response;
       };
 
       // Limpa o interceptor caso o componente seja desmontado
@@ -186,6 +192,7 @@
                 height={40}
                 priority
                 className="hover:scale-105 transition-transform"
+                style={{ width: 'auto', height: 'auto' }}
               />
             </div>
 

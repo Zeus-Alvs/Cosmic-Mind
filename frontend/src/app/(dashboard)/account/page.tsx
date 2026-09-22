@@ -47,12 +47,22 @@ export default function AccountPage() {
 
   const avatares = [1, 2, 3, 4];
 
+  const getAuthHeaders = () => {
+    const dadosSalvos = JSON.parse(localStorage.getItem('user_data') || '{}');
+    const token = dadosSalvos.token_acesso;
+
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    };
+  };
+
   const handleAvatarChange = async (novoId: string) => {
     setSelectedAvatar(novoId);
     try {
       await fetch(`${getApiUrl()}/conta/atualizar/${usuario.email}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           avatar: parseInt(novoId)
         }),
@@ -73,7 +83,7 @@ export default function AccountPage() {
     try {
       const response = await fetch(`${getApiUrl()}/conta/atualizar/${usuario.email}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           nome: formData.nome,
           email: formData.email,
@@ -87,7 +97,7 @@ export default function AccountPage() {
       if (usuario.tipo_perfil === 'especialista') {
         await fetch(`${getApiUrl()}/conta/crp`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify({ email: usuario.email, crp: formData.crp_especialista })
         });
       }
@@ -163,7 +173,7 @@ export default function AccountPage() {
     try {
       const response = await fetch(`${getApiUrl()}/conta/senha/${usuario.email}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           senha_atual: passData.atual,
           nova_senha: passData.nova
@@ -195,8 +205,7 @@ export default function AccountPage() {
     try {
       const response = await fetch(`${getApiUrl()}/conta/deletar/${usuario.email}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-
+        headers: getAuthHeaders(),
         body: JSON.stringify({ senha: deletePassword })
       });
 

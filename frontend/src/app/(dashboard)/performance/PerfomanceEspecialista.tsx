@@ -68,8 +68,14 @@ export default function PerfomanceS() {
       try {
         const dadosSalvos = JSON.parse(localStorage.getItem('user_data') || '{}');
         const token = dadosSalvos.token_acesso;
+        const pacienteId = pacienteAtivo?.id ?? pacienteAtivo?._id ?? pacienteAtivo?.id_jogador ?? null;
 
-        const res = await fetch(`${getApiUrl()}/estatisticas/${pacienteAtivo.id || pacienteAtivo._id}`, {
+        if (!pacienteId) {
+          setEstatisticasGlobais(null);
+          return;
+        }
+
+        const res = await fetch(`${getApiUrl()}/estatisticas/${encodeURIComponent(pacienteId)}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -95,8 +101,13 @@ export default function PerfomanceS() {
         const dadosSalvos = JSON.parse(localStorage.getItem('user_data') || '{}');
         const token = dadosSalvos.token_acesso;
 
-        const idReal = pacienteAtivo.id || pacienteAtivo._id;
-        const res = await fetch(`${getApiUrl()}/estatisticas/${idReal}?planetId=${planetaAtivo.id}`, {
+        const pacienteId = pacienteAtivo?.id ?? pacienteAtivo?._id ?? pacienteAtivo?.id_jogador ?? null;
+        if (!pacienteId) {
+          setEstatisticasPlaneta(null);
+          return;
+        }
+
+        const res = await fetch(`${getApiUrl()}/estatisticas/${encodeURIComponent(pacienteId)}?planetId=${encodeURIComponent(planetaAtivo.id)}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 

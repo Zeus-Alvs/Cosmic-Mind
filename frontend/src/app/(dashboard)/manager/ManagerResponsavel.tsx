@@ -46,6 +46,18 @@ export default function ManagerR() {
   const [isGeneratingPin, setIsGeneratingPin] = useState(false);
 
   // 👇 MÁGICA AQUI: Busca os jogadores e ENRIQUECE com as estatísticas reais
+  const getAuthHeaders = () => {
+    const dadosSalvos = JSON.parse(localStorage.getItem('user_data') || '{}');
+    const token = dadosSalvos.token_acesso;
+
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    };
+  };
+
+  const resolvePlayerId = (jogador: any) => jogador?.id ?? jogador?._id ?? jogador?.id_jogador ?? null;
+
   const loadPlayers = async () => {
     try {
       const dadosSalvos = JSON.parse(localStorage.getItem('user_data') || '{}');
@@ -67,8 +79,13 @@ export default function ManagerR() {
         // 2. Para cada jogador, busca as estatísticas para preencher o card
         const jogadoresEnriquecidos = await Promise.all(
           jogadoresBase.map(async (jogador: any) => {
+            const jogadorId = resolvePlayerId(jogador);
             try {
-              const resStats = await fetch(`${getApiUrl()}/estatisticas/${jogador.id || jogador._id}`, {
+              if (!jogadorId) {
+                throw new Error('ID do jogador ausente');
+              }
+
+              const resStats = await fetch(`${getApiUrl()}/estatisticas/${encodeURIComponent(jogadorId)}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
               });
 
@@ -87,23 +104,23 @@ export default function ManagerR() {
                 }
 
                 return {
-                  id: jogador.id || jogador._id,
+                  id: jogadorId,
                   nome: jogador.nome || jogador.apelido,
                   foto_perfil: stats.foto_perfil || jogador.foto_perfil || 1,
                   codigo_vinculo: jogador.codigo_vinculo || stats.codigo_vinculo,
                   progresso: progressoCalc,
-                  tempoUso: `${stats.total_partidas} partidas`, // Trocamos "horas" por total de partidas
+                  tempoUso: `${stats.total_partidas} partidas`,
                   nivelFase: nomeFaseAtual,
                   pontuacao: stats.pontuacao_maxima || 0
                 };
               }
             } catch (err) {
-              console.error(`Erro ao buscar stats do jogador ${jogador.nome}`, err);
+              console.error(`Erro ao buscar stats do jogador ${jogador.nome || jogador.apelido || 'desconhecido'}`, err);
             }
 
             // Fallback caso a rota de estatísticas falhe para algum jogador
             return {
-              id: jogador.id || jogador._id,
+              id: jogadorId ?? `${Date.now()}-${Math.random()}`,
               nome: jogador.nome || jogador.apelido,
               foto_perfil: jogador.foto_perfil || 1,
               codigo_vinculo: jogador.codigo_vinculo,
@@ -115,7 +132,7 @@ export default function ManagerR() {
           })
         );
 
-        setPlayers(jogadoresEnriquecidos);
+        setPlayers(jogadoresEnriquecidos.filter((j) => !!j && !!j.id));
       }
     } catch (error) {
       console.error('Erro ao buscar jogadores:', error);
@@ -151,7 +168,7 @@ export default function ManagerR() {
     try {
       const resCriar = await fetch(`${getApiUrl()}/jogadores/` + dadosSalvos.id, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ apelido: newPlayerName, foto_perfil: 1, data_nascimento: birthDate })
       });
 
@@ -179,7 +196,8 @@ export default function ManagerR() {
 
     try {
       const resPin = await fetch(`${getApiUrl()}/jogo/gerar-pin/` + jogadorId, {
-        method: 'POST'
+        method: 'POST',
+        headers: getAuthHeaders(),
       });
 
       if (!resPin.ok) throw new Error("Falha ao gerar PIN");
@@ -231,7 +249,7 @@ export default function ManagerR() {
 
             return (
               <div
-                key={card.id}
+                key={"isAdd" in card ? 'add-card' : `player-${card.id}`}
                 onClick={!("isAdd" in card) ? undefined : () => setIsModalOpen(true)}
                 className={`
                   absolute transition-all duration-500 ease-in-out rounded-[35px] shadow-lg

@@ -10,6 +10,8 @@ function EditPageContent() {
     const searchParams = useSearchParams();
     const idJogador = searchParams.get('id');
 
+    const normalizeJogadorId = (jogador: any) => jogador?.id ?? jogador?._id ?? jogador?.id_jogador ?? null;
+
     const [isLoading, setIsLoading] = useState(true);
 
     const [nomeJogador, setNomeJogador] = useState('');
@@ -22,6 +24,16 @@ function EditPageContent() {
 
     const voltar = () => {
         router.push('/manager');
+    };
+
+    const getAuthHeaders = () => {
+        const dadosSalvos = JSON.parse(localStorage.getItem('user_data') || '{}');
+        const token = dadosSalvos.token_acesso;
+
+        return {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+        };
     };
 
     useEffect(() => {
@@ -39,10 +51,12 @@ function EditPageContent() {
             setUsuarioId(dadosSalvos.id);
 
             try {
-                const response = await fetch(`${getApiUrl()}/jogadores/` + dadosSalvos.id);
+                const response = await fetch(`${getApiUrl()}/jogadores/` + dadosSalvos.id, {
+                    headers: getAuthHeaders(),
+                });
                 if (response.ok) {
                     const jogadores = await response.json();
-                    const jogadorSelecionado = jogadores.find((j: any) => j.id === idJogador);
+                    const jogadorSelecionado = jogadores.find((j: any) => normalizeJogadorId(j) === idJogador);
 
                     if (jogadorSelecionado) {
                         setNomeJogador(jogadorSelecionado.nome);
@@ -50,6 +64,7 @@ function EditPageContent() {
                             setAvatarIndex(jogadorSelecionado.foto_perfil);
                         }
                     } else {
+                        console.warn('Jogador não encontrado na lista do usuário:', idJogador, jogadores);
                         voltar();
                     }
                 } else {
@@ -73,7 +88,7 @@ function EditPageContent() {
         try {
             const response = await fetch(`${getApiUrl()}/jogadores/${idJogador}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify({ apelido: nomeJogador, foto_perfil: avatarIndex })
             });
 
@@ -92,7 +107,8 @@ function EditPageContent() {
     const handleDesconectar = async () => {
         try {
             const response = await fetch(`${getApiUrl()}/jogadores/${idJogador}/desconectar`, {
-                method: 'POST'
+                method: 'POST',
+                headers: getAuthHeaders(),
             });
             if (response.ok) {
                 alert('Dispositivos desconectados com sucesso!');
@@ -110,7 +126,7 @@ function EditPageContent() {
         try {
             const response = await fetch(`${getApiUrl()}/jogadores/${usuarioId}/${idJogador}`, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify({ senha })
             });
 

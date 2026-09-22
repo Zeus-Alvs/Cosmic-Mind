@@ -68,8 +68,14 @@ export default function PerfomanceR() {
       try {
         const dadosSalvos = JSON.parse(localStorage.getItem('user_data') || '{}');
         const token = dadosSalvos.token_acesso;
+        const jogadorId = jogadorAtivo?.id ?? jogadorAtivo?._id ?? jogadorAtivo?.id_jogador ?? null;
 
-        const res = await fetch(`${getApiUrl()}/estatisticas/${jogadorAtivo.id}`, {
+        if (!jogadorId) {
+          setEstatisticasGlobais(null);
+          return;
+        }
+
+        const res = await fetch(`${getApiUrl()}/estatisticas/${encodeURIComponent(jogadorId)}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -97,8 +103,14 @@ export default function PerfomanceR() {
       try {
         const dadosSalvos = JSON.parse(localStorage.getItem('user_data') || '{}');
         const token = dadosSalvos.token_acesso;
+        const jogadorId = jogadorAtivo?.id ?? jogadorAtivo?._id ?? jogadorAtivo?.id_jogador ?? null;
 
-        const res = await fetch(`${getApiUrl()}/estatisticas/${jogadorAtivo.id}?planetId=${planetaAtivo.id}`, {
+        if (!jogadorId) {
+          setEstatisticasPlaneta(null);
+          return;
+        }
+
+        const res = await fetch(`${getApiUrl()}/estatisticas/${encodeURIComponent(jogadorId)}?planetId=${encodeURIComponent(planetaAtivo.id)}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 

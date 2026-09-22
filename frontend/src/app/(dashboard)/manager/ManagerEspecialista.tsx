@@ -34,6 +34,8 @@ export default function ManagerS() {
   const [players, setPlayers] = useState<PlayerPerformanceDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const resolvePatientId = (paciente: any) => paciente?.id ?? paciente?._id ?? paciente?.id_jogador ?? null;
+
   // 👇 Busca os pacientes e ENRIQUECE com as estatísticas reais do Back-end
   const loadPlayers = async () => {
     try {
@@ -56,8 +58,13 @@ export default function ManagerS() {
         // 2. Para cada paciente, busca as estatísticas para preencher o card
         const pacientesEnriquecidos = await Promise.all(
           pacientesBase.map(async (paciente: any) => {
+            const pacienteId = resolvePatientId(paciente);
             try {
-              const resStats = await fetch(`${getApiUrl()}/estatisticas/${paciente.id || paciente._id}`, {
+              if (!pacienteId) {
+                throw new Error('ID do paciente ausente');
+              }
+
+              const resStats = await fetch(`${getApiUrl()}/estatisticas/${encodeURIComponent(pacienteId)}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
               });
 
@@ -76,7 +83,7 @@ export default function ManagerS() {
                 }
 
                 return {
-                  id: paciente.id || paciente._id,
+                  id: pacienteId,
                   nome: paciente.nome || paciente.apelido || "Paciente",
                   foto_perfil: stats.foto_perfil || paciente.foto_perfil || 1,
                   codigo_vinculo: paciente.codigo_vinculo || stats.codigo_vinculo,
@@ -87,12 +94,12 @@ export default function ManagerS() {
                 };
               }
             } catch (err) {
-              console.error(`Erro ao buscar stats do paciente ${paciente.nome}`, err);
+              console.error(`Erro ao buscar stats do paciente ${paciente.nome || paciente.apelido || 'desconhecido'}`, err);
             }
 
             // Fallback caso a rota de estatísticas falhe
             return {
-              id: paciente.id || paciente._id,
+              id: pacienteId ?? `${Date.now()}-${Math.random()}`,
               nome: paciente.nome || "Paciente",
               foto_perfil: paciente.foto_perfil || 1,
               codigo_vinculo: paciente.codigo_vinculo,
@@ -104,7 +111,7 @@ export default function ManagerS() {
           })
         );
 
-        setPlayers(pacientesEnriquecidos);
+        setPlayers(pacientesEnriquecidos.filter((p) => !!p && !!p.id));
       }
     } catch (error) {
       console.error('Erro ao buscar pacientes:', error);
@@ -171,7 +178,7 @@ export default function ManagerS() {
 
                 return (
                   <div
-                    key={card.id}
+                    key={`patient-${card.id}`}
                     className={`
                       absolute transition-all duration-500 ease-in-out rounded-[35px] shadow-lg
                       ${isCenter ? 'z-50 scale-100 opacity-100 shadow-2xl translate-x-0' : ''}

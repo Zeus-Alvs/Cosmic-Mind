@@ -15,6 +15,13 @@ def test_account_routes_are_registered():
     assert "/api/conta/deletar/{email_usuario}" in paths
 
 
+def test_auth_routes_are_registered():
+    paths = app.openapi()["paths"]
+
+    assert "/api/login" in paths
+    assert "/api/cadastrar" in paths
+
+
 def test_account_recovery_services_exist():
     assert callable(solicitar_recuperacao)
     assert callable(redefinir_senha)

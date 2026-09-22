@@ -5,18 +5,18 @@ from app.core.database import db
 
 
 def obter_estatisticas(id_jogador: str, planetId: str | None = None, current_user: dict | None = None):
-    if current_user and current_user.get("tipo_perfil") == "responsavel":
-        vinculos = current_user.get("jogadores_vinculados", [])
-        if ObjectId(id_jogador) not in vinculos and id_jogador not in [str(v) for v in vinculos]:
-            raise HTTPException(status_code=403, detail="Você não tem permissão para visualizar estatísticas deste jogador.")
-
-    if not id_jogador:
+    if not id_jogador or str(id_jogador).strip().lower() in {"undefined", "null", "none", ""}:
         raise HTTPException(status_code=400, detail="ID de jogador inválido.")
 
     try:
         jogador_obj_id = ObjectId(id_jogador)
     except Exception:
         raise HTTPException(status_code=400, detail="ID de jogador inválido.")
+
+    if current_user and current_user.get("tipo_perfil") == "responsavel":
+        vinculos = current_user.get("jogadores_vinculados", [])
+        if jogador_obj_id not in vinculos and id_jogador not in [str(v) for v in vinculos]:
+            raise HTTPException(status_code=403, detail="Você não tem permissão para visualizar estatísticas deste jogador.")
 
     jogador = db["jogador"].find_one({"_id": jogador_obj_id})
     if not jogador:
