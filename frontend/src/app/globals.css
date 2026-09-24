@@ -204,3 +204,11 @@ html.tema-escuro .border-slate-100,
 html.tema-escuro .border-slate-200 {
   border-color: #334155 !important;
 }
+/* Remove native browser password reveal icon */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+}

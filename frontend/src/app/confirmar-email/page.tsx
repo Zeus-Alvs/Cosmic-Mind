@@ -71,7 +71,7 @@ function ConfirmarEmailContent() {
           </p>
           <button
             onClick={() => router.push('/login')}
-            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#4078A4] to-[#3E89AE] text-white py-3.5 rounded-xl font-bold shadow-md hover:brightness-110 transition-all"
+            className="w-full flex items-center justify-center gap-2 bg-[#4078A4]   text-white py-3.5 rounded-xl font-bold shadow-md hover:brightness-110 transition-all"
           >
             Fazer Login <ArrowRight className="w-4 h-4" />
           </button>

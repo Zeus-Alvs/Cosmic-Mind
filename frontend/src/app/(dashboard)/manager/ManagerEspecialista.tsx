@@ -136,10 +136,10 @@ export default function ManagerS() {
 
   return (
     <div className="w-full max-w-5xl mx-auto p-4 flex flex-col items-center">
-      <div className="fixed top-0 left-0 md:left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+      <div className="fixed top-0 left-0 md:left-64 right-0 h-1.5 bg-[#4078A4] z-50" />
 
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">
+        <h2 className="text-3xl font-bold bg-[#4078A4]   bg-clip-text text-transparent mb-1">
           Pacientes Acompanhados
         </h2>
         <p className="text-slate-400 text-xs mt-1">Selecione um paciente para analisar as métricas cognitivas</p>
@@ -200,7 +200,7 @@ export default function ManagerS() {
                             <div className="mt-1.5 flex items-center gap-1.5">
                               <span className="text-[9px] font-black uppercase text-slate-400">Cód:</span>
                               <span 
-                                className="text-xs font-mono font-bold bg-white text-[#AC57EB] px-2 py-0.5 rounded-md tracking-widest border border-[#AC57EB]/20 shadow-sm"
+                                className="text-xs font-mono font-bold bg-white text-[#4078A4] px-2 py-0.5 rounded-md tracking-widest border border-[#4078A4]/20 shadow-sm"
                                 title="Código de vínculo do paciente"
                               >
                                 {card.codigo_vinculo || '----'}
@@ -216,7 +216,7 @@ export default function ManagerS() {
                               cx="32"
                               cy="32"
                               r="26"
-                              stroke="#AC57EB"
+                              stroke="#4078A4"
                               strokeWidth="6"
                               fill="transparent"
                               strokeDasharray={163.3}
@@ -237,7 +237,7 @@ export default function ManagerS() {
                       <button
                         // 👇 Redirecionamento ajustado para /performance
                         onClick={() => router.push(`/performance`)}
-                        className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#3E89AE] to-[#AC57EB] text-white font-bold text-xs shadow-md hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
+                        className="w-full py-3.5 rounded-2xl bg-[#4078A4]   text-white font-bold text-xs shadow-md hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
                       >
                         <Activity className="w-4 h-4" />
                         Ver Análise Completa
@@ -260,7 +260,7 @@ export default function ManagerS() {
             {players.map((_, i) => (
               <div
                 key={i}
-                className={`h-2 rounded-full transition-all duration-300 ${currentIndex === i ? 'w-10 bg-[#AC57EB]' : 'w-2 bg-slate-200'}`}
+                className={`h-2 rounded-full transition-all duration-300 ${currentIndex === i ? 'w-10 bg-[#4078A4]' : 'w-2 bg-slate-200'}`}
               />
             ))}
           </div>

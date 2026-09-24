@@ -168,10 +168,10 @@ export default function AjustesPage() {
 
   return (
     <div className="max-w-6xl mx-auto p-4 dark:bg-slate-900 transition-colors duration-300">
-      <div className="fixed top-0 left-0 md:left-64 right-0 h-1 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+      <div className="fixed top-0 left-0 md:left-64 right-0 h-1.5 bg-[#4078A4] z-50" />
 
       <header className="mb-8 pl-2">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">
+        <h2 className="text-3xl font-bold bg-[#4078A4]   bg-clip-text text-transparent mb-1">
           Ajustes
         </h2>
         <p className="text-slate-400 text-sm font-medium">
@@ -185,7 +185,7 @@ export default function AjustesPage() {
         <div className="space-y-6">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-[24px] border border-slate-100 dark:border-slate-700 shadow-sm transition-colors">
             <div className="flex items-center gap-2 mb-6">
-              <Eye className="w-5 h-5 text-[#AC57EB]"/>
+              <Eye className="w-5 h-5 text-[#4078A4]"/>
               <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Interface & Acessibilidade</h3>
             </div>
 
@@ -197,7 +197,7 @@ export default function AjustesPage() {
                 <select 
                   value={configs.tema}
                   onChange={(e) => mudaTema(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all text-slate-700 dark:text-slate-200 cursor-pointer"
+                  className="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#4078A4] focus:ring-1 focus:ring-[#4078A4] transition-all text-slate-700 dark:text-slate-200 cursor-pointer"
                 >
                   <option value="claro" className="cursor-pointer">Modo Claro</option>
                   <option value="escuro" className="cursor-pointer">Modo Escuro</option>
@@ -212,7 +212,7 @@ export default function AjustesPage() {
                 <select 
                   value={configs.tamanhoFonte}
                   onChange={(e) => mudaTamanhoFonte(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all text-slate-700 dark:text-slate-200 cursor-pointer"
+                  className="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#4078A4] focus:ring-1 focus:ring-[#4078A4] transition-all text-slate-700 dark:text-slate-200 cursor-pointer"
                 >
                   <option value="pequeno" className="cursor-pointer">Pequeno</option>
                   <option value="normal" className="cursor-pointer">Normal (Padrão)</option>
@@ -222,12 +222,12 @@ export default function AjustesPage() {
               </div>
 
               <div className="pt-4 border-t border-slate-100 dark:border-slate-700 space-y-4">
-                <div className="flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-100 dark:border-purple-800/30 transition-colors">
+                <div className="flex items-center justify-between p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-xl border border-cyan-100 dark:border-cyan-800/30 transition-colors">
                   <div className="flex items-start gap-3">
-                    <Type className="w-5 h-5 text-purple-400 mt-0.5"/>
+                    <Type className="w-5 h-5 text-cyan-400 mt-0.5"/>
                     <div>
-                      <p className="text-sm font-bold text-purple-900 dark:text-purple-300">Fonte para Dislexia</p>
-                      <p className="text-xs text-purple-600 dark:text-purple-400/80">Altera a tipografia global em tempo real.</p>
+                      <p className="text-sm font-bold text-cyan-900 dark:text-cyan-300">Fonte para Dislexia</p>
+                      <p className="text-xs text-cyan-600 dark:text-cyan-400/80">Altera a tipografia global em tempo real.</p>
                     </div>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -237,7 +237,7 @@ export default function AjustesPage() {
                       checked={configs.fonteDislexia}
                       onChange={(e) => toggleDislexia(e.target.checked)}
                     />
-                    <div className="w-11 h-6 bg-slate-200 dark:bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#AC57EB]"></div>
+                    <div className="w-11 h-6 bg-slate-200 dark:bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#4078A4]"></div>
                   </label>
                 </div>
 
@@ -256,7 +256,7 @@ export default function AjustesPage() {
                       checked={configs.altoContraste}
                       onChange={(e) => toggleContraste(e.target.checked)}
                     />
-                    <div className="w-11 h-6 bg-slate-200 dark:bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#AC57EB]"></div>
+                    <div className="w-11 h-6 bg-slate-200 dark:bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#4078A4]"></div>
                   </label>
                 </div>
               </div>
@@ -460,7 +460,7 @@ export default function AjustesPage() {
           <button 
             type="submit" 
             disabled={saving}
-            className="flex items-center gap-2 bg-gradient-to-r from-[#4078A4] to-[#3E89AE] text-white px-10 py-3.5 rounded-xl text-sm font-bold hover:brightness-110 transition-all shadow-md disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-2 bg-[#4078A4]   text-white px-10 py-3.5 rounded-xl text-sm font-bold hover:brightness-110 transition-all shadow-md disabled:opacity-50 cursor-pointer"
           >
             <Save className="w-5 h-5"/> 
             {saving ? 'Salvando ajustes...' : 'Salvar Ajustes'}

@@ -1,4 +1,6 @@
   'use client';
+import { Menu } from 'lucide-react';
+
 
   import Link from "next/link";
   import Image from "next/image";
@@ -164,7 +166,7 @@
             className="md:hidden fixed top-4 left-4 z-[100] bg-slate-800 text-white p-2 rounded-lg shadow-md cursor-pointer"
             onClick={() => setMenuOpen(!menuOpen)}
           >
-            ☰
+            <Menu className="w-5 h-5 inline-block" />
           </button>
 
           {/* Overlay Mobile */}
@@ -210,7 +212,7 @@
                       className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group cursor-pointer
                         ${
                           isActive
-                            ? "bg-gradient-to-r from-[#4078A4] to-[#3E89AE] shadow-lg font-bold"
+                            ? "bg-[#4078A4] shadow-lg font-bold"
                             : "hover:bg-slate-800 text-slate-300 hover:text-white"
                         }
                       `}

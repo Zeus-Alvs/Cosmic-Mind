@@ -67,7 +67,7 @@ export default function EsqueciSenhaPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#4078A4] to-[#AC57EB] text-white py-3 rounded-xl font-bold shadow-md hover:brightness-110 transition-all disabled:opacity-50 mt-4"
+                className="w-full flex items-center justify-center gap-2 bg-[#4078A4]   text-white py-3 rounded-xl font-bold shadow-md hover:brightness-110 transition-all disabled:opacity-50 mt-4"
               >
                 {loading ? 'Enviando...' : <><Send className="w-4 h-4" /> Enviar Link</>}
               </button>

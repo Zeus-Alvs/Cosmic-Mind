@@ -226,9 +226,9 @@ export default function ManagerR() {
 
   return (
     <div className="w-full max-w-5xl mx-auto p-4 flex flex-col items-center overflow-hidden">
-      <div className="fixed top-0 left-0 md:left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+      <div className="fixed top-0 left-0 md:left-64 right-0 h-1.5 bg-[#4078A4] z-50" />
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">Gerenciar Contas</h2>
+        <h2 className="text-3xl font-bold bg-[#4078A4]   bg-clip-text text-transparent mb-1">Gerenciar Contas</h2>
         <p className="text-slate-400 text-xs mt-1">Selecione um jogador para acompanhar o seu progresso</p>
       </div>
 
@@ -273,7 +273,7 @@ export default function ManagerR() {
                           <div className="mt-1.5 flex items-center gap-1.5">
                             <span className="text-[9px] font-black uppercase text-slate-400">Cód:</span>
                             <span 
-                              className="text-xs font-mono font-bold bg-white text-[#AC57EB] px-2 py-0.5 rounded-md tracking-widest border border-[#AC57EB]/20 shadow-sm"
+                              className="text-xs font-mono font-bold bg-white text-[#4078A4] px-2 py-0.5 rounded-md tracking-widest border border-[#4078A4]/20 shadow-sm"
                               title="Compartilhe este código com o especialista"
                             >
                               {card.codigo_vinculo || 'GERANDO...'}
@@ -306,13 +306,13 @@ export default function ManagerR() {
                     <div className="flex gap-2">
                       <button
                         onClick={(e) => { e.stopPropagation(); router.push(`/edit?id=${card.id}`); }}
-                        className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#69A1C9] to-[#9D70D6] text-white font-bold text-xs shadow-md hover:brightness-110 transition-all cursor-pointer"
+                        className="flex-1 py-3 rounded-2xl bg-[#4078A4]   text-white font-bold text-xs shadow-md hover:brightness-110 transition-all cursor-pointer"
                       >
                         Editar
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); handleConectar(card.id, card.nome); }}
-                        className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#3E89AE] to-[#4078A4] text-white font-bold text-xs shadow-md hover:brightness-110 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="flex-1 py-3 rounded-2xl bg-[#4078A4]   text-white font-bold text-xs shadow-md hover:brightness-110 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         <Smartphone className="w-3.5 h-3.5" />
                         Conectar
@@ -362,8 +362,8 @@ export default function ManagerR() {
 
             <form onSubmit={handleCreateSubmit}>
               <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Gamepad2 className="w-8 h-8 text-[#AC57EB]" />
+                <div className="w-16 h-16 bg-cyan-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Gamepad2 className="w-8 h-8 text-[#4078A4]" />
                 </div>
                 <h3 className="text-2xl font-bold text-slate-800">Novo Jogador</h3>
                 <p className="text-sm text-slate-500 mt-1">Crie um perfil para o jogador. Depois, use o botão "Conectar" para gerar o código de acesso.</p>
@@ -377,7 +377,7 @@ export default function ManagerR() {
                     value={newPlayerName}
                     onChange={(e) => setNewPlayerName(e.target.value)}
                     placeholder="Ex: Davi"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all text-slate-700 mt-1"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#4078A4] focus:ring-1 focus:ring-[#4078A4] transition-all text-slate-700 mt-1"
                     autoFocus
                   />
                 </div>
@@ -388,7 +388,7 @@ export default function ManagerR() {
                     type="date"
                     value={birthDate}
                     onChange={(e) => setBirthDate(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all text-slate-700 mt-1"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#4078A4] focus:ring-1 focus:ring-[#4078A4] transition-all text-slate-700 mt-1"
                   />
                 </div>
 
@@ -399,7 +399,7 @@ export default function ManagerR() {
                 <button
                   type="submit"
                   disabled={isCreating}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#4078A4] to-[#AC57EB] text-white font-bold text-sm shadow-md hover:brightness-110 transition-all disabled:opacity-50 mt-4 cursor-pointer"
+                  className="w-full py-3.5 rounded-xl bg-[#4078A4]   text-white font-bold text-sm shadow-md hover:brightness-110 transition-all disabled:opacity-50 mt-4 cursor-pointer"
                 >
                   {isCreating ? 'Criando...' : 'Criar Perfil'}
                 </button>

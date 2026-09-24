@@ -59,7 +59,7 @@ export default function NotificationsR() {
       pausa: { icon: <Zap className="w-5 h-5 text-orange-500" />, bg: 'bg-orange-100' },
       solicitacao: { icon: <Bell className="w-5 h-5 text-blue-500" />, bg: 'bg-blue-100' },
       conquista: { icon: <Trophy className="w-5 h-5 text-yellow-500" />, bg: 'bg-yellow-100' },
-      novidade: { icon: <Star className="w-5 h-5 text-purple-500" />, bg: 'bg-purple-100' },
+      novidade: { icon: <Star className="w-5 h-5 text-cyan-500" />, bg: 'bg-cyan-100' },
       info: { icon: <Info className="w-5 h-5 text-slate-500" />, bg: 'bg-slate-100' },
     };
     return configs[type] || configs.info;
@@ -91,10 +91,10 @@ export default function NotificationsR() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 font-sans">
-      <div className="fixed top-0 left-0 md:left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+      <div className="fixed top-0 left-0 md:left-64 right-0 h-1.5 bg-[#4078A4] z-50" />
 
       <header className="text-center mb-8">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">
+        <h2 className="text-3xl font-bold bg-[#4078A4]   bg-clip-text text-transparent mb-1">
           Notificações
         </h2>
         <p className="text-slate-400 text-xs font-medium">Acompanhe os jogadores em tempo real</p>
@@ -141,7 +141,7 @@ export default function NotificationsR() {
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-0.5 gap-1 sm:gap-0">
                       <h4 className="font-bold text-slate-700 text-sm truncate">{notif.title.replace('57b6d77617cbdc1499b06cab3d9f650e', 'Terra')}</h4>
-                      <span className="text-[9px] font-black text-[#AC57EB] uppercase shrink-0">
+                      <span className="text-[9px] font-black text-[#4078A4] uppercase shrink-0">
                         {new Date(notif.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                       </span>
                     </div>

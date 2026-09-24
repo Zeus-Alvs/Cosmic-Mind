@@ -152,7 +152,7 @@ function EditPageContent() {
 
     return (
         <div className="w-full max-w-4xl mx-auto p-8 relative -mt-5">
-            <div className="fixed top-0 left-0 md:left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+            <div className="fixed top-0 left-0 md:left-64 right-0 h-1.5 bg-[#4078A4] z-50" />
 
             {}
             <div className="flex items-center justify-center relative mb-6">
@@ -162,7 +162,7 @@ function EditPageContent() {
                 >
                     <ArrowLeft className="w-6 h-6" />
                 </button>
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent">
+                <h2 className="text-3xl font-bold bg-[#4078A4]   bg-clip-text text-transparent">
                     Perfil do Jogador
                 </h2>
             </div>
@@ -186,7 +186,7 @@ function EditPageContent() {
                         <button
                             key={idx}
                             onClick={() => setAvatarIndex(idx)}
-                            className={`w-12 h-12 rounded-full border-2 transition-all overflow-hidden bg-slate-200 flex items-center justify-center cursor-pointer ${avatarIndex === idx ? 'border-[#AC57EB] scale-110 shadow-md' : 'border-transparent hover:scale-105'}`}
+                            className={`w-12 h-12 rounded-full border-2 transition-all overflow-hidden bg-slate-200 flex items-center justify-center cursor-pointer ${avatarIndex === idx ? 'border-[#4078A4] scale-110 shadow-md' : 'border-transparent hover:scale-105'}`}
                         >
                             <img src={`/jogadores/foto${idx}.png`} alt={`Avatar ${idx}`} className="w-full h-full object-cover" />
                         </button>
@@ -201,7 +201,7 @@ function EditPageContent() {
                         type="text"
                         value={nomeJogador}
                         onChange={(e) => setNomeJogador(e.target.value)}
-                        className="w-full bg-[#E8E3E6] border border-[#D9D3D6] text-slate-700 text-sm rounded-full pl-12 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#AC57EB]/50 transition-all font-medium placeholder-slate-400"
+                        className="w-full bg-[#E8E3E6] border border-[#D9D3D6] text-slate-700 text-sm rounded-full pl-12 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#4078A4]/50 transition-all font-medium placeholder-slate-400"
                         placeholder="Nome do Jogador"
                     />
                 </div>
@@ -209,7 +209,7 @@ function EditPageContent() {
                 <button
                     onClick={handleSalvar}
                     disabled={isSaving || !nomeJogador.trim()}
-                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#4078A4] to-[#AC57EB] text-white font-bold text-sm shadow-lg hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer"
+                    className="w-full py-4 rounded-2xl bg-[#4078A4]   text-white font-bold text-sm shadow-lg hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer"
                 >
                     {isSaving ? 'SALVANDO...' : 'SALVAR ALTERAÇÕES'}
                 </button>

@@ -1,4 +1,6 @@
 'use client';
+import { AlertTriangle } from 'lucide-react';
+
 
 import React, { useState, useEffect } from 'react';
 import { User, Lock, Save, Eye, EyeOff, CheckCircle2, Clock, X, Trash2 } from 'lucide-react';
@@ -230,10 +232,10 @@ export default function AccountPage() {
 
   return (
     <div className="max-w-6xl mx-auto p-2 lg:p-6 font-sans">
-      <div className="fixed top-0 left-0 md:left-0 md:left-64 right-0 h-1 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+      <div className="fixed top-0 left-0 md:left-64 right-0 h-1.5 bg-[#4078A4] z-50" />
 
       <header className="mb-8 pl-2">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">
+        <h2 className="text-3xl font-bold bg-[#4078A4]   bg-clip-text text-transparent mb-1">
           Minha Conta
         </h2>
         <p className="text-slate-400 text-sm font-medium">Gerencie suas informações, segurança e identidade visual.</p>
@@ -283,7 +285,7 @@ export default function AccountPage() {
                 Excluir Minha Conta
               </button>
             ) : (
-              <div className="space-y-3 text-left animate-in fade-in slide-in-from-top-2">
+              <div className="space-y-3 text-left animate-in fade-in slide-in-">
                 <label className="text-[10px] font-bold text-red-800 ml-1 tracking-wider">CONFIRME SUA SENHA</label>
                 <div className="relative">
                   <input
@@ -437,7 +439,7 @@ export default function AccountPage() {
           {}
           <form onSubmit={handleSavePassword} className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm">
             <div className="flex items-center gap-2 mb-6">
-              <Lock className="w-5 h-5 text-[#AC57EB]" />
+              <Lock className="w-5 h-5 text-[#4078A4]" />
               <h3 className="text-lg font-bold text-slate-800">Segurança</h3>
             </div>
 
@@ -450,7 +452,7 @@ export default function AccountPage() {
                     type={showAtual ? "text" : "password"}
                     value={passData.atual}
                     onChange={(e) => setPassData({ ...passData, atual: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all pr-12"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#4078A4] focus:ring-1 focus:ring-[#4078A4] transition-all pr-12"
                     placeholder="••••••••"
                     required
                   />
@@ -482,7 +484,7 @@ export default function AccountPage() {
                     type={showNova ? "text" : "password"}
                     value={passData.nova}
                     onChange={(e) => setPassData({ ...passData, nova: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all pr-12"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#4078A4] focus:ring-1 focus:ring-[#4078A4] transition-all pr-12"
                     placeholder="••••••••"
                     required
                   />
@@ -497,7 +499,7 @@ export default function AccountPage() {
                 {}
                 {!showNova && (
                   <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-left mt-1.5">
-                    <p className="text-[10px] font-black text-amber-600 uppercase tracking-wider mb-1.5">⚠️ Regras para uma senha segura:</p>
+                    <p className="text-[10px] font-black text-amber-600 uppercase tracking-wider mb-1.5"><AlertTriangle className="w-5 h-5 inline-block" /> Regras para uma senha segura:</p>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2 text-[11px] text-amber-700 font-medium">
                         <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
@@ -524,7 +526,7 @@ export default function AccountPage() {
                     type={showConfirmar ? "text" : "password"}
                     value={passData.confirmar}
                     onChange={(e) => setPassData({ ...passData, confirmar: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all pr-12"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#4078A4] focus:ring-1 focus:ring-[#4078A4] transition-all pr-12"
                     placeholder="••••••••"
                     required
                   />
@@ -556,7 +558,7 @@ export default function AccountPage() {
               <button
                 type="submit"
                 disabled={savingPassword}
-                className="flex items-center gap-2 bg-[#AC57EB] text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:brightness-110 transition-all shadow-sm disabled:opacity-50 cursor-pointer"
+                className="flex items-center gap-2 bg-[#4078A4] text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:brightness-110 transition-all shadow-sm disabled:opacity-50 cursor-pointer"
               >
                 {savingPassword ? 'Alterando...' : 'Alterar Senha'}
               </button>

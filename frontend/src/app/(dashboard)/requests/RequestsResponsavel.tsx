@@ -122,10 +122,10 @@ export default function RequestsR() {
 
   return (
     <div className="max-w-5xl mx-auto p-6 font-sans">
-      <div className="fixed top-0 left-0 md:left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+      <div className="fixed top-0 left-0 md:left-64 right-0 h-1.5 bg-[#4078A4] z-50" />
 
       <div className="mb-10">
-        <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold tracking-tight bg-[#4078A4]    bg-clip-text text-transparent">
           Solicitações Recebidas
         </h2>
       </div>
@@ -150,7 +150,7 @@ export default function RequestsR() {
                   </div>
                   <button
                     onClick={() => setModalConfira(item)}
-                    className="text-[10px] font-black text-[#AC57EB] bg-white px-3 py-1.5 rounded-lg shadow-sm hover:bg-[#AC57EB] hover:text-white transition-all border border-purple-50 cursor-pointer"
+                    className="text-[10px] font-black text-[#4078A4] bg-white px-3 py-1.5 rounded-lg shadow-sm hover:bg-[#4078A4] hover:text-white transition-all border border-cyan-50 cursor-pointer"
                   >
                     CONFIRA
                   </button>
@@ -168,7 +168,7 @@ export default function RequestsR() {
 
       <section>
         <div className="mb-6">
-          <h3 className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] bg-clip-text text-transparent">
+          <h3 className="text-xl font-bold tracking-tight bg-[#4078A4]    bg-clip-text text-transparent">
             Acessos Permitidos
           </h3>
         </div>
@@ -226,7 +226,7 @@ export default function RequestsR() {
             </div>
 
             <div className="flex items-center justify-center gap-4 mb-8">
-              <img src={modalConfira.fotoProfissional} className="w-14 h-14 rounded-full object-cover ring-4 ring-purple-50" alt="" />
+              <img src={modalConfira.fotoProfissional} className="w-14 h-14 rounded-full object-cover ring-4 ring-cyan-50" alt="" />
               <div className="h-px w-8 bg-slate-200" />
               <img src={modalConfira.fotoPaciente} className="w-14 h-14 rounded-xl bg-slate-50 border-2 border-white shadow-md p-1" alt="" />
             </div>
@@ -238,7 +238,7 @@ export default function RequestsR() {
               <div className="space-y-1.5">
                 {modalConfira.permissoes.map((perm, index) => (
                   <div key={index} className="flex gap-2 items-center text-[10px] text-slate-500 font-bold leading-tight">
-                    <div className="w-1 h-1 rounded-full bg-[#AC57EB] shrink-0" />
+                    <div className="w-1 h-1 rounded-full bg-[#4078A4] shrink-0" />
                     <p>{perm}</p>
                   </div>
                 ))}

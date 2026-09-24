@@ -153,10 +153,10 @@ export default function RequestsS() {
 
   return (
     <div className="max-w-5xl mx-auto p-6 font-sans">
-      <div className="fixed top-0 left-0 md:left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+      <div className="fixed top-0 left-0 md:left-64 right-0 h-1.5 bg-[#4078A4] z-50" />
 
       <div className="mb-10">
-        <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold tracking-tight bg-[#4078A4]   bg-clip-text text-transparent">
           Gerenciar Pacientes
         </h2>
         <p className="text-slate-400 text-sm mt-1">Busque novos pacientes e acompanhe suas solicitações.</p>
@@ -186,7 +186,7 @@ export default function RequestsS() {
         </form>
 
         {resultadoBusca && (
-          <div className="animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="animate-in fade-in slide-in- duration-300">
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <img src={`/jogadores/foto${resultadoBusca.foto || 1}.png`} className="w-12 h-12 rounded-xl bg-white border border-slate-200 shadow-sm p-1" alt="" />
@@ -205,7 +205,7 @@ export default function RequestsS() {
                 </button>
                 <button 
                   onClick={handleSolicitar}
-                  className="bg-gradient-to-r from-[#AC57EB] to-[#9D70D6] hover:brightness-110 text-white px-6 py-2 rounded-xl text-xs font-bold shadow-md transition-all flex items-center gap-1.5"
+                  className="bg-[#4078A4]   hover:brightness-110 text-white px-6 py-2 rounded-xl text-xs font-bold shadow-md transition-all flex items-center gap-1.5"
                 >
                   <UserPlus className="w-4 h-4" /> Enviar Solicitação
                 </button>

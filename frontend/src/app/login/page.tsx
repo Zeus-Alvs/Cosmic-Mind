@@ -56,7 +56,7 @@ export default function LoginPage() {
     <div className="flex h-screen w-full bg-white">
 
       {/* Banner / Painel Esquerdo */}
-      <div className="hidden md:flex flex-col justify-center items-start p-16 w-1/2 bg-gradient-to-br from-purple-500 to-blue-400 text-white relative overflow-hidden">
+      <div className="hidden md:flex flex-col justify-center items-start p-16 w-1/2 bg-[#0F172A] text-white relative overflow-hidden">
         {/* Logo / Âncora para Landpage */}
         <Link href="/" className="absolute top-6 left-1/2 -translate-x-1/2 z-20 group transition transform hover:scale-105">
           <Image
@@ -70,27 +70,27 @@ export default function LoginPage() {
         </Link>
 
         {/* Estrelas SVG de fundo */}
-        <svg className="absolute top-12 left-10 w-6 h-6 text-white/40 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+        <svg className="absolute top-12 left-10 w-6 h-6 text-cyan-400/40 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 16.8l-6.3 4.6 2.3-7.4-6-4.6h7.6z" />
         </svg>
-        <svg className="absolute top-24 right-16 w-4 h-4 text-white/30" fill="currentColor" viewBox="0 0 24 24">
+        <svg className="absolute top-24 right-16 w-4 h-4 text-cyan-400/30" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 16.8l-6.3 4.6 2.3-7.4-6-4.6h7.6z" />
         </svg>
-        <svg className="absolute bottom-16 right-12 w-8 h-8 text-white/50 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+        <svg className="absolute bottom-16 right-12 w-8 h-8 text-cyan-400/50 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 16.8l-6.3 4.6 2.3-7.4-6-4.6h7.6z" />
         </svg>
-        <svg className="absolute bottom-28 left-16 w-5 h-5 text-white/35" fill="currentColor" viewBox="0 0 24 24">
+        <svg className="absolute bottom-28 left-16 w-5 h-5 text-cyan-400/35" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 16.8l-6.3 4.6 2.3-7.4-6-4.6h7.6z" />
         </svg>
-        <svg className="absolute top-1/2 right-8 w-5 h-5 text-white/25" fill="currentColor" viewBox="0 0 24 24">
+        <svg className="absolute top-1/2 right-8 w-5 h-5 text-cyan-400/25" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 16.8l-6.3 4.6 2.3-7.4-6-4.6h7.6z" />
         </svg>
-        <svg className="absolute top-1/3 left-1/3 w-3 h-3 text-white/20" fill="currentColor" viewBox="0 0 24 24">
+        <svg className="absolute top-1/3 left-1/3 w-3 h-3 text-cyan-400/20" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 16.8l-6.3 4.6 2.3-7.4-6-4.6h7.6z" />
         </svg>
 
         <h1 className="text-4xl font-bold mb-8 relative z-10">Ainda não tem<br />uma conta?</h1>
-        <Link href="/register" className="flex items-center px-6 py-3 border-2 border-white rounded-full hover:bg-white hover:text-purple-500 transition font-medium relative z-10">
+        <Link href="/register" className="flex items-center px-6 py-3 border-2 border-white rounded-full hover:bg-white hover:text-cyan-500 transition font-medium relative z-10">
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
           Cadastre-se
         </Link>
@@ -100,7 +100,7 @@ export default function LoginPage() {
       <div className="flex flex-col items-center w-full md:w-1/2 p-6 md:p-8 overflow-y-auto">
         <div className="w-full max-w-md my-auto">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500 mb-2">Entrar</h2>
+            <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-[#4078A4]   mb-2">Entrar</h2>
             <p className="text-slate-500 text-sm">Para acessar a sua conta, insira os seus dados abaixo:</p>
           </div>
 
@@ -123,7 +123,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-purple-400 text-slate-800"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-400 text-slate-800"
               />
             </div>
 
@@ -143,7 +143,7 @@ export default function LoginPage() {
                   onChange={(e) => setSenha(e.target.value)}
                   required
                   autoComplete="current-password"
-                  className="w-full px-4 py-3 pr-12 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-purple-400 text-slate-800"
+                  className="w-full px-4 py-3 pr-12 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-400 text-slate-800"
                 />
 
                 { }
@@ -171,7 +171,7 @@ export default function LoginPage() {
 
             { }
             <div className="mt-8 text-center flex flex-col items-center gap-4 pt-2">
-              <button type="submit" className="px-12 py-3 bg-gradient-to-r from-blue-400 to-purple-500 text-white font-bold rounded-full shadow-lg hover:opacity-90 transition cursor-pointer">
+              <button type="submit" className="px-12 py-3 bg-[#4078A4]   text-white font-bold rounded-full shadow-lg hover:opacity-90 transition cursor-pointer">
                 ACESSAR
               </button>
 
@@ -182,7 +182,7 @@ export default function LoginPage() {
               {/* Link de Cadastro para Mobile */}
               <div className="md:hidden text-sm text-slate-500 mt-2">
                 Não tem uma conta?{' '}
-                <Link href="/register" className="text-purple-500 font-bold hover:underline">
+                <Link href="/register" className="text-cyan-500 font-bold hover:underline">
                   Cadastre-se agora!
                 </Link>
               </div>

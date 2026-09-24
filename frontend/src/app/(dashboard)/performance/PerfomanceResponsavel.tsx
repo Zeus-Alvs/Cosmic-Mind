@@ -142,8 +142,8 @@ export default function PerfomanceR() {
   return (
     <div className="w-full max-w-6xl mx-auto p-5 bg-transparent font-sans text-slate-600 overflow-hidden">
       <div className="mb-6 text-center">
-        <div className="fixed top-0 left-0 md:left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">
+        <div className="fixed top-0 left-0 md:left-64 right-0 h-1.5 bg-[#4078A4] z-50" />
+        <h2 className="text-3xl font-bold bg-[#4078A4]   bg-clip-text text-transparent mb-1">
           Desempenho do Jogador
         </h2>
         <p className="text-slate-400 text-xs font-medium">Acompanhe a evolução cognitiva em tempo real</p>
@@ -290,7 +290,7 @@ export default function PerfomanceR() {
                             strokeDasharray={circumference}
                             strokeDashoffset={offset}
                             strokeLinecap="round"
-                            className="transition-all duration-1000 ease-out group-hover:stroke-[#AC57EB]"
+                            className="transition-all duration-1000 ease-out group-hover:stroke-[#4078A4]"
                           />
                         </svg>
                         <div className="absolute flex flex-col items-center leading-none">

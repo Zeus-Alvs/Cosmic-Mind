@@ -1,4 +1,8 @@
 "use client";
+import { ChevronRight, ChevronLeft } from 'lucide-react';
+
+import { Crown, Globe, Zap, Palette, Sparkles, Star, Shield, Ghost, Radio, Gamepad2, Brain, BarChart, Mail, Code, Moon } from 'lucide-react';
+
 
 import { useRef, useState, useEffect } from "react"; 
 import { useRouter } from "next/navigation";
@@ -30,7 +34,7 @@ const starPositions: StarPosition[] = [
 interface TeamMember {
   name: string;
   role: string;
-  icon: string; 
+  icon: React.ReactNode; 
   color: string; 
   bg: string;
   desc: string; 
@@ -41,8 +45,8 @@ const selenesTeam: TeamMember[] = [
   {
     name: "Eduarda Belles",
     role: "Líder e desenvolvedora front-end",
-    icon: "👑",
-    color: "from-purple-500 to-indigo-500",
+    icon: <Crown className="w-5 h-5 inline-block" />,
+    color: " ",
     bg: "bg-teal-500/10",
     desc: "UI/UX designer. Focada na experiência do usuário.",
     image: "/members/eduarda.jpeg"
@@ -50,8 +54,8 @@ const selenesTeam: TeamMember[] = [
   {
     name: "Brenno D'Luca",
     role: "Desenvolvedor Back-end",
-    icon: "🪐",
-    color: "from-blue-600 to-cyan-500",
+    icon: <Globe className="w-5 h-5 inline-block" />,
+    color: " ",
     bg: "bg-teal-500/10",
     desc: "Foco na lógica por trás do sistema.",
     image: "/members/brenno.jpeg"
@@ -59,8 +63,8 @@ const selenesTeam: TeamMember[] = [
   {
     name: "Zeus Machado",
     role: "Engenheiro de Software",
-    icon: "⚡",
-    color: "from-amber-500 to-orange-600",
+    icon: <Zap className="w-5 h-5 inline-block" />,
+    color: " ",
     bg: "bg-teal-500/10",
     desc: "Foco em trazer um sistema bom e funcional.",
     image: "/members/zeus.jpeg"
@@ -68,8 +72,8 @@ const selenesTeam: TeamMember[] = [
   {
     name: "Ellen Gouveia",
     role: "Analista e Desenvolvedora front-end",
-    icon: "🎨",
-    color: "from-pink-500 to-purple-500",
+    icon: <Palette className="w-5 h-5 inline-block" />,
+    color: " ",
     bg: "bg-teal-500/10",
     desc: "Artista e game designer, focando no lado criativo do projeto.",
     image: "/members/ellen.jpeg"
@@ -77,8 +81,8 @@ const selenesTeam: TeamMember[] = [
   {
     name: "Luana",
     role: "Desenvolvedora front-end e game designer",
-    icon: "✨",
-    color: "from-teal-400 to-blue-500",
+    icon: <Sparkles className="w-5 h-5 inline-block" />,
+    color: " ",
     bg: "bg-teal-500/10",
     desc: "Foco em priorizar o lado criativo e lúdico do projeto.",
     image: "/members/luana.jpeg"
@@ -89,8 +93,8 @@ const spectrumTeam: TeamMember[] = [
   {
     name: "Eduarda Belles",
     role: "Líder & UX/UI Designer",
-    icon: "💫",
-    color: "from-purple-500 to-pink-500",
+    icon: <Star className="w-5 h-5 inline-block" />,
+    color: " ",
     bg: "bg-teal-500/10",
     desc: "UI/UX designer. Focada na experiência do usuário.",
     image: "/members/eduarda.jpeg"
@@ -98,8 +102,8 @@ const spectrumTeam: TeamMember[] = [
   {
     name: "Raiza Antoneli",
     role: "Engenheira de Software",
-    icon: "🛡️",
-    color: "from-indigo-600 to-blue-500",
+    icon: <Shield className="w-5 h-5 inline-block" />,
+    color: " ",
     bg: "bg-teal-500/10",
     desc: "Prioriza um sistema bom e funcional.",
     image: "/members/raiza.jpeg"
@@ -107,8 +111,8 @@ const spectrumTeam: TeamMember[] = [
   {
     name: "Luigi Campregher",
     role: "Desenvolvedor de Jogos",
-    icon: "👾",
-    color: "from-green-500 to-teal-500",
+    icon: <Ghost className="w-5 h-5 inline-block" />,
+    color: " ",
     bg: "bg-teal-500/10",
     desc: "Foco em trazer um jogo lúdico e funcional para os usuários.",
     image: "/members/luigi.jpeg"
@@ -116,8 +120,8 @@ const spectrumTeam: TeamMember[] = [
   {
     name: "Ângelo Ferreira",
     role: "Desenvolvedor Back-end",
-    icon: "📡",
-    color: "from-cyan-600 to-indigo-500",
+    icon: <Radio className="w-5 h-5 inline-block" />,
+    color: " ",
     bg: "bg-teal-500/10",
     desc: "Foco na lógica por trás do sistema.",
     image: "/members/angelo.jpeg"
@@ -125,8 +129,8 @@ const spectrumTeam: TeamMember[] = [
   {
     name: "Takeshi Aoki",
     role: "Desenvolvedor e Designer de Jogos",
-    icon: "🎮",
-    color: "from-rose-500 to-orange-500",
+    icon: <Gamepad2 className="w-5 h-5 inline-block" />,
+    color: " ",
     bg: "bg-teal-500/10",
     desc: "Foco no lado criativo e lúdico do jogo.",
     image: "/members/takeshi.jpeg"
@@ -150,7 +154,7 @@ function StarSVG({ size }: { size: number }) {
       height={size}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <polygon points={points.join(" ")} fill="rgba(160,80,255,0.75)" />
+      <polygon points={points.join(" ")} fill="rgba(30, 58, 138, 0.9)" />
     </svg>
   );
 }
@@ -266,7 +270,7 @@ export default function Home() {
 
         .brand-cosmic {
           color: #bf5fff;
-          text-shadow: 0 0 30px rgba(180,80,255,0.35);
+          text-shadow: 0 0 30px rgba(64,120,164,0.35);
         }
 
         .brand-mind {
@@ -277,8 +281,8 @@ export default function Home() {
         .btn-login {
           padding: 9px 28px;
           border-radius: 999px;
-          background: rgba(80, 60, 180, 0.45);
-          border: 1px solid rgba(120, 100, 220, 0.5);
+          background: rgba(64,120,164, 0.45);
+          border: 1px solid rgba(64,120,164, 0.5);
           color: #fff;
           font-family: 'Raleway', sans-serif;
           font-weight: 500;
@@ -289,7 +293,7 @@ export default function Home() {
           letter-spacing: 0.03em;
         }
         .btn-login:hover {
-          background: rgba(100, 80, 200, 0.65);
+          background: rgba(64,120,164, 0.65);
           transform: translateY(-1px);
         }
 
@@ -321,7 +325,7 @@ export default function Home() {
         }
         .game-card:hover {
           transform: translateY(-4px);
-          box-shadow: 0 16px 48px rgba(80, 30, 160, 0.45);
+          box-shadow: 0 16px 48px rgba(64,120,164, 0.45);
         }
 
         @keyframes fadeSlideDown {
@@ -447,7 +451,7 @@ export default function Home() {
               alt="Cosmic Mind Logo"
               width={500}
               height={200}
-              className="h-32 sm:h-40 md:h-52 w-auto object-contain drop-shadow-[0_0_35px_rgba(180,80,255,0.4)]"
+              className="h-32 sm:h-40 md:h-52 w-auto object-contain drop-shadow-[0_0_35px_rgba(64,120,164,0.4)]"
               priority
             />
           </div>
@@ -455,17 +459,18 @@ export default function Home() {
           <p
             className="animate-hero-2 mb-14 max-w-2xl leading-relaxed"
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Raleway', sans-serif",
               fontSize: "1.45rem",
-              fontWeight: 300,
-              color: "rgba(255,255,255,0.68)",
+              fontWeight: 400,
+              color: "rgba(255, 255, 255, 0.95)",
+              textShadow: "0 2px 4px rgba(0,0,0,0.5)"
             }}
           >
             Uma plataforma inteligente que une diversão com dados e métricas precisas sobre o TDAH.
           </p>
 
           <button 
-            className="animate-hero-3 px-10 py-4 rounded-full bg-gradient-to-r to-cyan-500 from-purple-500 text-white font-bold tracking-[0.2em] hover:to-cyan-600 hover:from-purple-600 hover:scale-105 active:scale-95 transition-all shadow-lg"
+            className="animate-hero-3 px-10 py-4 rounded-full bg-[#4078A4]   text-white font-bold tracking-[0.2em] hover: hover: hover:scale-105 active:scale-95 transition-all shadow-lg"
             onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
           >
             CONHECER
@@ -485,14 +490,14 @@ export default function Home() {
         bottom: "-18px",
         left: "-14px",
         fontSize: "2rem",
-        color: "rgba(130, 60, 220, 0.8)",
+        color: "rgba(30, 58, 138, 0.8)",
         filter: "blur(1px)",
         zIndex: 0,
         pointerEvents: "none",
       }}
       aria-hidden="true"
     >
-      ★
+      <Star className="w-5 h-5 inline-block" />
     </span>
     <img 
       src="/game/game1.jpeg" 
@@ -571,7 +576,7 @@ export default function Home() {
             {}
             <div className="flex flex-col items-center">
               <h3 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-xl text-cyan-400 mb-6 uppercase tracking-wider font-semibold">
-                🌙 Equipe Selenes
+                <Moon className="w-5 h-5 inline-block" /> Equipe Selenes
               </h3>
 
               <div className="relative w-full max-w-sm px-4">
@@ -585,7 +590,7 @@ export default function Home() {
                         <div className={`game-card ${member.bg} p-6 flex flex-col items-center text-center h-[340px] justify-between border border-white/10`}>
 
                           {}
-                          <div className={`w-22 h-22 rounded-full bg-gradient-to-tr ${member.color} flex items-center justify-center shadow-lg shadow-black/45 ring-2 ring-white/15 relative`}>
+                          <div className={`w-22 h-22 rounded-full bg-[#4078A4] ${member.color} flex items-center justify-center shadow-lg shadow-black/45 ring-2 ring-white/15 relative`}>
                             <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
                               <img 
                                 src={member.image} 
@@ -617,14 +622,14 @@ export default function Home() {
                   className="absolute -left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-cyan-500/30 hover:border-cyan-400 text-cyan-400 flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-10"
                   aria-label="Membro Anterior"
                 >
-                  ◀
+                  <ChevronLeft className="w-5 h-5 inline-block" />
                 </button>
                 <button 
                   onClick={() => handleNext("selenes", selenesTeam.length)}
                   className="absolute -right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-cyan-500/30 hover:border-cyan-400 text-cyan-400 flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-10"
                   aria-label="Próximo Membro"
                 >
-                  ▶
+                  <ChevronRight className="w-5 h-5 inline-block" />
                 </button>
 
                 <div className="flex justify-center gap-2 mt-4">
@@ -641,8 +646,8 @@ export default function Home() {
 
             {}
             <div className="flex flex-col items-center">
-              <h3 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-xl text-purple-400 mb-6 uppercase tracking-wider font-semibold">
-                👾 Equipe Spectrum
+              <h3 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-xl text-cyan-400 mb-6 uppercase tracking-wider font-semibold">
+                <Ghost className="w-5 h-5 inline-block" /> Equipe Spectrum
               </h3>
 
               <div className="relative w-full max-w-sm px-4">
@@ -656,7 +661,7 @@ export default function Home() {
                         <div className={`game-card ${member.bg} p-6 flex flex-col items-center text-center h-[340px] justify-between border border-white/10`}>
 
                           {}
-                          <div className={`w-22 h-22 rounded-full bg-gradient-to-tr ${member.color} flex items-center justify-center shadow-lg shadow-black/45 ring-2 ring-white/15 relative`}>
+                          <div className={`w-22 h-22 rounded-full bg-[#4078A4] ${member.color} flex items-center justify-center shadow-lg shadow-black/45 ring-2 ring-white/15 relative`}>
                             <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
                               <img 
                                 src={member.image} 
@@ -674,7 +679,7 @@ export default function Home() {
 
                           <div className="mt-4 flex-grow flex flex-col justify-center">
                             <h4 className="text-white text-lg font-bold tracking-wide">{member.name}</h4>
-                            <p className="text-purple-400 text-xs uppercase tracking-widest font-semibold mt-1 mb-3">{member.role}</p>
+                            <p className="text-cyan-400 text-xs uppercase tracking-widest font-semibold mt-1 mb-3">{member.role}</p>
                             <p className="text-white/60 text-xs font-light px-2 line-clamp-3 leading-relaxed">{member.desc}</p>
                           </div>
                         </div>
@@ -685,17 +690,17 @@ export default function Home() {
 
                 <button 
                   onClick={() => handlePrev("spectrum", spectrumTeam.length)}
-                  className="absolute -left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-purple-500/30 hover:border-purple-400 text-purple-400 flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-10"
+                  className="absolute -left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-cyan-500/30 hover:border-cyan-400 text-cyan-400 flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-10"
                   aria-label="Membro Anterior"
                 >
-                  ◀
+                  <ChevronLeft className="w-5 h-5 inline-block" />
                 </button>
                 <button 
                   onClick={() => handleNext("spectrum", spectrumTeam.length)}
-                  className="absolute -right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-purple-500/30 hover:border-purple-400 text-purple-400 flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-10"
+                  className="absolute -right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-cyan-500/30 hover:border-cyan-400 text-cyan-400 flex items-center justify-center transition-all hover:scale-105 active:scale-95 z-10"
                   aria-label="Próximo Membro"
                 >
-                  ▶
+                  <ChevronRight className="w-5 h-5 inline-block" />
                 </button>
 
                 <div className="flex justify-center gap-2 mt-4">
@@ -703,7 +708,7 @@ export default function Home() {
                     <button
                       key={idx}
                       onClick={() => setSpectrumIndex(idx)}
-                      className={`h-2 rounded-full transition-all duration-300 ${spectrumIndex === idx ? "w-6 bg-purple-400" : "w-2 bg-white/25"}`}
+                      className={`h-2 rounded-full transition-all duration-300 ${spectrumIndex === idx ? "w-6 bg-cyan-400" : "w-2 bg-white/25"}`}
                     />
                   ))}
                 </div>
@@ -722,7 +727,7 @@ export default function Home() {
               <h2 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-3xl text-white mb-6 uppercase tracking-widest">
                 Sobre o Cosmic Mind
               </h2>
-              <p style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-xl text-white/80 leading-relaxed">
+              <p style={{ fontFamily: "'Raleway', sans-serif" }} className="text-xl text-white/80 leading-relaxed">
                 A plataforma tem como objetivo transformar dados gerados dentro do jogo educativo em métricas claras e acessíveis, auxiliando no acompanhamento do desempenho de crianças com TDAH de forma intuitiva e eficiente. 
                 <br /><br />
                 Unindo tecnologia, inclusão e inovação, buscamos criar uma experiência moderna e acolhedora para análise e acompanhamento infantil. 
@@ -732,25 +737,25 @@ export default function Home() {
             {}
             <div style={{ flex: '1 1 450px', maxWidth: '540px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
               <div className="game-card p-5 border-t-2 border-cyan-500/50">
-                <div className="text-cyan-400 mb-2 text-xl">🧠</div>
+                <div className="text-cyan-400 mb-2 text-xl"><Brain className="w-5 h-5 inline-block" /></div>
                 <h4 className="text-white font-bold mb-1 text-sm">Métricas Inteligentes</h4>
                 <p className="text-white/60 text-[11px] text-pretty leading-normal">Análise de desempenho em tempo real para identificar padrões e evolução.</p>
               </div>
 
-              <div className="game-card p-5 border-t-2 border-purple-500/50">
-                <div className="text-purple-400 mb-2 text-xl">🎮</div>
+              <div className="game-card p-5 border-t-2 border-cyan-500/50">
+                <div className="text-cyan-400 mb-2 text-xl"><Gamepad2 className="w-5 h-5 inline-block" /></div>
                 <h4 className="text-white font-bold mb-1 text-sm">Integração Total</h4>
                 <p className="text-white/60 text-[11px] text-pretty leading-normal">Conectado diretamente ao universo lúdico criado pela equipe Spectrum.</p>
               </div>
 
               <div className="game-card p-5 border-t-2 border-cyan-500/50">
-                <div className="text-cyan-400 mb-2 text-xl">📊</div>
+                <div className="text-cyan-400 mb-2 text-xl"><BarChart className="w-5 h-5 inline-block" /></div>
                 <h4 className="text-white font-bold mb-1 text-sm">Dashboard Interativo</h4>
                 <p className="text-white/60 text-[11px] text-pretty leading-normal">Visualização simples de dados complexos para pais e especialistas.</p>
               </div>
 
-              <div className="game-card p-5 border-t-2 border-purple-500/50">
-                <div className="text-purple-400 mb-2 text-xl">✨</div>
+              <div className="game-card p-5 border-t-2 border-cyan-500/50">
+                <div className="text-cyan-400 mb-2 text-xl"><Sparkles className="w-5 h-5 inline-block" /></div>
                 <h4 className="text-white font-bold mb-1 text-sm">Foco em Inclusão</h4>
                 <p className="text-white/60 text-[11px] text-pretty leading-normal">Tecnologia pensada para acessibilidade e suporte ao desenvolvimento infantil.</p>
               </div>
@@ -759,22 +764,22 @@ export default function Home() {
         </section>
 
         {}
-        <section id="contact" className="py-24 relative z-10 px-6 bg-gradient-to-b from-transparent to-purple-900/20">
+        <section id="contact" className="py-24 relative z-10 px-6 bg-[#0B1B3D]/80">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
 
             <div className="flex flex-col justify-center">
               <h2 style={{ fontFamily: "'Orbitron', sans-serif" }} className="text-4xl text-white mb-6 uppercase tracking-tighter">
                 Vamos Conversar?
               </h2>
-              <p style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-xl text-white/70 mb-10 leading-relaxed">
+              <p style={{ fontFamily: "'Raleway', sans-serif" }} className="text-xl text-white/70 mb-10 leading-relaxed">
                 Estamos sempre abertos para sugestões, feedbacks e novas parcerias. 
-                Entre em contato com a equipe Selenes e acompanhe a evolução do <strong>Cosmic Mind</strong>. 💫
+                Entre em contato com a equipe Selenes e acompanhe a evolução do <strong>Cosmic Mind</strong>. <Star className="w-5 h-5 inline-block" />
               </p>
 
               <div className="space-y-6">
                 <div className="flex items-center gap-4 group cursor-pointer">
                   <div className="w-12 h-12 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500/20 transition-all">
-                    📧
+                    <Mail className="w-5 h-5 inline-block" />
                   </div>
                   <div>
                     <p className="text-white/40 text-xs uppercase tracking-widest font-bold">E-mail</p>
@@ -783,8 +788,8 @@ export default function Home() {
                 </div>
 
                 <div className="flex items-center gap-4 group cursor-pointer">
-                  <div className="w-12 h-12 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:bg-purple-500/20 transition-all">
-                    🐙
+                  <div className="w-12 h-12 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500/20 transition-all">
+                    <Code className="w-5 h-5 inline-block" />
                   </div>
                   <div>
                     <p className="text-white/40 text-xs uppercase tracking-widest font-bold">GitHub</p>
@@ -805,13 +810,13 @@ export default function Home() {
                 </div>
                 <div>
                   <label className="text-white/60 text-xs uppercase tracking-widest mb-2 block">E-mail</label>
-                  <input type="email" className="w-full bg-white/5 border border-white/10 rounded-md p-3 text-white focus:outline-none focus:border-purple-500/50 transition-all" placeholder="seu@email.com" />
+                  <input type="email" className="w-full bg-white/5 border border-white/10 rounded-md p-3 text-white focus:outline-none focus:border-cyan-500/50 transition-all" placeholder="seu@email.com" />
                 </div>
                 <div>
                   <label className="text-white/60 text-xs uppercase tracking-widest mb-2 block">Mensagem</label>
                   <textarea rows={4} className="w-full bg-white/5 border border-white/10 rounded-md p-3 text-white focus:outline-none focus:border-cyan-500/50 transition-all resize-none" placeholder="Como podemos ajudar?"></textarea>
                 </div>
-                <button type="button" className="w-full py-4 bg-gradient-to-r from-cyan-600 to-purple-600 text-white font-bold uppercase tracking-widest rounded-full hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-cyan-500/20">
+                <button type="button" className="w-full py-4 bg-[#4078A4]   text-white font-bold uppercase tracking-widest rounded-full hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-cyan-500/20">
                   Enviar Mensagem
                 </button>
               </form>

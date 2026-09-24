@@ -183,11 +183,11 @@ export default function PerfomanceS() {
     <div className="w-full max-w-6xl mx-auto p-5 bg-transparent font-sans text-slate-600 overflow-hidden">
       
       {/* ================= CABEÇALHO GLOBAL DA TELA ================= */}
-      <div className="fixed top-0 left-0 md:left-64 right-0 h-3 bg-gradient-to-r from-[#AC57EB] via-[#4078A4] to-[#3E89AE] z-50" />
+      <div className="fixed top-0 left-0 md:left-64 right-0 h-1.5 bg-[#4078A4] z-50" />
       
       <div className="mb-8 flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-4">
         <div>
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4078A4] to-[#AC57EB] bg-clip-text text-transparent mb-1">
+          <h2 className="text-3xl font-bold bg-[#4078A4]   bg-clip-text text-transparent mb-1">
             Análise Clínica
           </h2>
           <p className="text-slate-400 text-xs font-medium">Acompanhe a evolução cognitiva do seu paciente em tempo real</p>
@@ -197,7 +197,7 @@ export default function PerfomanceS() {
         <button 
           onClick={handleBaixarPDF}
           disabled={!estatisticasPlaneta || isGeneratingPDF}
-          className="flex items-center gap-2 bg-gradient-to-r from-[#4078A4] to-[#3E89AE] hover:brightness-110 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-md transition-all disabled:opacity-50 cursor-pointer"
+          className="flex items-center gap-2 bg-[#4078A4]   hover:brightness-110 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-md transition-all disabled:opacity-50 cursor-pointer"
         >
           {isGeneratingPDF ? (
             <span className="animate-pulse flex items-center gap-2">Processando PDF...</span>
@@ -346,7 +346,7 @@ export default function PerfomanceS() {
                             strokeDasharray={circumference}
                             strokeDashoffset={offset}
                             strokeLinecap="round"
-                            className="transition-all duration-1000 ease-out group-hover:stroke-[#AC57EB]"
+                            className="transition-all duration-1000 ease-out group-hover:stroke-[#4078A4]"
                           />
                         </svg>
                         <div className="absolute flex flex-col items-center leading-none">

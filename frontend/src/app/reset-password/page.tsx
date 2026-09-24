@@ -120,7 +120,7 @@ function RedefinirSenhaForm() {
               value={novaSenha}
               onChange={(e) => setNovaSenha(e.target.value)}
               required
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-12 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all text-slate-800"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-12 text-sm focus:outline-none focus:border-[#4078A4] focus:ring-1 focus:ring-[#4078A4] transition-all text-slate-800"
               placeholder="Ex: SenhaForte@123"
             />
             <button
@@ -129,7 +129,7 @@ function RedefinirSenhaForm() {
               className="absolute right-4 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
               title={showNovaSenha ? "Ocultar senha" : "Mostrar senha"}
             >
-              {showNovaSenha ? <Eye className="w-5 h-5 text-[#AC57EB]" /> : <EyeOff className="w-5 h-5" />}
+              {showNovaSenha ? <Eye className="w-5 h-5 text-[#4078A4]" /> : <EyeOff className="w-5 h-5" />}
             </button>
           </div>
 
@@ -181,7 +181,7 @@ function RedefinirSenhaForm() {
               value={confirmarSenha}
               onChange={(e) => setConfirmarSenha(e.target.value)}
               required
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-12 text-sm focus:outline-none focus:border-[#AC57EB] focus:ring-1 focus:ring-[#AC57EB] transition-all text-slate-800"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-12 text-sm focus:outline-none focus:border-[#4078A4] focus:ring-1 focus:ring-[#4078A4] transition-all text-slate-800"
               placeholder="Repita a senha digitada acima"
             />
             <button
@@ -190,7 +190,7 @@ function RedefinirSenhaForm() {
               className="absolute right-4 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
               title={showConfirmarSenha ? "Ocultar senha" : "Mostrar senha"}
             >
-              {showConfirmarSenha ? <Eye className="w-5 h-5 text-[#AC57EB]" /> : <EyeOff className="w-5 h-5" />}
+              {showConfirmarSenha ? <Eye className="w-5 h-5 text-[#4078A4]" /> : <EyeOff className="w-5 h-5" />}
             </button>
           </div>
 
@@ -206,7 +206,7 @@ function RedefinirSenhaForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-gradient-to-r from-[#AC57EB] to-[#4078A4] text-white py-3 rounded-xl font-bold shadow-md hover:brightness-110 transition-all disabled:opacity-50 mt-6 cursor-pointer"
+          className="w-full bg-[#4078A4]   text-white py-3 rounded-xl font-bold shadow-md hover:brightness-110 transition-all disabled:opacity-50 mt-6 cursor-pointer"
         >
           {loading ? 'Salvando...' : 'Redefinir Senha'}
         </button>
