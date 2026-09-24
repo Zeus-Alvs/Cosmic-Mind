@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react"; 
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface StarPosition {
   top: number;
@@ -438,21 +439,18 @@ export default function Home() {
           </div>
         </header>
 
-        {}
-        <div id="hero" className="flex flex-col items-center text-center px-6 pt-40 pb-20 relative z-10 min-h-[70vh] justify-center">
-          <h1
-            className="animate-hero mb-10"
-            style={{
-              fontFamily: "'Orbitron', sans-serif",
-              fontSize: "clamp(2.5rem, 7vw, 4.5rem)",
-              fontWeight: 700,
-              letterSpacing: "0.05em",
-              lineHeight: 1.1,
-            }}
-          >
-            <span className="brand-cosmic">Cosmic</span>{" "}
-            <span className="brand-mind">Mind</span>
-          </h1>
+        {/* Hero Section */}
+        <div id="hero" className="flex flex-col items-center text-center px-6 pt-28 md:pt-32 pb-20 relative z-10 min-h-[70vh] justify-center">
+          <div className="animate-hero mb-4 -mt-6">
+            <Image
+              src="/logoCM.svg"
+              alt="Cosmic Mind Logo"
+              width={500}
+              height={200}
+              className="h-32 sm:h-40 md:h-52 w-auto object-contain drop-shadow-[0_0_35px_rgba(180,80,255,0.4)]"
+              priority
+            />
+          </div>
 
           <p
             className="animate-hero-2 mb-14 max-w-2xl leading-relaxed"

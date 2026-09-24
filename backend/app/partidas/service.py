@@ -5,6 +5,7 @@ from fastapi import Header, HTTPException
 
 from app.core.database import db
 from app.partidas.repository import find_jogador_by_id, find_session_by_token, update_jogador
+from app.vinculos.service import notificar_rede_do_jogador
 from match_performance_calculator.MatchPerformanceCalculator import MatchPerformanceCalculator
 from models import (
     AtualizarProgressoRequest,
@@ -81,6 +82,15 @@ def salvar_partida(partida: PartidaParaPersistirModel, authorization: str = Head
     else:
         registro_retornado = registro_atual
 
+    # GATILHO DE NOTIFICAÇÃO
+    notificar_rede_do_jogador(
+        id_jogador=id_jogador,
+        tipo="conquista" if pontuacao > 1000 else "info",
+        titulo="Desempenho Brilhante!" if pontuacao > 1000 else "Partida Finalizada",
+        descricao=f"A partida no planeta {partida.planetId} foi concluída com {pontuacao} pontos e {estrelas} estrelas.",
+        link_to="/performance"
+    )
+
     return MelhorPartidaModel(**registro_retornado)
 
 
@@ -111,6 +121,15 @@ def atualizar_progresso(update_data: AtualizarProgressoRequest, authorization: s
         db["jogador"].update_one(
             {"_id": id_jogador},
             {"$push": {"planetas_desbloqueados": update_data.valor}},
+        )
+
+        # GATILHO DE NOTIFICAÇÃO
+        notificar_rede_do_jogador(
+            id_jogador=id_jogador,
+            tipo="novidade",
+            titulo="Nova Fase Desbloqueada!",
+            descricao="O jogador avançou de nível e desbloqueou um novo planeta para explorar.",
+            link_to="/performance"
         )
 
     elif update_data.tipo == "pontuacao":

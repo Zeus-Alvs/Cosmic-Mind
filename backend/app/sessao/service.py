@@ -4,7 +4,9 @@ from datetime import datetime, timedelta, timezone
 from bson import ObjectId
 from fastapi import HTTPException
 
+from app.core.database import db
 from app.core.security import create_player_token
+from app.vinculos.service import notificar_rede_do_jogador
 from app.sessao.repository import (
     find_session_by_pin,
     find_session_by_token,
@@ -59,5 +61,20 @@ def game_login(dados: GameLoginRequest):
             }
         },
     )
+
+    try:
+        id_jogador_obj = ObjectId(sessao["id_jogador"])
+        jogador = db["jogador"].find_one({"_id": id_jogador_obj})
+        nome_jogador = jogador.get("apelido", "O paciente") if jogador else "O paciente"
+
+        notificar_rede_do_jogador(
+            id_jogador=id_jogador_obj,
+            tipo="novidade", 
+            titulo="Jogador Conectado!",
+            descricao=f"{nome_jogador} acabou de entrar no Cosmic Mind e iniciou uma sessão de jogo.",
+            link_to="/performance"
+        )
+    except Exception as e:
+        print(f"Erro ao enviar notificação de login: {e}")
 
     return {"accessToken": token_jwt}

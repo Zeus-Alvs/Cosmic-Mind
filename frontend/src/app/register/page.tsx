@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getApiUrl } from '@/utils/api';
@@ -84,20 +85,52 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-white">
+    <div className="flex h-screen w-full bg-white">
 
-      {}
+      {/* Banner / Painel Esquerdo */}
       <div className="hidden md:flex flex-col justify-center items-start p-16 w-1/2 bg-gradient-to-br from-purple-500 to-blue-400 text-white relative overflow-hidden">
-        <h1 className="text-4xl font-bold mb-8">Já tem uma<br />conta?</h1>
-        <Link href="/login" className="flex items-center px-6 py-3 border-2 border-white rounded-full hover:bg-white hover:text-purple-500 transition font-medium">
+        {/* Logo / Âncora para Landpage */}
+        <Link href="/" className="absolute top-6 left-1/2 -translate-x-1/2 z-20 group transition transform hover:scale-105">
+          <Image 
+            src="/logoCM.svg" 
+            alt="Cosmic Mind Logo" 
+            width={300} 
+            height={150} 
+            className="h-28 md:h-36 w-auto object-top object-contain drop-shadow-md"
+            priority
+          />
+        </Link>
+
+        {/* Estrelas SVG de fundo */}
+        <svg className="absolute top-12 left-10 w-6 h-6 text-white/40 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 16.8l-6.3 4.6 2.3-7.4-6-4.6h7.6z" />
+        </svg>
+        <svg className="absolute top-24 right-16 w-4 h-4 text-white/30" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 16.8l-6.3 4.6 2.3-7.4-6-4.6h7.6z" />
+        </svg>
+        <svg className="absolute bottom-16 right-12 w-8 h-8 text-white/50 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 16.8l-6.3 4.6 2.3-7.4-6-4.6h7.6z" />
+        </svg>
+        <svg className="absolute bottom-28 left-16 w-5 h-5 text-white/35" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 16.8l-6.3 4.6 2.3-7.4-6-4.6h7.6z" />
+        </svg>
+        <svg className="absolute top-1/2 right-8 w-5 h-5 text-white/25" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 16.8l-6.3 4.6 2.3-7.4-6-4.6h7.6z" />
+        </svg>
+        <svg className="absolute top-1/3 left-1/3 w-3 h-3 text-white/20" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 16.8l-6.3 4.6 2.3-7.4-6-4.6h7.6z" />
+        </svg>
+
+        <h1 className="text-4xl font-bold mb-8 relative z-10">Já tem uma<br />conta?</h1>
+        <Link href="/login" className="flex items-center px-6 py-3 border-2 border-white rounded-full hover:bg-white hover:text-purple-500 transition font-medium relative z-10">
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
           Acesse já
         </Link>
       </div>
 
-      {}
-      <div className="flex flex-col justify-center items-center w-full md:w-1/2 p-8 my-auto">
-        <div className="w-full max-w-md">
+      {/* Formulário / Painel Direito */}
+      <div className="flex flex-col items-center w-full md:w-1/2 p-6 md:p-8 overflow-y-auto">
+        <div className="w-full max-w-md my-auto">
           <div className="text-center mb-6">
             <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500 mb-2">Cadastrar</h2>
             <p className="text-slate-500 text-sm">Preencha os dados e escolha o seu tipo de usuário.</p>

@@ -186,13 +186,12 @@
             {/* Logo */}
             <div className="pt-10 pb-6 px-6 flex items-center justify-center border-b border-slate-700/50">
               <Image
-                src="/icons/logo.png"
+                src="/logoCM.svg"
                 alt="Cosmic Mind"
-                width={150}
-                height={40}
+                width={120}
+                height={35}
                 priority
-                className="hover:scale-105 transition-transform"
-                style={{ width: 'auto', height: 'auto' }}
+                className="hover:scale-105 transition-transform w-28 md:w-32 h-auto"
               />
             </div>
 

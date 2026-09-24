@@ -35,6 +35,16 @@ def criar_notificacao(id_destino, tipo: str, titulo: str, descricao: str, link_t
     })
 
 
+def notificar_rede_do_jogador(id_jogador, tipo: str, titulo: str, descricao: str, link_to: str = None):
+    """Encontra responsáveis e especialistas vinculados ao jogador e notifica todos."""
+    if isinstance(id_jogador, str):
+        id_jogador = ObjectId(id_jogador)
+        
+    usuarios_interessados = usuarios.find({"jogadores_vinculados": id_jogador})
+    for usuario in usuarios_interessados:
+        criar_notificacao(usuario["_id"], tipo, titulo, descricao, link_to)
+
+
 def solicitar_vinculo(dados: SolicitarVinculo, current_user: dict):
     if current_user.get("tipo_perfil") != "especialista":
         raise HTTPException(status_code=403, detail="Apenas especialistas podem solicitar vínculos.")

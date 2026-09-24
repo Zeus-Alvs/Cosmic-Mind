@@ -16,6 +16,7 @@ from app.jogadores.repository import (
     update_jogador_by_id,
     update_sessao_expiration,
 )
+from app.vinculos.service import notificar_rede_do_jogador
 from models import ExcluirJogador, JogadorCadastro, JogadorUpdate
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -52,6 +53,15 @@ def criar_jogador(id_usuario: str, dados: JogadorCadastro, current_user: dict):
     id_novo_jogador = resultado.inserted_id
 
     add_jogador_ao_usuario(ObjectId(id_usuario), id_novo_jogador)
+
+    from app.vinculos.service import criar_notificacao
+    criar_notificacao(
+        id_destino=ObjectId(id_usuario),
+        tipo="info",
+        titulo="Novo Perfil Criado",
+        descricao=f"O perfil do jogador {dados.apelido} foi criado e vinculado à sua conta com sucesso.",
+        link_to="/performance"
+    )
 
     return {
         "message": "Jogador criado com sucesso.",
@@ -98,6 +108,21 @@ def desconectar_jogador(id_jogador: str, current_user: dict):
         raise HTTPException(status_code=404, detail="Sessão não encontrada.")
 
     update_sessao_expiration(id_jogador, datetime.now(timezone.utc))
+
+    try:
+        id_jogador_obj = ObjectId(id_jogador)
+        jogador = db["jogador"].find_one({"_id": id_jogador_obj})
+        nome_jogador = jogador.get("apelido", "O paciente") if jogador else "O paciente"
+
+        notificar_rede_do_jogador(
+            id_jogador=id_jogador_obj,
+            tipo="pausa",
+            titulo="Sessão Encerrada",
+            descricao=f"A conexão do jogo de {nome_jogador} foi encerrada pelo painel.",
+            link_to=None
+        )
+    except Exception as e:
+        print(f"Erro ao enviar notificação de desconexão: {e}")
 
     return {"message": "Dispositivos desconectados com sucesso."}
 
